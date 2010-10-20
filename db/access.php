@@ -1,0 +1,5 @@
+<?php
+
+$capabilities = array(
+
+);
