@@ -34,7 +34,7 @@ global $CFG;
 require_once($CFG->dirroot.'/plagiarism/lib.php');
 
 ///// Turnitin Class ////////////////////////////////////////////////////
-class plagiarism_plugin_new extends plagiarism_plugin {
+class plagiarism_plugin_moss extends plagiarism_plugin {
      /**
      * hook to allow plagiarism specific information to be displayed beside a submission 
      * @param array  $linkarraycontains all relevant information for the plugin to generate a link
