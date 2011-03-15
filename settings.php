@@ -26,11 +26,11 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     require_once(dirname(dirname(__FILE__)) . '/../config.php');
     require_once($CFG->libdir.'/adminlib.php');
     require_once($CFG->libdir.'/plagiarismlib.php');
-    require_once($CFG->dirroot.'/plagiarism/new/lib.php');
-    require_once($CFG->dirroot.'/plagiarism/new/plagiarism_form.php');
+    require_once($CFG->dirroot.'/plagiarism/moss/lib.php');
+    require_once($CFG->dirroot.'/plagiarism/moss/plagiarism_form.php');
 
     require_login();
-    admin_externalpage_setup('plagiarismnew');
+    admin_externalpage_setup('plagiarismmoss');
 
     $context = get_context_instance(CONTEXT_SYSTEM);
 
@@ -38,7 +38,7 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
 
     require_once('plagiarism_form.php');
     $mform = new plagiarism_setup_form();
-    $plagiarismplugin = new plagiarism_plugin_new();
+    $plagiarismplugin = new plagiarism_plugin_moss();
 
     if ($mform->is_cancelled()) {
         redirect('');
@@ -47,11 +47,11 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     echo $OUTPUT->header();
 
     if (($data = $mform->get_data()) && confirm_sesskey()) {
-        if (!isset($data->new_use)) {
-            $data->new_use = 0;
+        if (!isset($data->moss_use)) {
+            $data->moss_use = 0;
         }
         foreach ($data as $field=>$value) {
-            if (strpos($field, 'new')===0) {
+            if (strpos($field, 'moss')===0) {
                 if ($tiiconfigfield = $DB->get_record('config_plugins', array('name'=>$field, 'plugin'=>'plagiarism'))) {
                     $tiiconfigfield->value = $value;
                     if (! $DB->update_record('config_plugins', $tiiconfigfield)) {
@@ -68,7 +68,7 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
                 }
             }
         }
-        notify(get_string('savedconfigsuccess', 'plagiarism_new'), 'notifysuccess');
+        notify(get_string('savedconfigsuccess', 'plagiarism_moss'), 'notifysuccess');
     }
     $plagiarismsettings = (array)get_config('plagiarism');
     $mform->set_data($plagiarismsettings);
@@ -77,3 +77,5 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     $mform->display();
     echo $OUTPUT->box_end();
     echo $OUTPUT->footer();
+
+

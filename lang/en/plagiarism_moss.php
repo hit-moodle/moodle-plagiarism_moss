@@ -28,3 +28,11 @@ $string['mossexplain'] = 'For more information on this plugin see: ';
 $string['moss'] = 'moss plagiarism plugin';
 $string['usemoss'] ='Enable moss';
 $string['savedconfigsuccess'] = 'Plagiarism Settings Saved';
+
+$string['activateentry'] = 'Activate entry';
+$string['filename'] = 'File name';
+$string['language'] = 'Programming language';
+$string['sensitivity'] = 'Sensitivity';
+$string['sensitivity_help'] = 'Moss needs a specific sensitivity value to conduct anti-plagiarism process, the value indicate the sensitivity of the engine';
+$string['basefile'] = 'Base file';
+$string['basefile_help'] = 'Moss normally reports all code that matches in pairs of files. but when a base file is supplied, program code that appears in the base file will not counted in matches';
