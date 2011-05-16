@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['studentdisclosuredefault']  ='All files uploaded will be submitted to a plagiarism detection service';
+$string['studentdisclosuredefault']  ='All files uploaded will be submitted to a moss plagiarism detection service';
 $string['studentdisclosure'] = 'Student Disclosure';
 $string['studentdisclosure_help'] = 'This text will be displayed to all students on the file upload page.';
 $string['mossexplain'] = 'For more information on this plugin see: ';
@@ -29,8 +29,10 @@ $string['moss'] = 'moss plagiarism plugin';
 $string['usemoss'] ='Enable moss';
 $string['savedconfigsuccess'] = 'Plagiarism Settings Saved';
 
+$string['activatemoss'] = 'Activate moss plagiarism';
+$string['tag'] = 'tag';
 $string['activateentry'] = 'Activate entry';
-$string['filename'] = 'File name';
+$string['filepattern'] = 'File pattern';
 $string['language'] = 'Programming language';
 $string['sensitivity'] = 'Sensitivity';
 $string['sensitivity_help'] = 'Moss needs a specific sensitivity value to conduct anti-plagiarism process, the value indicate the sensitivity of the engine';

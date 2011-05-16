@@ -27,25 +27,75 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     require_once($CFG->libdir.'/adminlib.php');
     require_once($CFG->libdir.'/plagiarismlib.php');
     require_once($CFG->dirroot.'/plagiarism/moss/lib.php');
-    require_once($CFG->dirroot.'/plagiarism/moss/plagiarism_form.php');
+    require_once($CFG->dirroot.'/lib/formslib.php');
 
+    class moss_enable_form extends moodleform {
+
+    	function definition () {
+            global $CFG;
+
+            $mform =& $this->_form;
+            $choices = array('No','Yes');
+            $helplink = get_string('mossexplain', 'plagiarism_moss');
+            $helplink .= '<a href='.$CFG->wwwroot.'/plagiarism/moss/help.php></a>';
+            $mform->addElement('html', $helplink);
+            
+            $mform->addElement('checkbox', 'moss_use', get_string('usemoss', 'plagiarism_moss'));
+
+            $mform->addElement('textarea', 'moss_student_disclosure', get_string('studentdisclosure','plagiarism_moss'),'wrap="virtual" rows="6" cols="50"');
+            $mform->addHelpButton('moss_student_disclosure', 'studentdisclosure', 'plagiarism_moss');
+            $mform->setDefault('moss_student_disclosure', get_string('studentdisclosuredefault','plagiarism_moss'));
+
+            $mform->addElement('text','default_entry','Default entry number');
+            $mform->addHelpButton('default_entry','adsf');
+            
+            $yesnooptions = array(0 => get_string("yes"), 1 => get_string("no"));
+            
+            $mform->addElement('select','log','Enabel log',$yesnooptions);
+            $mform->addHelpButton('log','adsf');
+            
+            $mform->addElement('select','run','Rerun after settings changed',$yesnooptions);
+            $mform->addHelpButton('run','adsf');
+            
+            $mform->addElement('select','send','Send user Email',$yesnooptions);
+            $mform->addHelpButton('send','adsf');
+            
+            $mossoptions = array(0 => get_string("never"), 1 => get_string("always"));
+            $mform->addElement('select', 'plagiarism_show_student_text', 'Show similarity text to student', $mossoptions);
+            $mform->addHelpButton('plagiarism_show_student_text', 'showstudentstext');
+            $mform->addElement('select', 'plagiarism_show_student_result_detail', 'Show result detail to student', $mossoptions);
+            $mform->addHelpButton('plagiarism_show_student_result_detail',  'plagiarism_turnitin');
+        
+            
+            $mform->addElement('select', 'cross_anti_plagiarism','Enable cross course detection',$yesnooptions);
+            $mform->addHelpButton('cross_anti_plagiarism',  'plagiarism_turnitin');
+            
+            $this->add_action_buttons(true);
+        }
+    }
+    
     require_login();
     admin_externalpage_setup('plagiarismmoss');
-
     $context = get_context_instance(CONTEXT_SYSTEM);
-
     require_capability('moodle/site:config', $context, $USER->id, true, "nopermissions");
 
-    require_once('plagiarism_form.php');
-    $mform = new plagiarism_setup_form();
+    $mform = new moss_enable_form();
     $plagiarismplugin = new plagiarism_plugin_moss();
+    
+    $currenttab='tab1';
+    $tabs = array();
+    $tabs[] = new tabobject('tab1', 'settings.php', 'Moss general settings', 'General_settings', false);
+    $tabs[] = new tabobject('tab2', 'log.php', 'Moss error log', 'Error_log', false);
+    $tabs[] = new tabobject('tab3', 'backup.php', 'Plugin backup', 'Plugin_backup', false);
+    
 
     if ($mform->is_cancelled()) {
         redirect('');
     }
 
     echo $OUTPUT->header();
-
+    print_tabs(array($tabs), $currenttab);
+    
     if (($data = $mform->get_data()) && confirm_sesskey()) {
         if (!isset($data->moss_use)) {
             $data->moss_use = 0;
@@ -70,12 +120,12 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
         }
         notify(get_string('savedconfigsuccess', 'plagiarism_moss'), 'notifysuccess');
     }
+
     $plagiarismsettings = (array)get_config('plagiarism');
     $mform->set_data($plagiarismsettings);
     
-    echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+    echo $OUTPUT->box_start();
     $mform->display();
     echo $OUTPUT->box_end();
     echo $OUTPUT->footer();
-
 
