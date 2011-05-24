@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="plagiarism/moss/db" VERSION="20110408" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="moss_settings" COMMENT="moss settings for specific assignment" NEXT="moss_tags">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
+        <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="cmid" NEXT="language"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="sensitivity"/>
+        <FIELD NAME="sensitivity" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="language" NEXT="basefilename"/>
+        <FIELD NAME="basefilename" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="sensitivity" NEXT="measuredtime"/>
+        <FIELD NAME="measuredtime" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="basefilename"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="moss_tags" COMMENT="tags to identify assignments with same task" PREVIOUS="moss_settings" NEXT="moss_results">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="tag"/>
+        <FIELD NAME="tag" TYPE="char" LENGTH="250" NOTNULL="false" SEQUENCE="false" PREVIOUS="id" NEXT="cmid"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="tag"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="moss_results" COMMENT="place to store moss result" PREVIOUS="moss_tags">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
+        <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="cmid" NEXT="confirmed"/>
+        <FIELD NAME="confirmed" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="notuserid"/>
+        <FIELD NAME="notuserid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="如果本条记录有学生不属于本cm，则notuserid记录了这个学生的id 如果两个学生都属于本cm，则置null" PREVIOUS="confirmed" NEXT="rank"/>
+        <FIELD NAME="rank" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="notuserid" NEXT="user1id"/>
+        <FIELD NAME="user1id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rank" NEXT="user2id"/>
+        <FIELD NAME="user2id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user1id" NEXT="user1percent"/>
+        <FIELD NAME="user1percent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user2id" NEXT="user2percent"/>
+        <FIELD NAME="user2percent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user1percent" NEXT="linecount"/>
+        <FIELD NAME="linecount" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user2percent" NEXT="link"/>
+        <FIELD NAME="link" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" PREVIOUS="linecount"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
