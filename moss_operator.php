@@ -2,43 +2,48 @@
 //include file operator class
 require_once($CFG->dirroot.'/plagiarism/moss/file_operator.php');
 
-class moss_operator{
- 
+class moss_operator
+{ 
 	/**
 	 * this function will connect moss server and save anti-plagiarism results
 	 * 
 	 * @param unknown_type $cmid
 	 */
-    public function connect_moss($cmid){
-    	global $CFG;
+    public function connect_moss($cmid)
+    {
+        global $CFG;
+
+        //delete previous results
+        $this->delete_result($cmid);
     	
-    	//delete previous results
-    	$this->delete_result($cmid);
-    	
-    	//prepare file directory (move student files to a moss-readable path)
+        //prepare file directory (move student files to a moss-readable path)
         $file_op = new file_operator();
-        if(!$file_op->prepare_files($cmid)){
+        if(!$file_op->prepare_files($cmid))
+        {
             mtrace('准备temp文件错误，cmid = '.$cmid);
             return false;
         }
         
         //prepare moss's shell command
         $cmdarray = $this->prepare_cmd($cmid);
-        if(empty($cmdarray)){
-        	$file_op->delete_temp_directory($CFG->dataroot.'/moss/');
+        if(empty($cmdarray))
+        {
+            $file_op->delete_temp_directory($CFG->dataroot.'/moss/');
             mtrace('准备cmd错误, cmid = '.$cmid);
             return false;
         }
         
         //connect moss server and save results
-        foreach($cmdarray as $filepattern => $cmd){
-        	mtrace('moss命令： '.$cmd);
+        foreach($cmdarray as $filepattern => $cmd)
+        {
+            mtrace('moss命令： '.$cmd);
             $descriptorspec = array(0 => array('pipe', 'r'),  // stdin 
                                     1 => array('pipe', 'w'),  // stdout
                                     2 => array('pipe', 'w') // stderr
                                    );
             $proc = proc_open($command, $descriptorspec, $pipes);
-            if (!is_resource($proc)) {
+            if (!is_resource($proc)) 
+            {
                 $file_op->delete_temp_directory($CFG->dataroot.'/moss/');
                 mtrace("proc_open 错误"); 
                 return false;
@@ -49,21 +54,26 @@ class moss_operator{
             mtrace($out);
             mtrace($err);
             $count = proc_close($proc);
-            if($count){
-            	$file_op->delete_temp_directory($CFG->dataroot.'/moss/');
+            if($count)
+            {
+                $file_op->delete_temp_directory($CFG->dataroot.'/moss/');
                 mtrace("proc_close 错误");
                 return false;
             } 
-            else{
+            else
+            {
         	    $url_p = '/http:\/\/moss\.stanford\.edu\/results\/\d+/';
-        	    if(preg_match($url_p, $out, $match)){
-        	        if(!$this->save_result($match[0], $cmid, $filepattern)){
+        	    if(preg_match($url_p, $out, $match))
+                {
+        	        if(!$this->save_result($match[0], $cmid, $filepattern))
+        	        {
                         $file_op->delete_temp_directory($CFG->dataroot.'/moss/');
-        	        	return false;
+        	            return false;
         	        }
         	    }
-        	    else{
-        	    	$file_op->delete_temp_directory($CFG->dataroot.'/moss/');
+        	    else
+        	    {
+        	        $file_op->delete_temp_directory($CFG->dataroot.'/moss/');
         	        mtrace("找不到moss结果链接");
         	        return false;
         	    }
@@ -83,20 +93,23 @@ class moss_operator{
      * Enter description here ...
      * @param unknown_type $cmid
      */
-    private function prepare_cmd($cmid){
+    private function prepare_cmd($cmid)
+    {
         global $DB;
         global $CFG;
         $cmdarray = array();
         
         //get moss settings
         $settings = $DB->get_records('moss_settings', array('cmid'=>$cmid));
-        if(!isset($settings)){
+        if(!isset($settings))
+        {
             mtrace('找不到moss设置，cmid = '.$cmid);
             return $cmdarray;
         }
            
         //prepare $cmd and save in $cmdarray
-        foreach($settings as $setting){
+        foreach($settings as $setting)
+        {
             $cmd = $CFG->dirroot.'/plagiarism/moss/moss/moss_bash';
             $cmd .= ' -l '.$setting->language;
             $cmd .= ' -m '.$setting->sensitivity;
@@ -122,9 +135,11 @@ class moss_operator{
      * @param unknown_type $cmid
      * @param unknown_type $filepattern
      */
-    private function save_result($moss_result_url, $cmid, $filepattern){
+    private function save_result($moss_result_url, $cmid, $filepattern)
+    {
         $fp = fopen($moss_result_url, 'r');
-        if(!$fp){
+        if(!$fp)
+        {
             mtrace('打开url = '.$moss_result_url.' 错误');
             return false;
         }
@@ -134,13 +149,17 @@ class moss_operator{
         //TODO /var/moodledata应该改用$CFG.dirroot
         $re_url = '/(http:\/\/moss\.stanford\.edu\/results\/\d+\/match\d+\.html)">\/var\/moodledata\/moss\/(\d+)\/(\d+)\/ \((\d+)%\)/';
         
-        while(!feof($fp)){
+        while(!feof($fp))
+        {
             $line = fgets($fp);
-            if(preg_match($re_url, $line, $matches1)){//学生一
+            if(preg_match($re_url, $line, $matches1))//学生一
+            {
                 $line = fgets($fp);
-                if(preg_match($re_url, $line, $matches2)){//学生二
+                if(preg_match($re_url, $line, $matches2))//学生二
+                {
                     $line = fgets($fp);
-                    if(preg_match('/(\d+)/', $line, $matches3)){//行数      	
+                    if(preg_match('/(\d+)/', $line, $matches3))//行数     
+                    { 	
                         //两个学生都不属于本cm 
                     	if(($matches1[2] != $cmid) && ($matches2[2] != $cmid))
                             continue;
@@ -179,7 +198,8 @@ class moss_operator{
      * 参数：  $cmid
      * 返回：  无
      */
-    private function delete_result($cmid){
+    private function delete_result($cmid)
+    {
         global $DB;
         $DB->delete_records('moss_results', array('cmid' => $cmid));
     }

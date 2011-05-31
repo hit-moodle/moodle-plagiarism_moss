@@ -100,8 +100,8 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     	//called at top of submissions/grading pages - allows printing of admin style links or updating status
         //echo '<div class="allcoursegrades"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id . '">'
         //        . get_string('seeallcoursegrades', 'grades') . '</a></div>';
-        
-        echo '<a href="http://localhost/moodle/plagiarism/moss/test/test.php">anti-plagiarism verify page</a>';
+      
+        echo '<a href="http://localhost/moodle/plagiarism/moss/test/test.php?id='.$cm->id.'">anti-plagiarism verify page</a>';
        
     }
     
