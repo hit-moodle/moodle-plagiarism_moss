@@ -101,7 +101,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         //echo '<div class="allcoursegrades"><a href="' . $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id . '">'
         //        . get_string('seeallcoursegrades', 'grades') . '</a></div>';
       
-        echo '<a href="http://localhost/moodle/plagiarism/moss/test/test.php?id='.$cm->id.'">anti-plagiarism verify page</a>';
+        echo '<a href="http://localhost/moodle/plagiarism/moss/result_pages/view_all.php?id='.$cm->id.'">anti-plagiarism verify page</a>';
        
     }
     
