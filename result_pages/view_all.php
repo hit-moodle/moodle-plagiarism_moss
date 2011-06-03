@@ -5,6 +5,7 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
 require_once($CFG->dirroot.'/lib/form/button.php');
 require_once($CFG->libdir.'/tablelib.php');
+global $CFG;
 
 class view_all_filter_form extends moodleform 
 {
@@ -141,6 +142,8 @@ echo html_writer::table($table);
 echo $OUTPUT->footer();
 ?>
 
+
+
 <head>
 <script type="text/javascript">
 
@@ -221,6 +224,28 @@ function confirm(element)
 function unconfirm(element)
 {
 	alert(element.parentNode.parentNode.id);
+}
+
+function connect_server(pageid, requestid, value)
+{
+    if (window.XMLHttpRequest)
+    {   // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+    }
+    else
+    {   // code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xmlhttp.onreadystatechange=function()
+    {
+        if(xmlhttp.readyState==4 && xmlhttp.status==200)
+        {
+            //document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
+        }
+    }
+    xmlhttp.open("GET","javascript.php?pid="+pageid+"&rid="+requestid+"&value="+value,true);
+    xmlhttp.send();
 }
 </script>
 </head>

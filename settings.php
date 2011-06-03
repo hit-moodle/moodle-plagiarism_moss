@@ -29,13 +29,19 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     require_once($CFG->dirroot.'/plagiarism/moss/lib.php');
     require_once($CFG->dirroot.'/lib/formslib.php');
 
-    class moss_enable_form extends moodleform {
+    class moss_enable_form extends moodleform 
+    {
 
-    	function definition () {
+    	function definition () 
+        {
             global $CFG;
+            global $DB;
 
             $mform =& $this->_form;
-            $choices = array('No','Yes');
+            $choices = array('YES','NO');
+            $yesnooptions = array(0 => "NO", 1 => "YES");
+            $mossoptions = array(0 => "NEVER", 1 => "ALWAYS");
+            
             $helplink = get_string('mossexplain', 'plagiarism_moss');
             $helplink .= '<a href='.$CFG->wwwroot.'/plagiarism/moss/help.php></a>';
             $mform->addElement('html', $helplink);
@@ -45,32 +51,64 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
             $mform->addElement('textarea', 'moss_student_disclosure', get_string('studentdisclosure','plagiarism_moss'),'wrap="virtual" rows="6" cols="50"');
             $mform->addHelpButton('moss_student_disclosure', 'studentdisclosure', 'plagiarism_moss');
             $mform->setDefault('moss_student_disclosure', get_string('studentdisclosuredefault','plagiarism_moss'));
+            $mform->disabledIf('moss_student_disclosure', 'moss_use');
 
             $mform->addElement('text','default_entry','Default entry number');
+            $mform->addRule('default_entry', null, 'numeric', null, 'client');
             $mform->addHelpButton('default_entry','adsf');
+            $mform->disabledIf('default_entry', 'moss_use');
             
-            $yesnooptions = array(0 => get_string("yes"), 1 => get_string("no"));
+            $mform->addElement('select','enable_log','Enabel log',$yesnooptions);
+            $mform->addHelpButton('enable_log', 'adsf');
+            $mform->disabledIf('enable_log', 'moss_use');
             
-            $mform->addElement('select','log','Enabel log',$yesnooptions);
-            $mform->addHelpButton('log','adsf');
+            $mform->addElement('select','rerun','Rerun after settings changed',$yesnooptions);
+            $mform->addHelpButton('rerun', 'adsf');
+            $mform->disabledIf('rerun', 'moss_use');
             
-            $mform->addElement('select','run','Rerun after settings changed',$yesnooptions);
-            $mform->addHelpButton('run','adsf');
+            $mform->addElement('select','send_email','Send Email to students',$yesnooptions);
+            $mform->addHelpButton('send_email', 'adsf');
+            $mform->disabledIf('send_email', 'moss_use');
             
-            $mform->addElement('select','send','Send user Email',$yesnooptions);
-            $mform->addHelpButton('send','adsf');
+            $mform->addElement('select', 'show_text', 'Show similarity text to student', $mossoptions);
+            $mform->addHelpButton('show_text', 'showstudentstext');
+            $mform->disabledIf('show_text', 'moss_use');
             
-            $mossoptions = array(0 => get_string("never"), 1 => get_string("always"));
-            $mform->addElement('select', 'plagiarism_show_student_text', 'Show similarity text to student', $mossoptions);
-            $mform->addHelpButton('plagiarism_show_student_text', 'showstudentstext');
-            $mform->addElement('select', 'plagiarism_show_student_result_detail', 'Show result detail to student', $mossoptions);
-            $mform->addHelpButton('plagiarism_show_student_result_detail',  'plagiarism_turnitin');
-        
+            $mform->addElement('select', 'show_entrys', 'Show result entrys to student', $mossoptions);
+            $mform->addHelpButton('show_entrys', 'plagiarism_moss');
+            $mform->disabledIf('show_entrys', 'moss_use');
             
-            $mform->addElement('select', 'cross_anti_plagiarism','Enable cross course detection',$yesnooptions);
-            $mform->addHelpButton('cross_anti_plagiarism',  'plagiarism_turnitin');
+            $mform->addElement('select', 'cross_detection','Enable cross course detection',$yesnooptions);
+            $mform->addHelpButton('cross_detection', 'plagiarism_moss');
+            $mform->disabledIf('cross_detection', 'moss_use');
             
             $this->add_action_buttons(true);
+            
+            $default_setting = array('entryno'=> 3,'log'=> 1,'rerun'=> 1,'email'=> 0,'text'=> 0,'entrys'=> 1,'cross'=> 1);
+            $old_setting = $DB->get_record('moss_plugin_setting', array('id'=>1));
+            
+            if($old_setting != null)
+            {
+                $DB->delete_records('moss_plugin_setting', array('id'=>1));
+                $mform->setDefault('default_entry',$old_setting->entryno);	
+                $mform->setDefault('enable_log',$old_setting->log);
+                $mform->setDefault('rerun', $old_setting->rerun);
+                $mform->setDefault('send_email', $old_setting->email);
+                $mform->setDefault('show_text', $old_setting->text);
+                $mform->setDefault('show_entrys', $old_setting->entrys);
+                $mform->setDefault('cross_detection', $old_setting->cross);
+            }
+            else
+            {
+                $mform->setDefault('default_entry',$default_setting['entryno']);	
+                $mform->setDefault('enable_log',$default_setting['log']);
+                $mform->setDefault('rerun', $default_setting['rerun']);
+                $mform->setDefault('send_email', $default_setting['email']);
+                $mform->setDefault('show_text', $default_setting['text']);
+                $mform->setDefault('show_entrys', $default_setting['entrys']);
+                $mform->setDefault('cross_detection', $default_setting['cross']);
+            }
+            
         }
     }
     
@@ -87,7 +125,6 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     $tabs[] = new tabobject('tab1', 'settings.php', 'Moss general settings', 'General_settings', false);
     $tabs[] = new tabobject('tab2', 'log.php', 'Moss error log', 'Error_log', false);
     $tabs[] = new tabobject('tab3', 'backup.php', 'Plugin backup', 'Plugin_backup', false);
-    
 
     if ($mform->is_cancelled()) {
         redirect('');
@@ -96,7 +133,20 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     echo $OUTPUT->header();
     print_tabs(array($tabs), $currenttab);
     
-    if (($data = $mform->get_data()) && confirm_sesskey()) {
+    if (($data = $mform->get_data()) && confirm_sesskey())
+    {  	
+        $newsetting = new object();
+        $newsetting->entryno = (int)($data->default_entry);
+        $newsetting->log = (int)($data->enable_log);
+        $newsetting->rerun = (int)($data->rerun);
+        $newsetting->email = (int)($data->send_email);
+        $newsetting->text = (int)($data->show_text);
+        $newsetting->entrys = (int)($data->show_entrys);
+        $newsetting->cross = (int)($data->cross_detection);
+        $DB->insert_record('moss_plugin_setting', $newsetting);
+        //print_object($newsetting);
+       // die;
+        
         if (!isset($data->moss_use)) {
             $data->moss_use = 0;
         }
@@ -118,6 +168,7 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
                 }
             }
         }
+        
         notify(get_string('savedconfigsuccess', 'plagiarism_moss'), 'notifysuccess');
     }
 
