@@ -45,23 +45,23 @@
         foreach($DB_results as $entry)
         {
             //unsolved
-    	    if($entry->status == 0)
-    	    {
-    		    $status = "Unsolved"; 	
-    		    $status_button = '<button type="button" onclick = test(this)>test</button>';
-    	    }
-    	    else 
-    	    {
-    		    $status = "Solved";
-    		    $status_button = '';
-    	    }
-    	    $row1 = new html_table_row(array(
-    	                                    $entry->errordate,
-    	                                    $entry->type,
-    	                                    $entry->describtion,
-    	                                    $status,
-    	                                    $status_button
-    	                                    ));
+            if($entry->status == 0)
+            {
+                $status = "Unsolved"; 	
+                $status_button = '<button type="button" onclick = test(this)>test</button>';
+            }
+            else 
+            {
+                $status = "Solved";
+                $status_button = '';
+            }
+            $row1 = new html_table_row(array(
+                                            $entry->errordate,
+                                            $entry->type,
+                                            $entry->describtion,
+                                            $status,
+                                            $status_button
+                                            ));
             $row1->id = $entry->id;
             if($entry->status == 0)
                 $row1->style = 'color:red';

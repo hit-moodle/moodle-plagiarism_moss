@@ -1,4 +1,3 @@
-
 <?php 
 require_once(dirname(dirname(__FILE__)) . '/../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -19,7 +18,7 @@ class view_all_filter_form extends moodleform
     }
 }
 
-function initial_table($DB_result)
+function initial_table($DB_results)
 {
     $table = new html_table();
     $table->id = 'view_all_table';
@@ -64,17 +63,17 @@ function initial_table($DB_result)
     $table->align = array ("center","center", "center", "left","center", "center", "center","center" ,"center");
     $table->width = "100%";
 	
-    foreach($DB_result as $entry)
+    foreach($DB_results as $entry)
     {
     	if($entry->confirmed == 1)
     	{
     		$status = "confirmed"; 	
-    		$status_button = '<button type="button" onclick = unconfirm(this)>Cancel'.$entry->rank.'</button>';
+    		$status_button = '<button type="button" onclick = unconfirm(this)>Cancel</button>';
     	}
     	else 
     	{
     		$status = "unconfirmed";
-    		$status_button = '<button type="button" onclick = confirm(this)>Confirm'.$entry->rank.'</button>';
+    		$status_button = '<button type="button" onclick = confirm(this)>Confirm</button>';
     	}
     	$row1 = new html_table_row(array(
     	                                $entry->rank,
@@ -83,7 +82,7 @@ function initial_table($DB_result)
     	                                $entry->user2id,
     	                                $entry->user2percent,
     	                                $entry->linecount,
-    	                                '<button type="button" onclick = view_code("'.$entry->link.'")>View code</button>',
+    	                                '<button type="button" onclick = view_code(this,"'.$entry->link.'")>View code</button>',
     	                                $status_button,
     	                                $status
     	                                )
@@ -95,6 +94,19 @@ function initial_table($DB_result)
             $row1->style = 'color:black';
         $table->data[] = $row1;
     }
+    return $table;
+}
+
+function initial_table2()
+{
+    $table = new html_table();
+    $table->align = array ("center","center");
+    $row1 = new html_table_row(array(
+                                    '<button type="button" onclick = undo()>Undo</button>',
+                                    '<button type="button" onclick = redo()>Redo</button>'   
+                                    )
+                                    );
+    $table->data[] = $row1;
     return $table;
 }
 
@@ -112,6 +124,7 @@ global $DB;
 $form = new view_all_filter_form();
 $cmid = optional_param('id', 0, PARAM_INT);  
 $table;
+$table2;
 
 $currenttab='tab1';
 $tabs = array();
@@ -124,12 +137,14 @@ if(($data = $form->get_data()) && confirm_sesskey())
     global $DB;
     //read DB accoding to form data
     $table = initial_table($result);
+    $table2 = initial_table2();
 }
 else
 {
     //read all
     $result = $DB->get_records('moss_results', array('cmid'=>$cmid));
     $table = initial_table($result);
+    $table2 = initial_table2();
 }
 
 //print HTML page
@@ -138,6 +153,7 @@ echo $OUTPUT->box_start();
 $form->display();
 echo $OUTPUT->box_end();
 print_tabs(array($tabs), $currenttab);
+echo html_writer::table($table2);
 echo html_writer::table($table);
 echo $OUTPUT->footer();
 ?>
@@ -210,23 +226,40 @@ function swap_innerHTML(row1, row2)
 
 }
 
-function view_code(link)
+function view_code(element, link)
 {
 	//element.innerHTML = '<input type = "textbox">fuck</input>';
-	alert(link);
+	var entryid = element.parentNode.parentNode.id;
+	alert(entryid+"    "+link);
+	//connect_server('view_all_page', 'view_code', entryid);
+	
 }
 
 function confirm(element)
 {
-    alert(element.parentNode.parentNode.id);
+	var entryid = element.parentNode.parentNode.id;
+	alert(entryid);
+	connect_server('view_all_page', 'confirm', entryid);
 }
 
 function unconfirm(element)
 {
-	alert(element.parentNode.parentNode.id);
+    var entryid = element.parentNode.parentNode.id;
+	alert(entryid);
+	connect_server('view_all_page', 'unconfirm', entryid);
 }
 
-function connect_server(pageid, requestid, value)
+function redo()
+{
+    alert('redo');
+}
+
+function undo()
+{
+    alert('undo');
+}
+
+function connect_server(page, request, entryid)
 {
     if (window.XMLHttpRequest)
     {   // code for IE7+, Firefox, Chrome, Opera, Safari
@@ -241,10 +274,16 @@ function connect_server(pageid, requestid, value)
     {
         if(xmlhttp.readyState==4 && xmlhttp.status==200)
         {
+            //receive a xml file contain requestid and value
+            //<response>
+            //    <status>status</status> 1==abnormal 0==normal
+            //    <requestid>requestid</requestid>
+            //    <value>value</value> 
+            //</response>
             //document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
         }
     }
-    xmlhttp.open("GET","javascript.php?pid="+pageid+"&rid="+requestid+"&value="+value,true);
+    xmlhttp.open("GET","ajax.php?page="+page+"&request="+request+"&value="+entryid,true);
     xmlhttp.send();
 }
 </script>

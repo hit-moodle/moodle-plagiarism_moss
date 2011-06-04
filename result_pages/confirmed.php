@@ -3,22 +3,16 @@ require_once(dirname(dirname(__FILE__)) . '/../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
 
-class confirmed_filter_form extends moodleform {
-
-    	function definition () {
-            global $CFG;
-
-            $mform =& $this->_form;
-            $choices = array('No','Yes');
-            $mform->addElement('html', get_string('mossexplain', 'plagiarism_moss'));
-            $mform->addElement('checkbox', 'moss_use', get_string('usemoss', 'plagiarism_moss'));
-
-            $mform->addElement('textarea', 'moss_student_disclosure', get_string('studentdisclosure','plagiarism_moss'),'wrap="virtual" rows="6" cols="50"');
-            $mform->addHelpButton('moss_student_disclosure', 'studentdisclosure', 'plagiarism_moss');
-            $mform->setDefault('moss_student_disclosure', 'tab2');
-
-            $this->add_action_buttons(true);
-        }
+class confirmed_filter_form extends moodleform 
+{
+    function definition() 
+    {
+        global $CFG;
+        $mform =& $this->_form;
+        $choices = array('No','Yes');
+        $mform->addElement('html', get_string('mossexplain', 'plagiarism_moss'));
+        $this->add_action_buttons(true);    
+    }
 }
 
 require_login();
@@ -46,11 +40,42 @@ if(($data = $form->get_data()) && confirm_sesskey())
     
     
 echo $OUTPUT->header();
-
-print_tabs(array($tabs), $currenttab);
-    
-echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
+echo $OUTPUT->box_start();
 $form->display();
 echo $OUTPUT->box_end();
-
+print_tabs(array($tabs), $currenttab);
 echo $OUTPUT->footer();
+?>
+
+<head>
+<script type="text/javascript">
+function connect_server(pageid, requestid, value)
+{
+    if (window.XMLHttpRequest)
+    {   // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+    }
+    else
+    {   // code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xmlhttp.onreadystatechange=function()
+    {
+        if(xmlhttp.readyState==4 && xmlhttp.status==200)
+        {
+            //receive a xml file contain requestid and value
+            //<response>
+            //    <status>status</status> 0==abnormal 1==normal
+            //    <requestid>requestid</requestid>
+            //    <value>value</value>
+            //    <data>...</data>
+            //</response>
+            //document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
+        }
+    }
+    xmlhttp.open("GET","ajax.php?pid="+pageid+"&rid="+requestid+"&value="+value,true);
+    xmlhttp.send();
+}
+</script>
+</head>
