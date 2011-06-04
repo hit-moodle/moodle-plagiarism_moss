@@ -85,11 +85,12 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
             $this->add_action_buttons(true);
             
             $default_setting = array('entryno'=> 3,'log'=> 1,'rerun'=> 1,'email'=> 0,'text'=> 0,'entrys'=> 1,'cross'=> 1);
-            $old_setting = $DB->get_record('moss_plugin_setting', array('id'=>1));
+            //moss_plugin_setting only contain one entry ('id' == 1)
+            //actually use database to store configuration is a stupid idea, maybe i will rewrite it use XML later.
+            $old_setting = $DB->get_record('moss_plugin_setting',array('id'=>1));
             
             if($old_setting != null)
             {
-                $DB->delete_records('moss_plugin_setting', array('id'=>1));
                 $mform->setDefault('default_entry',$old_setting->entryno);	
                 $mform->setDefault('enable_log',$old_setting->log);
                 $mform->setDefault('rerun', $old_setting->rerun);
@@ -135,17 +136,20 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     
     if (($data = $mform->get_data()) && confirm_sesskey())
     {  	
-        $newsetting = new object();
-        $newsetting->entryno = (int)($data->default_entry);
-        $newsetting->log = (int)($data->enable_log);
-        $newsetting->rerun = (int)($data->rerun);
-        $newsetting->email = (int)($data->send_email);
-        $newsetting->text = (int)($data->show_text);
-        $newsetting->entrys = (int)($data->show_entrys);
-        $newsetting->cross = (int)($data->cross_detection);
-        $DB->insert_record('moss_plugin_setting', $newsetting);
-        //print_object($newsetting);
-       // die;
+        $newsetting = new stdClass();
+        $newsetting->id = 1;
+        $newsetting->entryno = $data->default_entry;
+        $newsetting->log = $data->enable_log;
+        $newsetting->rerun = $data->rerun;
+        $newsetting->email = $data->send_email;
+        $newsetting->text = $data->show_text;
+        $newsetting->entrys = $data->show_entrys;
+        $newsetting->crossdetection = $data->cross_detection;
+        $oldsetting = $DB->get_record('moss_plugin_setting',array('id'=>1));
+        if($oldsetting != null)
+            $DB->update_record('moss_plugin_setting', $newsetting);
+        else 
+            $DB->insert_record('moss_plugin_setting', $newsetting);
         
         if (!isset($data->moss_use)) {
             $data->moss_use = 0;
