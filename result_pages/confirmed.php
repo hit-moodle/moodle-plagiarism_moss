@@ -20,7 +20,7 @@ $PAGE->set_url('/plagiarism/moss/result_pages/confirmed.php');
 $PAGE->set_context(null);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title('anti-plagiarism confirm page');
-$PAGE->set_heading('Confirm page');
+$PAGE->set_heading('Confirmed page');
 $PAGE->navbar->add('anti-plagiarism');
 $PAGE->navbar->add('results');
 

@@ -38,3 +38,6 @@ $string['sensitivity'] = 'Sensitivity';
 $string['sensitivity_help'] = 'Moss needs a specific sensitivity value to conduct anti-plagiarism process, the value indicate the sensitivity of the engine';
 $string['basefile'] = 'Base file';
 $string['basefile_help'] = 'Moss normally reports all code that matches in pairs of files. but when a base file is supplied, program code that appears in the base file will not counted in matches';
+
+$string['tabletype'] = 'Display type';
+$string['viewallpagefilter'] = 'Anti-plagiarism results filter';

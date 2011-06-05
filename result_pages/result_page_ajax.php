@@ -16,12 +16,15 @@ class verification_handler
     {
         switch($this->request)
         {
-        	case 'view_code': $this->view_code();
-                              break;
-        	case 'confirm'  : $this->confirm();
-                              break;
-        	case 'unconfirm': $this->unconfirm();
-                              break;
+        case 'view_code': 
+            $this->view_code();
+            break;
+        case 'confirm'  : 
+            $this->confirm();
+            break;
+        case 'unconfirm': 
+            $this->unconfirm();
+            break;
         }
     }
     
@@ -44,7 +47,7 @@ class verification_handler
         if($DB->update_record('moss_results', $entry)) 
             echo $this->generatexml(0);
         else
-            ;//TODO plugin error
+            echo $this->generatexml(1);//TODO plugin error
     }
     
     private function unconfirm()
@@ -57,17 +60,17 @@ class verification_handler
         if($DB->update_record('moss_results', $entry))
             echo $this->generatexml(0);
         else 
-            ;//TODO
+            echo $this->generatexml(1);//TODO
     }
     
     private function generatexml($status)
     {
         $content = '<?xml version="1.0" encoding="ISO-8859-1"?>';
-        $content.= '<response>';
-        $content.= '<status>'.$status.'</status>';
-        $content.= '<request>'.$this->request.'</request>';
-        $content.= '<id>'.$this->id.'</id>';
-        $content.= '</response>';
+        $content.= '<ROOT><RESPONSE>';
+        $content.= '<STATUS>'.$status.'</STATUS>';
+        $content.= '<REQUEST>'.$this->request.'</REQUEST>';
+        $content.= '<ID>'.$this->id.'</ID>';
+        $content.= '</RESPONSE></ROOT>';
         return $content;
     }
 }
@@ -86,17 +89,23 @@ class statistics_handler
     }
 }
 
-$page = optional_param('page', 0, PARAM_INT);  
-$request = optional_param('request', 0, PARAM_INT);
+$page = optional_param('page', 0, PARAM_ALPHAEXT);  
+$request = optional_param('request', 0, PARAM_ALPHAEXT);
 $value = optional_param('value', 0, PARAM_INT);
+
+header("Content-type:text/xml");
 
 switch ($page)
 {
-	case 'confirmed_page' :
-    case 'view_all_page'  :  $handler = new verification_handler($request, $value);
-                             $handler -> response();         
-                             break;
-    case 'statistics_page' : $handler = new statistics_handler($request, $value);
-                             $handler -> response();
-                             break; 
+case 'confirmed_page' :
+case 'view_all_page'  :  
+    $handler = new verification_handler($request, $value);
+    $handler -> response();         
+    break;
+case 'statistics_page' : 
+    $handler = new statistics_handler($request, $value);
+    $handler -> response();
+    break; 
+default:                 
+	break;
 }

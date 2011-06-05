@@ -12,16 +12,23 @@ class view_all_filter_form extends moodleform
     {
         global $CFG;
         $mform =& $this->_form;
-        $choices = array('No','Yes');
-        $mform->addElement('html', get_string('mossexplain', 'plagiarism_moss'));
-        $this->add_action_buttons(true);    
+        $mform->addElement('header', 'head', get_string('viewallpagefilter', 'plagiarism_moss'));
+        $choices = array('view_all_table' => 'view all entrys',
+                         'confirmed_table' => 'confirmed entrys',
+                         'unconfirmed_table' => 'unconfirmed entrys');
+        $mform->addElement('select','tabletype', get_string('tabletype','plagiarism_moss'),$choices);
+        $mform->addElement('submit', 'submit', 'Submit'); 
+        //$mform->setAdvanced('activate');
+          
     }
 }
 
-function initial_table($DB_results)
+function initial_table($DB_results, $tablesummary)
 {
+    global $DB;
     $table = new html_table();
-    $table->id = 'view_all_table';
+    $table->id = 'result_table';
+    $table->summary = $tablesummary;
 
     //initialize sortable columns of the table
     $rank_cell = new html_table_cell('<font color="#3333FF">Rank</font>');
@@ -41,8 +48,8 @@ function initial_table($DB_results)
     $line_count_cell -> style = 'cursor:move';
     
     //initialize unsortable columns
-    $name1_cell = new html_table_cell('student 1');
-    $name2_cell = new html_table_cell('student 2');
+    $name1_cell = new html_table_cell('Student 1');
+    $name2_cell = new html_table_cell('Student 2');
     $detail_cell = new html_table_cell('Code detail');
     $confirm_cell = new html_table_cell('Confirmed');
     $status_cell = new html_table_cell('Status');
@@ -60,38 +67,49 @@ function initial_table($DB_results)
                           $confirm_cell,
                           $status_cell);
 						  
-    $table->align = array ("center","center", "center", "left","center", "center", "center","center" ,"center");
+    $table->align = array ("center","center", "center", "center","center", "center", "center","center" ,"center");
     $table->width = "100%";
 	
     foreach($DB_results as $entry)
     {
-    	if($entry->confirmed == 1)
-    	{
-    		$status = "confirmed"; 	
-    		$status_button = '<button type="button" onclick = unconfirm(this)>Cancel</button>';
-    	}
-    	else 
-    	{
-    		$status = "unconfirmed";
-    		$status_button = '<button type="button" onclick = confirm(this)>Confirm</button>';
-    	}
-    	$row1 = new html_table_row(array(
-    	                                $entry->rank,
-    	                                $entry->user1id,
-    	                                $entry->user1percent,
-    	                                $entry->user2id,
-    	                                $entry->user2percent,
-    	                                $entry->linecount,
-    	                                '<button type="button" onclick = view_code(this,"'.$entry->link.'")>View code</button>',
-    	                                $status_button,
-    	                                $status
+        if($entry->confirmed == 1)
+        {
+            $status_txt = "confirmed"; 	
+            $confirm_button_txt = '<button type="button" onclick = unconfirm(this)>Cancel</button>';
+        }
+        else 
+        {
+            $status_txt = "unconfirmed";
+            $confirm_button_txt = '<button type="button" onclick = confirm(this)>Confirm</button>';
+        }
+        
+        $confirm_button_cell = new html_table_cell($confirm_button_txt);
+        $confirm_button_cell->id = 'confirm_button';
+        $status_txt_cell = new html_table_cell($status_txt);
+        $status_txt_cell->id = 'status';
+        
+        $user1 = $DB->get_record('user', array('id'=>$entry->user1id));
+        $user2 = $DB->get_record('user', array('id'=>$entry->user2id));
+        
+        $row1 = new html_table_row(array(
+                                        $entry->rank,
+                                        $user1->firstname.' '.$user1->lastname,
+                                        $entry->user1percent,
+                                        $user2->firstname.' '.$user2->lastname,
+                                        $entry->user2percent,
+                                        $entry->linecount,
+                                        '<button type="button" onclick = view_code(this,"'.$entry->link.'")>View code</button>',
+                                        $confirm_button_cell,
+                                        $status_txt_cell
     	                                )
     	                                );
         $row1->id = $entry->id;
+      /*
         if($entry->confirmed == 1)
             $row1->style = 'color:red';
         else 
             $row1->style = 'color:black';
+       */
         $table->data[] = $row1;
     }
     return $table;
@@ -110,19 +128,22 @@ function initial_table2()
     return $table;
 }
 
+$cmid = optional_param('id', 0, PARAM_INT);
+  
 require_login();
-$PAGE->set_url('/plagiarism/moss/result_pages/view_all.php');
+$url = new moodle_url('/plagiarism/moss/result_pages/view_add.php?');
+$url->param('id', $cmid);
+$PAGE->set_url($url);
 $PAGE->set_context(null);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title('anti-plagiarism view all page');
 $PAGE->set_heading('View all page');
-$PAGE->navbar->add('anti-plagiarism');
-$PAGE->navbar->add('results');
-$PAGE->navbar->add('view all');
+$PAGE->navbar->add('Anti-plagiarism');
+$PAGE->navbar->add('Results');
+$PAGE->navbar->add('View all');
 
 global $DB;
 $form = new view_all_filter_form();
-$cmid = optional_param('id', 0, PARAM_INT);  
 $table;
 $table2;
 
@@ -135,23 +156,20 @@ $tabs[] = new tabobject('tab3', "statistics.php?id=".$cmid, 'Statistics', 'Stati
 if(($data = $form->get_data()) && confirm_sesskey())
 {
     global $DB;
-    //read DB accoding to form data
-    $table = initial_table($result);
+    $table = initial_table($result, '');
     $table2 = initial_table2();
 }
 else
 {
     //read all
     $result = $DB->get_records('moss_results', array('cmid'=>$cmid));
-    $table = initial_table($result);
+    $table = initial_table($result, 'view_all_table');
     $table2 = initial_table2();
 }
 
 //print HTML page
 echo $OUTPUT->header();
-echo $OUTPUT->box_start();
 $form->display();
-echo $OUTPUT->box_end();
 print_tabs(array($tabs), $currenttab);
 echo html_writer::table($table2);
 echo html_writer::table($table);
@@ -169,7 +187,7 @@ sortdir = new Array("ASC","ASC","ASC","ASC","ASC","ASC","ASC","ASC","ASC");
 
 function sort_table(cell_index)
 {
-    var table = document.getElementById('view_all_table');
+    var table = document.getElementById('result_table');
     //the head row is counted, so the actual row number is 'length -1',
     //start from (1 to 'length-1')
     var length = table.rows.length;
@@ -228,7 +246,6 @@ function swap_innerHTML(row1, row2)
 
 function view_code(element, link)
 {
-	//element.innerHTML = '<input type = "textbox">fuck</input>';
 	var entryid = element.parentNode.parentNode.id;
 	alert(entryid+"    "+link);
 	//connect_server('view_all_page', 'view_code', entryid);
@@ -238,14 +255,12 @@ function view_code(element, link)
 function confirm(element)
 {
 	var entryid = element.parentNode.parentNode.id;
-	alert(entryid);
 	connect_server('view_all_page', 'confirm', entryid);
 }
 
 function unconfirm(element)
 {
     var entryid = element.parentNode.parentNode.id;
-	alert(entryid);
 	connect_server('view_all_page', 'unconfirm', entryid);
 }
 
@@ -274,34 +289,89 @@ function connect_server(page, request, entryid)
     {
         if(xmlhttp.readyState==4 && xmlhttp.status==200)
         {
-            //receive a xml file contain requestid and value
-            //<response>
-            //    <status>status</status> 1==abnormal 0==normal
-            //    <requestid>requestid</requestid>
-            //    <value>value</value> 
-            //</response>
-            //document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
+            try{
+            	var response = xmlhttp.responseXML.documentElement.getElementsByTagName("RESPONSE");
+                var status = response[0].getElementsByTagName("STATUS")[0].firstChild.nodeValue;
+                var request = response[0].getElementsByTagName("REQUEST")[0].firstChild.nodeValue;
+                var id = response[0].getElementsByTagName("ID")[0].firstChild.nodeValue;
+            }
+            catch(er)
+            {
+                alert('xml parse exception');
+                return;
+            }
+            if(status == 1)
+            {    
+                alert("request rejected");
+                return;
+            }
+            if(status == 0)
+            {
+                alert("request accepted");
+                var table = document.getElementById('result_table');
+                var type = table.summary;
+                var row = null;
+                var length = table.rows.length;
+
+                for(var i = 0; i <= length - 1; i++)
+                    if(table.rows[i].id == id)
+                        row = table.rows[i];
+                if(row == null)
+                {
+                    alert('entry id = '+id+' not found');
+                    return;
+                }
+
+                switch(type)
+                {
+                case 'view_all_table':     
+                    modify_view_all_table(row, request);
+                    break;
+                case 'confirmed_table':    
+                    modify_confirmed_table(row, request);
+                    break;
+                case 'unconfirmed_table':  
+                    modify_unconfirmed_table(row, request);
+                    break;
+                }
+            }
         }
     }
-    xmlhttp.open("GET","ajax.php?page="+page+"&request="+request+"&value="+entryid,true);
+    xmlhttp.open("GET","result_page_ajax.php?page="+page+"&request="+request+"&value="+entryid,true);
     xmlhttp.send();
 }
+
+function modify_view_all_table(row, request)
+{
+    var confirm_button_txt;
+    var status_txt = (request == 'confirm') ? 'confirmed' : 'unconfirmed';
+    if(status_txt == 'confirmed')
+        confirm_button_txt = '<button type="button" onclick = unconfirm(this)>Cancel</button>';
+    else
+        confirm_button_txt = '<button type="button" onclick = confirm(this)>Confirm</button>';     
+
+    var length = row.cells.length;
+    for(var i = 0; i <= length-1; i++)
+        switch(row.cells[i].id)
+        {
+        case 'confirm_button':
+            row.cells[i].innerHTML = confirm_button_txt;
+            break;
+        case 'status':
+            row.cells[i].innerHTML = status_txt;
+            break;
+        }
+}
+
+function modify_confirmed_table(row, request)
+{
+    row.parentNode.removeChild(row);
+}
+
+function modify_unconfirmed_table(row, request)
+{
+	row.parentNode.removeChild(row);
+}
+
 </script>
 </head>
-
-
-
-
-
-
-
-<!-- 
- $table1 = new html_table();
-$table1->width = "100%";
-$table1->data[] = array('<iframe src="http://www.baidu.com" frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%"></iframe>',
-						'<iframe src="http://www.baidu.com" frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%"></iframe>'
-					   );
-echo html_writer::table($table1);
--->
-
-
