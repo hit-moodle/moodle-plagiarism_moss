@@ -117,6 +117,117 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     }
 }
 
+class config_xml
+{
+
+    public function get_config_all()
+    {
+    	global $CFG;
+        $array = array();
+        //if xml file not exist return default data 
+        if(file_exists($CFG->dirroot.'/plagiarism/moss/config.xml'))
+        {
+        	if(!is_readable($CFG->dirroot.'/plagiarism/moss/config.xml'))
+        	{
+        	    echo 'xml file exist, but unreadable, check permission';
+                return $this->default;        
+        	}
+        }    
+        else 
+        {
+            return $this->default;
+        }
+        $doc = new DOMDocument();
+        if($doc->load($CFG->dirroot.'/plagiarism/moss/config.xml'))
+        {
+            try{
+                $entry_number = $doc->getElementsByTagName('entry_number');
+                $array['entry_number'] = $entry_number->item(0)->nodeValue;
+                $enable_log = $doc->getElementsByTagName('enable_log');
+                $array['enable_log'] = $enable_log->item(0)->nodeValue;        
+                $rerun = $doc->getElementsByTagName('rerun_after_change');
+                $array['rerun_after_change'] = $rerun->item(0)->nodeValue;           
+                $send_email = $doc->getElementsByTagName('send_email');
+                $array['send_email'] = $send_email->item(0)->nodeValue;          
+                $show_code = $doc->getElementsByTagName('show_code');
+                $array['show_code'] = $show_code->item(0)->nodeValue;         
+                $show_entrys = $doc->getElementsByTagName('show_entrys');
+                $array['show_entrys'] = $show_entrys->item(0)->nodeValue;         
+                $cross = $doc->getElementsByTagName('enable_cross-course_detection');
+                $array['enable_cross-course_detection'] = $cross->item(0)->nodeValue;
+            }
+            catch(Exception $e)
+            {//error unable to read xml file
+            	return $this->default;
+            }
+            
+    	    return $array;
+        }
+        else
+        {
+            echo 'load xml file error';
+            return $this->default;
+        }
+    }
+    public function save_config($array)
+    {
+        global $CFG;
+    	$doc = new DOMDocument('1.0');
+        $doc->formatOutput = true;
+    	$root = $doc->createElement("config");
+    	$doc->appendChild($root);
+    	//expandable code
+    	foreach ($array as $name => $value)
+        {
+            $$name = $doc->createElement($name);
+            $$name->appendChild($doc->createTextNode($value));
+            $root->appendChild($$name);
+        }
+        //$config_xml = $doc->saveXML();
+        //delete config.xml if existed.
+        if(file_exists($CFG->dirroot.'/plagiarism/moss/config.xml'))
+           if(!unlink($CFG->dirroot.'/plagiarism/moss/config.xml'))
+               echo 'unlink config.xml error';//delete error, throw exception
+        if(!$doc->save($CFG->dirroot.'/plagiarism/moss/config.xml'))
+            echo 'save xml file error';//save error, throw exception
+    }
+    public function get_config($tagname)
+    {
+    	global $CFG;
+    	//read xml file if not exist, return default 
+    	if(! file_exists($CFG->dirroot.'/plagiarism/moss/config.xml'))
+            return $this->default[$tagname];
+        $doc = new DOMDocument();
+        if($doc->load($CFG->dirroot.'/plagiarism/moss/config.xml'))
+        {
+            $tag = $doc->getElementsByTagName($tagname);
+            if(isset($tag))
+                return $tag->item(0)->nodeValue;
+            else
+                return $this->default[$tagname];
+        }
+        else 
+        {
+            echo 'xml file exist, but load xml error';
+            return $this->default[$tagname];
+        }
+        //TODO error handle
+    }
+   
+
+    private $default = array('entry_number' => 2,
+                             'enable_log' => 'YES',
+                             'rerun_after_change' => 'YES',
+                             'send_email' => 'NO',
+                             'show_code' => 'NEVER',
+                             'show_entrys' => 'ALWAYS',
+                             'enable_cross-course_detection' => 'NO');
+   
+}
+
+class error_log
+{
+}
 /**
  * 
  * Enter description here ...
