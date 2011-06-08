@@ -39,8 +39,8 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
 
             $mform =& $this->_form;
             $choices = array('YES','NO');
-            $yesnooptions = array(0 => "NO", 1 => "YES");
-            $mossoptions = array(0 => "NEVER", 1 => "ALWAYS");
+            $yesnooptions = array('NO' => "NO", 'YES' => "YES");
+            $mossoptions = array('NEVER' => "NEVER", "ALWAYS" => "ALWAYS");
             
             $helplink = get_string('mossexplain', 'plagiarism_moss');
             $helplink .= '<a href='.$CFG->wwwroot.'/plagiarism/moss/help.php></a>';
@@ -84,32 +84,16 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
             
             $this->add_action_buttons(true);
             
-            $default_setting = array('entryno'=> 3,'log'=> 1,'rerun'=> 1,'email'=> 0,'text'=> 0,'entrys'=> 1,'cross'=> 1);
-            //moss_plugin_setting only contain one entry ('id' == 1)
-            //actually use database to store configuration is a stupid idea, maybe i will rewrite it use XML later.
-            $old_setting = $DB->get_record('moss_plugin_setting',array('id'=>1));
-            
-            if($old_setting != null)
-            {
-                $mform->setDefault('default_entry',$old_setting->entryno);	
-                $mform->setDefault('enable_log',$old_setting->log);
-                $mform->setDefault('rerun', $old_setting->rerun);
-                $mform->setDefault('send_email', $old_setting->email);
-                $mform->setDefault('show_text', $old_setting->text);
-                $mform->setDefault('show_entrys', $old_setting->entrys);
-                $mform->setDefault('cross_detection', $old_setting->cross);
-            }
-            else
-            {
-                $mform->setDefault('default_entry',$default_setting['entryno']);	
-                $mform->setDefault('enable_log',$default_setting['log']);
-                $mform->setDefault('rerun', $default_setting['rerun']);
-                $mform->setDefault('send_email', $default_setting['email']);
-                $mform->setDefault('show_text', $default_setting['text']);
-                $mform->setDefault('show_entrys', $default_setting['entrys']);
-                $mform->setDefault('cross_detection', $default_setting['cross']);
-            }
-            
+            $cnf_xml = new config_xml();
+            $config = $cnf_xml->get_config_all();
+
+            $mform->setDefault('default_entry',$config['entry_number']);	
+            $mform->setDefault('enable_log',$config['enable_log']);
+            $mform->setDefault('rerun', $config['rerun_after_change']);
+            $mform->setDefault('send_email', $config['send_email']);
+            $mform->setDefault('show_text', $config['show_code']);
+            $mform->setDefault('show_entrys', $config['show_entrys']);
+            $mform->setDefault('cross_detection', $config['enable_cross-course_detection']);
         }
     }
     
@@ -136,21 +120,16 @@ pl * plagiarism.php - allows the admin to configure plagiarism stuff
     
     if (($data = $mform->get_data()) && confirm_sesskey())
     {  	
-        $newsetting = new stdClass();
-        $newsetting->id = 1;
-        $newsetting->entryno = $data->default_entry;
-        $newsetting->log = $data->enable_log;
-        $newsetting->rerun = $data->rerun;
-        $newsetting->email = $data->send_email;
-        $newsetting->text = $data->show_text;
-        $newsetting->entrys = $data->show_entrys;
-        $newsetting->crossdetection = $data->cross_detection;
-        $oldsetting = $DB->get_record('moss_plugin_setting',array('id'=>1));
-        if($oldsetting != null)
-            $DB->update_record('moss_plugin_setting', $newsetting);
-        else 
-            $DB->insert_record('moss_plugin_setting', $newsetting);
-        
+        $cnf_xml = new config_xml();
+        $cnf_xml->save_config(array('entry_number' => $data->default_entry,
+                                    'enable_log' => $data->enable_log,
+                                    'rerun_after_change' => $data->rerun,
+                                    'send_email' => $data->send_email,
+                                    'show_code' => $data->show_text,
+                                    'show_entrys' => $data->show_entrys,
+                                    'enable_cross-course_detection' => $data->cross_detection
+        ));
+      
         if (!isset($data->moss_use)) {
             $data->moss_use = 0;
         }
