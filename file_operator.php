@@ -157,9 +157,17 @@ class file_operator{
         //准备$fs，$context, $cmarray, $temppath
         $fs = get_file_storage();
         $context = get_context_instance(CONTEXT_SYSTEM);
-        $record = $DB->get_record('moss_tags',array('cmid' => $cmid));
-        $tag = $record->tag;
-        $cmarray = $DB->get_records("moss_tags",array('tag' => $tag));
+        
+        $cnf_xml = new config_xml();
+        if($cnf_xml->get_config('enable_cross-course_detection') == 'YES')
+        {
+            $record = $DB->get_record('moss_tags',array('cmid' => $cmid));
+            $tag = $record->tag;
+            $cmarray = $DB->get_records("moss_tags",array('tag' => $tag));
+        }
+        else 
+            $cmarray = array($cmid);
+            
         $temppath = $CFG->dataroot.'/moss';
         
         //检查当前cm有没有学生上传的文件，如果没有返回false;
