@@ -15,9 +15,11 @@ class moss_settings{
         
         $mform->addElement('header', 'mossdesc', get_string('moss', 'plagiarism_moss'));
         
+         $cnf_xml = new config_xml();
+         $entry_num = $cnf_xml->get_config('entry_number');
         
         //初始化 
-        for($index = 0; $index <= 2; $index++){
+        for($index = 0; $index < $entry_num; $index++){
             //添加单选框
             $mform->addElement('checkbox', 'activate'.$index, get_string('activateentry', 'plagiarism_moss'));
      
@@ -70,7 +72,7 @@ class moss_settings{
         }
         
         //使用默认数据设置默认值 
-        for(; $index <= 2; $index++){
+        for(; $index < $entry_num; $index++){
                 $mform->setDefault('filepattern'.$index, $default_settings['filepattern']);
                 $mform->setDefault('language'.$index, $default_settings['language']);
                 $mform->setDefault('sensitivity'.$index, $default_settings['sensitivity']);	
@@ -103,8 +105,11 @@ class moss_settings{
             $DB->delete_records('moss_tags', array('cmid'=>$cmid));//删除tag
         }
         
+        $cnf_xml = new config_xml();
+        $entry_num = $cnf_xml->get_config('entry_number');
+        
         //根据checkbox状态来写数据库
-        for($index = 0; $index <= 2; $index++){	
+        for($index = 0; $index < $entry_num; $index++){	
             $element_name = array('checkbox'=>'activate'.$index,'filepattern'=>'filepattern'.$index,'language'=>'language'.$index,
                                   'sensitivity'=>'sensitivity'.$index,'basefile'=>'basefile'.$index);
             if(isset($data->$element_name['checkbox'])){//设置启用，写数据库
