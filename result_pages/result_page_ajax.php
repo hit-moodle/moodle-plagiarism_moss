@@ -5,11 +5,13 @@ class verification_handler
 {
     private $request;
     private $id;//indicate the entry's id in table 'moss_results'
+    private $type;
     
-    function __construct($request = "", $id = "")
+    function __construct($request = '', $id = -1, $type)
     {
         $this->request = $request;
         $this->id = $id;
+        $this->type = $type;
     }
     
     function response()
@@ -70,6 +72,7 @@ class verification_handler
         $content.= '<STATUS>'.$status.'</STATUS>';
         $content.= '<REQUEST>'.$this->request.'</REQUEST>';
         $content.= '<ID>'.$this->id.'</ID>';
+        $content.= '<TYPE>'.$this->type.'</TYPE>';
         $content.= '</RESPONSE></ROOT>';
         return $content;
     }
@@ -89,21 +92,21 @@ class statistics_handler
     }
 }
 
-$page = optional_param('page', 0, PARAM_ALPHAEXT);  
-$request = optional_param('request', 0, PARAM_ALPHAEXT);
-$value = optional_param('value', 0, PARAM_INT);
+$page = optional_param('page', '', PARAM_ALPHAEXT);  
+$request = optional_param('request', '', PARAM_ALPHAEXT);
+$id = optional_param('id', 0, PARAM_INT);
+$type = optional_param('type', '', PARAM_ALPHAEXT);
 
 header("Content-type:text/xml");
 
 switch ($page)
 {
-case 'confirmed_page' :
 case 'view_all_page'  :  
-    $handler = new verification_handler($request, $value);
+    $handler = new verification_handler($request, $id, $type);
     $handler -> response();         
     break;
 case 'statistics_page' : 
-    $handler = new statistics_handler($request, $value);
+    $handler = new statistics_handler($request, $id);
     $handler -> response();
     break; 
 default:                 
