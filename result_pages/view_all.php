@@ -6,163 +6,284 @@ require_once($CFG->dirroot.'/lib/form/button.php');
 require_once($CFG->libdir.'/tablelib.php');
 global $CFG;
 
+/**
+ * 
+ * Enter description here ...
+ * @author ycc
+ *
+ */
 class view_all_filter_form extends moodleform 
 {
-
+    /**
+     * (non-PHPdoc)
+     * @see moodleform::definition()
+     */
     function definition () 
     {
         global $CFG;
         $cmid  = $this->_customdata['cmid'];
          
         $mform =& $this->_form;
-        $mform->addElement('header', 'head', get_string('viewallpagefilter', 'plagiarism_moss'));
-        $choices = array('view_all_table' => 'view all entrys',
-                         'confirmed_table' => 'confirmed entrys',
-                         'unconfirmed_table' => 'unconfirmed entrys',
-                         'cross_table' => 'cross-course plagiarism entrys');
-        $general[] = $mform->createElement('select','tabletype', get_string('tabletype','plagiarism_moss'),$choices);
+        $mform->addElement('header', 'head', get_string('view_all_filter', 'plagiarism_moss'));
+        $table_choices = array('view_all_table'    => get_string('entry_type_all', 'plagiarism_moss'),
+                               'confirmed_table'   => get_string('entry_type_confirmed', 'plagiarism_moss'),
+                               'unconfirmed_table' => get_string('entry_type_unconfirmed', 'plagiarism_moss'),
+                               'cross_table'       => get_string('entry_type_cross', 'plagiarism_moss'));
+        $name_choices = array('western' => get_string('student_name_western', 'plagiarism_moss'),
+                              'Eastern' => get_string('student_name_eastern', 'plagiarism_moss'));
+        $rank_choices = $this->rank_array($cmid);
+        $percent_choices = $this->percent_array($cmid);
+        $line_choices = $this->lines_array($cmid);
+
+
+
+        $rank[] = $mform->createElement('select', 'rank_from', null, $rank_choices);
+        $rank[] = $mform->createElement('select', 'rank_to', null, array_reverse($rank_choices, true));
+        //try to set element value by call function setDefault, but it doesn't work
+        $rank[] = $mform->createElement('checkbox', 'rank_not_include', null, get_string('not_include', 'plagiarism_moss'));
+        $mform->addElement('group', 'rank', get_string('rank_range', 'plagiarism_moss'), $rank);
+        $mform->addHelpButton('rank', 'rank_range', 'plagiarism_moss');
+          
+        $percent[] = $mform->createElement('select', 'percent_from', null, $percent_choices);
+        $percent[] = $mform->createElement('select', 'percent_to', null, array_reverse($percent_choices, true));
+        $percent[] = $mform->createElement('checkbox', 'percent_not_include', null, get_string('not_include', 'plagiarism_moss'));
+        $mform->addElement('group', 'percent', get_string('percentage_range', 'plagiarism_moss'), $percent);
+        $mform->addHelpButton('percent', 'percentage_range', 'plagiarism_moss');
+        
+        $lines[] = $mform->createElement('select', 'lines_from', null, $line_choices);
+        $lines[] = $mform->createElement('select', 'lines_to', null, array_reverse($line_choices, true));
+        $lines[] = $mform->createElement('checkbox', 'lines_not_include', null, get_string('not_include', 'plagiarism_moss'));
+        $mform->addElement('group', 'lines', get_string('lines_range', 'plagiarism_moss'), $lines);
+        $mform->addHelpButton('lines', 'lines_range', 'plagiarism_moss');
+        
+                $general[] = $mform->createElement('select','tabletype', get_string('entry_type','plagiarism_moss'), $table_choices);
         $general[] = $mform->createElement('submit', 'submit1', 'Submit');
-        $mform->addElement('group', 'general', 'Display table type', $general);
-        
-        $mform->addElement('text', 'student', 'Student name');
-        
-        $rank[] = $mform->createElement('text', 'rank_from', null);
-        $rank[] = $mform->createElement('text', 'rank_to', null);
-        $mform->addElement('group', 'rank', 'Rank range', $rank);
-        
-        $percent[] = $mform->createElement('text', 'percent_from', null);
-        $percent[] = $mform->createElement('text', 'percent_to', null);
-        $mform->addElement('group', 'percent', 'Match percentage range', $percent);
-        
-        $lines[] = $mform->createElement('text', 'lines_from', null);
-        $lines[] = $mform->createElement('text', 'lines_to', null);
-        $mform->addElement('group', 'lines', 'Match lines range', $lines);
+        $mform->addElement('group', 'general', get_string('entry_type','plagiarism_moss'), $general);
+        $mform->addHelpButton('general', 'entry_type', 'plagiarism_moss');
         
         $mform->addElement('submit', 'submit2', 'Submit');
         
-        $mform->setAdvanced('student');
+        //$mform->setAdvanced('name');
         $mform->setAdvanced('rank');
         $mform->setAdvanced('percent');
         $mform->setAdvanced('lines');
         $mform->setAdvanced('submit2');
         
         //url param
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $this->set_data(array('id'=>$cmid));
+        $mform->addElement('hidden', 'cmid');
+        $mform->setType('cmid', PARAM_INT);
+        $this->set_data(array('cmid'=>$cmid));
                  
     }
 
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
+     */
+    function rank_array($cmid)
+    {
+        global $DB;
+        $rank_choices = array();
+        $max_rank = $DB->get_record_sql("SELECT MAX(rank) as maxrank FROM {moss_results}
+                                         WHERE cmid = ?",
+                                        array($cmid));
+        $max = $max_rank->maxrank;  
+        for($i = 1; $i <= $max; $i++)      
+            $rank_choices[''.$i] = 'rank '.$i;  
+        return $rank_choices;
+    }
+
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
+     */
+    function percent_array($cmid)
+    {
+        $percent_choices = array();
+        for($i = 1; $i <=100; $i++)
+            $percent_choices[''.$i] = $i.' %';
+        return $percent_choices;
+    }
+    
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
+     */
+    function lines_array($cmid)
+    {
+        global $DB;
+        $lines_choices = array();
+        $max_line = $DB->get_record_sql("SELECT MAX(linecount) as maxline FROM {moss_results}
+                                         WHERE cmid = ?",
+                                        array($cmid));
+        $max = $max_line->maxline;  
+        for($i = 1; $i <= $max; $i++)      
+            $lines_choices[''.$i] = $i.' lines';
+        return $lines_choices;
+    }
 }
 
-
-function initial_table($DB_results, $tablesummary)
+/**
+ * 
+ * Enter description here ...
+ * @param unknown_type $cmid
+ * @param unknown_type $DB_results
+ * @param unknown_type $tablesummary
+ */
+function initial_table($cmid, $DB_results, $tablesummary)
 {
     global $DB;
+    global $CFG;
     $table = new html_table();
     $table->id = 'result_table';
     $table->summary = $tablesummary;
 
     //initialize sortable columns of the table
-    $rank_cell = new html_table_cell('<font color="#3333FF">Rank<span> </span><img id ="arror_img" src="pix/DESC.gif"></font>');
-    $rank_cell -> attributes['onclick'] = 'sort_table(0)';
-    $rank_cell -> style = 'cursor:move';
+    $rank_head_cell = new html_table_cell('<font color="#3333FF">'.get_string('rank','plagiarism_moss').'<span> </span><img id ="arror_img" src="pix/DESC.gif"></font>');
+    $rank_head_cell -> attributes['onclick'] = 'sort_table(0)';
+    $rank_head_cell -> style = 'cursor:move';
     
-    $match1_cell = new html_table_cell('<font color="#3333FF">Match percent 1<span> </span></font>');
-    $match1_cell -> attributes['onclick'] = 'sort_table(2)';
-    $match1_cell -> style = 'cursor:move';
+    $match1_head_cell = new html_table_cell('<font color="#3333FF">'.get_string('match_percent', 'plagiarism_moss').' 1<span> </span></font>');
+    $match1_head_cell -> attributes['onclick'] = 'sort_table(2)';
+    $match1_head_cell -> style = 'cursor:move';
     
-    $match2_cell = new html_table_cell('<font color="#3333FF">Match percent 2<span> </span></font>');
-    $match2_cell -> attributes['onclick'] = 'sort_table(4)';
-    $match2_cell -> style = 'cursor:move';
+    $match2_head_cell = new html_table_cell('<font color="#3333FF">'.get_string('match_percent', 'plagiarism_moss').' 2<span> </span></font>');
+    $match2_head_cell -> attributes['onclick'] = 'sort_table(4)';
+    $match2_head_cell -> style = 'cursor:move';
     
-    $line_count_cell = new html_table_cell('<font color="#3333FF">Lines match<span> </span></font>');
-    $line_count_cell -> attributes['onclick'] = 'sort_table(5)';
-    $line_count_cell -> style = 'cursor:move';
+    $line_count_head_cell = new html_table_cell('<font color="#3333FF">'.get_string('lines_match', 'plagiarism_moss').'<span> </span></font>');
+    $line_count_head_cell -> attributes['onclick'] = 'sort_table(5)';
+    $line_count_head_cell -> style = 'cursor:move';
     
     //initialize unsortable columns
-    $name1_cell = new html_table_cell('Student 1');
-    $name2_cell = new html_table_cell('Student 2');
-    $detail_cell = new html_table_cell('Code detail');
-    $confirm_cell = new html_table_cell('Confirmed');
-    $status_cell = new html_table_cell('Status');
+    if($tablesummary == 'cross_table')
+    {
+        $name1_head_cell    = new html_table_cell(get_string('student_from_other_course', 'plagiarism_moss'));
+        $name2_head_cell    = new html_table_cell(get_string('student_name', 'plagiarism_moss'));
+    }
+    else
+    {    
+        $name1_head_cell    = new html_table_cell(get_string('student_name', 'plagiarism_moss').' 1');
+        $name2_head_cell    = new html_table_cell(get_string('student_name', 'plagiarism_moss').' 2');
+    }
+    $detail_head_cell   = new html_table_cell(get_string('view_code', 'plagiarism_moss'));
+    $action_head_cell   = new html_table_cell(get_string('action', 'plagiarism_moss'));
+    $relevant_head_cell = new html_table_cell(get_string('relevant_entry', 'plagiarism_moss'));
+    $status_head_cell   = new html_table_cell(get_string('entry_status', 'plagiarism_moss'));
     
     //add head cells to $table, notice that the order of head cells isn't random,
     //for example $rank_cell must at the head of the array, 
     //because if the 'onclick' event is triggered JS function 'sort(0)' will be called.
-    $table->head = array ($rank_cell,
-                          $name1_cell,
-                          $match1_cell,
-                          $name2_cell,
-                          $match2_cell,
-                          $line_count_cell,
-                          $detail_cell,
-                          $confirm_cell,
-                          $status_cell);
+    if(($tablesummary == 'view_all_table') || ($tablesummary == 'cross_table'))
+    {
+        $table->head = array ($rank_head_cell,
+                              $name1_head_cell,
+                              $match1_head_cell,
+                              $name2_head_cell,
+                              $match2_head_cell,
+                              $line_count_head_cell,
+                              $detail_head_cell,
+                              $action_head_cell,
+                              $relevant_head_cell,
+                              $status_head_cell);
 						  
-    $table->align = array ("center","left", "center", "left","center", "center", "center","center" ,"center");
+        $table->align = array ("center","left", "center", "left","center", "center", "center","center" ,"center","center");
+    }
+    else 
+    {
+    	$table->head = array ($rank_head_cell,
+                              $name1_head_cell,
+                              $match1_head_cell,
+                              $name2_head_cell,
+                              $match2_head_cell,
+                              $line_count_head_cell,
+                              $detail_head_cell,
+                              $action_head_cell,
+                              $status_head_cell);
+						  
+        $table->align = array ("center","left", "center", "left","center", "center", "center","center" ,"center");
+    }
     $table->width = "100%";
 	
     foreach($DB_results as $entry)
     {
         if($entry->confirmed == 1)
         {
-            $status_txt = "confirmed"; 	
-            $confirm_button_txt = '<button type="button" onclick = unconfirm(this)>Cancel</button>';
+            $status_txt = '<font color="#FF0000"><b>'.get_string('confirmed', 'plagiarism_moss').'</b></font>';	
+            $confirm_button = '<button type="button" onclick = unconfirm_entry(this)>'.get_string('unconfirm', 'plagiarism_moss').'</button>';
         }
         else 
         {
-            $status_txt = "unconfirmed";
-            $confirm_button_txt = '<button type="button" onclick = confirm(this)>Confirm</button>';
+            $status_txt = get_string('unconfirmed', 'plagiarism_moss');
+            $confirm_button = '<button type="button" onclick = confirm_entry(this)>'.get_string('confirm', 'plagiarism_moss').'</button>';
         }
         
         $user1 = $DB->get_record('user', array('id'=>$entry->user1id));
         $user2 = $DB->get_record('user', array('id'=>$entry->user2id));
         
-        $user1_cell = new html_table_cell('<font color="#3333FF">'.$user1->firstname.' '.$user1->lastname.'</font>');
-        $user1_cell -> attributes['onclick'] = 'show_user_profile('.$entry->user1id.')';
+        $user1_cell = new html_table_cell('<font color="#3333FF">'.fullname($user1).'</font>');
+        $link1 = $CFG->wwwroot."/user/profile.php?id=".$entry->user1id;
+        $user1_cell -> attributes['onclick'] = 'show_user_profile("'.$link1.'")';
         $user1_cell -> style = 'cursor:move';
-        $user2_cell = new html_table_cell('<font color="#3333FF">'.$user2->firstname.' '.$user2->lastname.'</font>');
-        $user2_cell -> attributes['onclick'] = 'show_user_profile('.$entry->user2id.')';
+        
+        $user2_cell = new html_table_cell('<font color="#3333FF">'.fullname($user2).'</font>');
+        $link2 = $CFG->wwwroot."/user/profile.php?id=".$entry->user2id;
+        $user2_cell -> attributes['onclick'] = 'show_user_profile("'.$link2.'")';
         $user2_cell -> style = 'cursor:move';
         
-        $row1 = new html_table_row(array(
-                                        $entry->rank,
-                                        $user1_cell,
-                                        $entry->user1percent.' %',
-                                        $user2_cell,
-                                        $entry->user2percent.' %',
-                                        $entry->linecount,
-                                        '<button type="button" onclick = view_code(this,"'.$entry->link.'")>View code</button>',
-                                        $confirm_button_txt,
-                                        $status_txt
-    	                                )
-    	                                );
+        if(($tablesummary == 'view_all_table') || ($tablesummary == 'cross_table'))
+        {
+            $row1 = new html_table_row(array(
+                                            $entry->rank,
+                                            $user1_cell,
+                                            $entry->user1percent.' %',
+                                            $user2_cell,
+                                            $entry->user2percent.' %',
+                                            $entry->linecount,
+                                            '<button type="button" onclick = view_code("'.$cmid.'","'.$entry->id.'")>'.get_string('view_code', 'plagiarism_moss').'</button>',
+                                            $confirm_button,
+                                            '<button type="button" onclick = relevant_entry("'.$cmid.'","'.$entry->user1id.'","'.$entry->user2id.'")>'.
+                                            ''.get_string('relevant_entry', 'plagiarism_moss').'</button>',
+                                            $status_txt));
+        }
+        else
+        {
+        	$row1 = new html_table_row(array(
+                                            $entry->rank,
+                                            $user1_cell,
+                                            $entry->user1percent.' %',
+                                            $user2_cell,
+                                            $entry->user2percent.' %',
+                                            $entry->linecount,
+                                            '<button type="button" onclick = view_code("'.$cmid.'","'.$entry->id.'")>'.get_string('view_code', 'plagiarism_moss').'</button>',
+                                            $confirm_button,
+                                            $status_txt));
+        }
+
         $row1->id = $entry->id;
-      /*
-        if($entry->confirmed == 1)
-            $row1->style = 'color:red';
-        else 
-            $row1->style = 'color:black';
-       */
+        
         $table->data[] = $row1;
     }
     return $table;
 }
 
 
-$cmid = optional_param('id', 0, PARAM_INT);
+$cmid = optional_param('cmid', 0, PARAM_INT);
 require_login();
+
 $url = new moodle_url('/plagiarism/moss/result_pages/view_add.php?');
-$url->param('id',$cmid);
+$url->param('cmid',$cmid);
 $PAGE->set_url($url);
 $PAGE->set_context(null);
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title('anti-plagiarism view all page');
-$PAGE->set_heading('View all page');
-$PAGE->navbar->add('Anti-plagiarism');
-$PAGE->navbar->add('Results');
-$PAGE->navbar->add('View all');
+$PAGE->set_title(get_string('view_all_title', 'plagiarism_moss'));
+$PAGE->set_heading(get_string('view_all_heading', 'plagiarism_moss'));
+$PAGE->navbar->add(get_string('plugin_name', 'plagiarism_moss'));
+$PAGE->navbar->add(get_string('results', 'plagiarism_moss'));
+$PAGE->navbar->add(get_string('view_all', 'plagiarism_moss'));
 
 global $DB;
 $form = new view_all_filter_form(NULL, array('cmid'=>$cmid));
@@ -170,32 +291,119 @@ $table;
 
 $currenttab='tab1';
 $tabs = array();
-$tabs[] = new tabobject('tab1', "view_all.php?id=".$cmid, 'View all', 'View all', false);
-$tabs[] = new tabobject('tab3', "statistics.php?id=".$cmid, 'Statistics', 'Statistics', false);
+$tabs[] = new tabobject('tab1', "view_all.php?cmid=".$cmid, get_string('view_all', 'plagiarism_moss'), 'View all', false);
+$tabs[] = new tabobject('tab3', "statistics.php?cmid=".$cmid, get_string('statistics', 'plagiarism_moss'), 'Statistics', false);
     
 if(($data = $form->get_data()) && confirm_sesskey())
 {
+	//print_object($data);
+	//die;
     global $DB;
-    print_object($data);
-    //cross table 与 view all table 一样 tablesummary 都设置为一样
-    $table = initial_table($result, '');
+    //we don't use BETWEEN ... AND ... because different database software have different rules
+    $params = array();
+    $sql = "SELECT * FROM {moss_results}
+            WHERE cmid = ? ";
+    $params[] = $cmid;
+
+    //add table type
+    $table_type = $data->general['tabletype'];
+    switch($table_type)
+    {
+    	 case 'view_all_table':
+    	 	break;   
+         case 'cross_table':
+         	$sql .= "AND iscross = 1 ";
+            break;
+         case 'confirmed_table':    
+            $sql .= "AND confirmed = 1 ";
+            break;
+         case 'unconfirmed_table':  
+            $sql .= "AND confirmed = 0 ";
+            break;
+    }
+    
+    //add rank range
+    if(isset($data->rank['rank_not_include']))
+       $rank_not_include = $data->rank['rank_not_include'];
+    $sql .= "AND rank >= ? AND rank <= ? ";
+    if(isset($rank_not_include))//not include edges
+    {//in our table 'rank','userpercent' and 'linecount' are all integer so ...
+        $params[] = $data->rank['rank_from'] + 1;
+        $params[] = $data->rank['rank_to'] - 1;
+    }
+    else 
+    {
+        $params[] = $data->rank['rank_from'];
+        $params[] = $data->rank['rank_to'];
+    }
+
+    //add percentage range
+    if(isset($data->percent['percent_not_include']));
+        $percent_not_include = $data->percent['percent_not_include'];
+    $sql .= "AND user1percent >= ? AND user1percent <= ? AND user2percent >= ? AND user2percent <= ? ";
+    if(isset($percent_not_include))
+    {
+        $params[] = $data->percent['percent_from'] + 1;
+        $params[] = $data->percent['percent_to'] - 1;
+        $params[] = $data->percent['percent_from'] + 1;
+        $params[] = $data->percent['percent_to'] - 1;
+    }
+    else 
+    {
+        $params[] = $data->percent['percent_from'];
+        $params[] = $data->percent['percent_to'];
+        $params[] = $data->percent['percent_from'];
+        $params[] = $data->percent['percent_to'];
+    }
+    
+    //add linecount range
+    if(isset($data->lines['lines_not_include']))
+        $lines_not_include = $data->lines['lines_not_include'];
+    $sql .= "AND linecount >= ? AND linecount <= ? ";
+    if(isset($lines_not_include))
+    {
+        $params[] = $data->lines['lines_from'] + 1;
+        $params[] = $data->lines['lines_to'] - 1;
+    }
+    else 
+    {
+        $params[] = $data->lines['lines_from'];
+        $params[] = $data->lines['lines_to'];
+    }
+
+    $results = $DB->get_records_sql($sql, $params);
+    $table = initial_table($cmid ,$results, $table_type);
 }
 else
 {
     //read all
-    $result = $DB->get_records('moss_results', array('cmid'=>$cmid));
-    $table = initial_table($result, 'view_all_table');
+    $results = $DB->get_records('moss_results', array('cmid'=>$cmid));
+    $table = initial_table($cmid, $results, 'view_all_table');
 }
 
 //print HTML page
 echo $OUTPUT->header();
 $form->display();
 print_tabs(array($tabs), $currenttab);
-echo '<b>Press "Undo" button to reverse an operation...<b> <br/>';
-echo '<button id="undo_button" disabled="true" type="button" onclick=undo()>Undo</button>';
-echo '<button id="redo_button" disabled="true" type="button" onclick=redo()>Redo</button><br/><br/>';
+echo '<b>'.get_string('undo_redo_describtion', 'plagiarism_moss').'<b> <br/>';
+echo '<button id="undo_button" disabled="true" type="button" onclick=undo()>'.get_string('undo', 'plagiarism_moss').'</button>';
+echo '<button id="redo_button" disabled="true" type="button" onclick=redo()>'.get_string('redo', 'plagiarism_moss').'</button><br/><br/>';
 echo html_writer::table($table);
 echo $OUTPUT->footer();
+
+echo  '<div style="visibility:hidden">';
+echo  '<div id="confirm_prompt">'.get_string('confirm_prompt','plagiarism_moss').'</div>';
+echo  '<div id="unconfirm_prompt">'.get_string('unconfirm_prompt','plagiarism_moss').'</div>';
+echo  '<div id="nothing_to_undot">'.get_string('nothing_to_undo','plagiarism_moss').'</div>';
+echo  '<div id="nothing_to_redo">'.get_string('nothing_to_redo','plagiarism_moss').'</div>';
+echo  '<div id="parse_xml_exception">'.get_string('parse_xml_exception','plagiarism_moss').'</div>';
+echo  '<div id="request_rejected">'.get_string('request_rejected','plagiarism_moss').'</div>';
+echo  '<div id="confirm">'.get_string('confirm','plagiarism_moss').'</div>';
+echo  '<div id="confirmed">'.get_string('confirmed','plagiarism_moss').'</div>';
+echo  '<div id="unconfirm">'.get_string('unconfirm','plagiarism_moss').'</div>';
+echo  '<div id="unconfirmed">'.get_string('unconfirmed','plagiarism_moss').'</div>';
+echo  '</div>';
+
 ?>
 
 
@@ -248,6 +456,7 @@ function string_to_number(string)
 	//percentage
     if(string[string.length-1] == '%')
         return (parseFloat(string.substring(0,string.length-1)))/100;
+    
     //we believe the string is valid
     var val1 = parseInt(string);
     var val2 = parseFloat(string);
@@ -270,39 +479,97 @@ function swap_innerHTML(row1, row2)
     tmp = row1.id;
     row1.id = row2.id;
     row2.id = tmp;
-
 }
 
-function view_code(element, link)
+function view_code(cmid, entryid)
 {
-    var entryid = element.parentNode.parentNode.id;
     var height = window.screen.availHeight;
     var width = window.screen.availWidth;
     var w_height = parseInt(height * 2 / 3);
     var w_width = parseInt(width * 4 / 5);
     var w_top = parseInt((height - w_height) / 2);
     var w_left = parseInt((width - w_width) / 2);
-	window.open("view_code/code.php","view code",
-			    "height="+w_height+",width="+w_width+",top="+w_top+",left="+w_left); 
-	//connect_server('view_all_page', 'view_code', entryid);
-	
-}
-function show_user_profile(uid)
-{
-    alert('show user profile uid = '+uid);
-}
-function confirm(element)
-{
-    var entryid = element.parentNode.parentNode.id;
-    connect_server('view_all_page', 'confirm', entryid, 'new');
+	window.open("view_code.php?cmid="+cmid+"&entryid="+entryid,
+			    "view code",
+			    "height="+w_height+",width="+w_width+",top="+w_top+",left="+w_left);
 }
 
-function unconfirm(element)
+function relevant_entry(cmid, uid1, uid2)
+{
+    var height = window.screen.availHeight;
+    var width = window.screen.availWidth;
+    var w_height = parseInt(height * 2 / 3);
+    var w_width = parseInt(width * 4 / 5);
+    var w_top = parseInt((height - w_height) / 2);
+    var w_left = parseInt((width - w_width) / 2);
+    window.open("relevant?cmid="+cmid+"&uid1="+uid1+"&uid2="+uid2,
+    	        "Relevant entrys",
+                "height="+w_height+",width="+w_width+",top="+w_top+",left="+w_left); 	
+}
+
+function show_user_profile(url)
+{
+    var height = window.screen.availHeight;
+    var width = window.screen.availWidth;
+    var w_height = parseInt(height * 2 / 3);
+    var w_width = parseInt(width * 4 / 5);
+    var w_top = parseInt((height - w_height) / 2);
+    var w_left = parseInt((width - w_width) / 2);
+    window.open(url,
+    	        "view user",
+                "height="+w_height+",width="+w_width+",top="+w_top+",left="+w_left); 
+}
+
+function get_label(id, default_txt)
+{
+	//var element = document.getElementById(id);
+	//if(element != null)
+	//	return element.innerHTML;
+	//else
+	if(default_txt == 'Confirmed')
+		return '<font color="#FF0000"><b>Confirmed</b></font>';
+	return default_txt;	
+}
+
+function confirm_entry(element)
+{
+	if(confirm(get_label('confirm_prompt', 'Are you sure you want to confirm this entry ?')))
+	{
+        var entryid = element.parentNode.parentNode.id;
+        connect_server('view_all_page', 
+    	               'confirm', 
+    	                entryid, 
+    	               'new');
+	}
+}
+
+function confirm_by_entry_id(id)
+{
+    connect_server('view_all_page', 
+                   'confirm', 
+                    id, 
+                   'new');
+}
+
+function unconfirm_entry(element)
+{ 
+	if(confirm(get_label('unconfirm_prompt', 'Are you sure you want to unconfirm this entry ?')))
+	{
+        var entryid = element.parentNode.parentNode.id;
+        connect_server('view_all_page', 
+    	               'unconfirm', 
+    	                entryid, 
+    	               'new');
+	}
+}
+
+function unconfirm_by_entry_id(id)
 {  
-    var entryid = element.parentNode.parentNode.id;
-    connect_server('view_all_page', 'unconfirm', entryid, 'new');
+    connect_server('view_all_page', 
+    	           'unconfirm', 
+    	            id, 
+    	           'new');
 }
-
 
 //In this function we create a "undo & redo" stack, use an array as a stack,
 //every items in the stack array is an array that contains an operation and the corresponding table entry details,
@@ -328,6 +595,7 @@ function undo_redo_stack()
             this.restore_button()
             return null
         }
+
         var op = new Array();
         op[0] = this.stack[this.pointer][1];//id
         op[1] = (this.stack[this.pointer][2] == 'confirm') ? 'unconfirm' : 'confirm';//counter-operation
@@ -335,6 +603,7 @@ function undo_redo_stack()
         this.redo_button.disable = true;//low bandwidth concern, once a time
         return op;
     }
+    
     this.undo_operation_succeed = function()
     {
         var item = this.stack[this.pointer];
@@ -342,17 +611,20 @@ function undo_redo_stack()
         this.restore_button();
         return item;
     }
+    
     this.restore_button = function()
     {
         if(this.pointer != 0)//still able to undo
             this.undo_button.disabled = false;
-        else
+        else   
             this.undo_button.disabled = true;
-        if(this.pointer < this.size)//still able to redo
+
+        if(this.pointer < this.size)//still able to redo  
             this.redo_button.disabled = false;
         else
             this.redo_button.disabled = true;
     }
+    
     //redo an operation, do not move pointer,
     //move pointer when server accepted the request,and responsed.
     //return array(0->'id', 1->'request')
@@ -363,6 +635,7 @@ function undo_redo_stack()
             this.restore_button();
             return null;
         }
+        
         var op = new Array();
         op[0] = this.stack[this.pointer + 1][1];//id
         op[1] = this.stack[this.pointer + 1][2];//operation  
@@ -370,6 +643,7 @@ function undo_redo_stack()
         this.redo_button.disable = true;//low bandwidth concern, once a time
         return op;
     }
+    
     this.redo_operation_succeed = function()
     {
         this.pointer += 1;
@@ -389,42 +663,42 @@ function undo_redo_stack()
         this.pointer += 1;
         this.redo_button.disabled = true;//unable to redo after a new operation added
         this.undo_button.disabled = false;//able to undo
-    }
-    
+    }   
 }
 
 //undo_redo_stack
-op_stack = new undo_redo_stack();;
+op_stack = new undo_redo_stack();
 
 function redo()
-{	
+{
     var op = op_stack.redo_operation();
     if(op == null)
-        alert('unable to redo');
+        alert(get_label('nothing_to_redo', 'Nothing to redo.'));
     else
-    	connect_server('view_all_page', op[1], op[0], 'redo');
+    	connect_server('view_all_page', 
+    	    	        op[1], 
+    	    	        op[0], 
+    	    	       'redo');
 }
 
 function undo()
-{
+{	
     var op = op_stack.undo_operation();
     if(op == null)
-        alert('unable to undo');   
-    else{
-    	connect_server('view_all_page', op[1], op[0], 'undo');
-    }
+        alert(get_label('nothing_to_undo', 'Nothing to undo.'));   
+    else
+    	connect_server('view_all_page', 
+    	    	        op[1], 
+    	    	        op[0], 
+    	    	       'undo');
 }
 
 function connect_server(page, request, entryid, type)
 {
-    if (window.XMLHttpRequest)
-    {   // code for IE7+, Firefox, Chrome, Opera, Safari
+    if (window.XMLHttpRequest)// code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp=new XMLHttpRequest();
-    }
-    else
-    {   // code for IE6, IE5
+    else// code for IE6, IE5
         xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-    }
     
     xmlhttp.onreadystatechange=function()
     {
@@ -439,25 +713,27 @@ function connect_server(page, request, entryid, type)
             }
             catch(er)
             {
-                alert('xml parse exception');
+                alert(get_label('parse_xml_exception', 'Parse XML exception.'));
                 op_stack.restore_button();
                 return;
             }
+            
             if(status == 1)
-            {    
-                alert("request rejected");
+            {
+                alert(get_label('request_rejected', 'Request rejected by server.'));
                 op_stack.restore_button();
                 return;
             }
             else
+            {
                 if(status == 0)
                 {
-                    alert("request accepted");
                     var table = document.getElementById('result_table'); 
                     var table_type = table.summary;
                     switch(table_type)
                     {
                     case 'view_all_table':     
+                    case 'cross_table':
                         modify_view_all_table(id, request, op_type);
                         break;
                     case 'confirmed_table':    
@@ -468,9 +744,11 @@ function connect_server(page, request, entryid, type)
                         break;
                     }
                 }
+                return;
+            }
         }
     }
-    xmlhttp.open("GET","result_page_ajax.php?page="+page+"&request="+request+"&id="+entryid+"&type="+type,true);
+    xmlhttp.open("GET","ajax_response.php?page="+page+"&request="+request+"&id="+entryid+"&type="+type,true);
     xmlhttp.send();
 }
 
@@ -481,13 +759,14 @@ function modify_view_all_table(id, request, op_type)
     var length = table.rows.length;
     for(var i = 0; i <= length - 1; i++)
         if(table.rows[i].id == id)
+        {
             row = table.rows[i];
-    if(row == null)
-    {
-        alert('entry id = '+id+' not found');
-        return;
-    }
+            break;
+        }
 
+    if(row == null)
+        return;
+    
     switch(op_type)
     {
     case 'undo':
@@ -504,14 +783,18 @@ function modify_view_all_table(id, request, op_type)
     }
     
     //change row status and request button
-    var status_txt = (request == 'confirm') ? 'confirmed' : 'unconfirmed';
-    row.cells[8].innerHTML = status_txt;
-    
-    if(status_txt == 'confirmed')
-    	row.cells[7].innerHTML = '<button type="button" onclick = unconfirm(this)>Cancel</button>';
+    if(request == 'confirm')
+    {
+    	row.cells[9].innerHTML = get_label('confirmed', 'Confirmed');
+    	var bl = get_label('unconfirm', 'Unconfirm');
+    	row.cells[7].innerHTML = '<button type="button" onclick = unconfirm_entry(this)>'+bl+'</button>';
+    }
     else
-    	row.cells[7].innerHTML = '<button type="button" onclick = confirm(this)>Confirm</button>';     
-   
+    {
+    	row.cells[9].innerHTML = get_label('unconfirmed', 'Unconfirmed');
+    	var bl = get_label('confirm', 'Confirm');
+    	row.cells[7].innerHTML = '<button type="button" onclick = confirm_entry(this)>'+bl+'</button>';
+    }   
 }
 
 function modify_confirmed_table(id, request, op_type)
@@ -531,8 +814,10 @@ function modify_confirmed_table(id, request, op_type)
             row = table.insertRow(1);
             row.innerHTML = entry[0];
             row.id = entry[1];
-            row.cells[7].innerHTML = '<button type="button" onclick = unconfirm(this)>Cancel</button>';
-            row.cells[8].innerHTML = 'confirmed';
+            
+            var bl = get_label('unconfirm', 'Unconfirm');
+            row.cells[7].innerHTML = '<button type="button" onclick = unconfirm_entry(this)>'+bl+'</button>';
+            row.cells[8].innerHTML = get_label('confirmed', 'Confirmed');
 
             //change back sorting order, and sort table 
             sortdir[sort_index] = (sortdir[sort_index] == "ASC") ? "DESC" : "ASC";
@@ -547,23 +832,21 @@ function modify_confirmed_table(id, request, op_type)
         {
             for(var i = 0; i <= length - 1; i++)
                 if(table.rows[i].id == id)
+                {    
                     row = table.rows[i];
+                    break;
+                }
+            
             if(row == null)
-            {
-                alert('entry id = '+id+' not found');
                 return;
-            }
             
             if(op_type == 'redo')
             	op_stack.redo_operation_succeed();
-            else
-                if(op_type == 'new')
-            	    op_stack.new_operation(row.innerHTML, id, request);
-
+            else  
+                op_stack.new_operation(row.innerHTML, id, request);
             //remove entry
             row.parentNode.removeChild(row);
         } 
-        
         break;
     default    ://error unrecognizable op_type
         break;
@@ -586,8 +869,10 @@ function modify_unconfirmed_table(id, request, op_type)
             row = table.insertRow(1);
             row.innerHTML = entry[0];
             row.id = entry[1];
-            row.cells[7].innerHTML = '<button type="button" onclick = confirm(this)>Confirm</button>';
-            row.cells[8].innerHTML = 'unconfirmed';
+            
+            var bl = get_label('confirm', 'Confirm');
+            row.cells[7].innerHTML = '<button type="button" onclick = confirm_entry(this)>'+bl+'</button>';
+            row.cells[8].innerHTML = get_label('unconfirmed', 'Unconfirmed');
 
             sortdir[sort_index] = (sortdir[sort_index] == "ASC") ? "DESC" : "ASC";
             sort_table(sort_index);
@@ -601,27 +886,28 @@ function modify_unconfirmed_table(id, request, op_type)
         {
             for(var i = 0; i <= length - 1; i++)
                 if(table.rows[i].id == id)
+                {
                     row = table.rows[i];
+                    break;
+                }
+
             if(row == null)
             {
                 alert('entry id = '+id+' not found');
                 return;
             }
-
+            
             if(op_type == 'redo')
             	op_stack.redo_operation_succeed();
             else
             	op_stack.new_operation(row.innerHTML, id, request);
-
             //remove entry
             row.parentNode.removeChild(row);
         } 
-
         break;
     default    ://error unrecognizable op_type
         break;
     }
-
 }
 
 </script>

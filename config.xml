@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+  <entry_number>2</entry_number>
+  <enable_log>YES</enable_log>
+  <rerun_after_change>YES</rerun_after_change>
+  <send_email>NO</send_email>
+  <show_code>NEVER</show_code>
+  <show_entrys_detail>ALWAYS</show_entrys_detail>
+  <enable_cross-course_detection>NO</enable_cross-course_detection>
+  <enable_student_appeal>ALWAYS</enable_student_appeal>
+  <default_students_in_statistics_page>8</default_students_in_statistics_page>
+</config>

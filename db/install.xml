@@ -12,7 +12,8 @@
         <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="sensitivity"/>
         <FIELD NAME="sensitivity" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="language" NEXT="basefilename"/>
         <FIELD NAME="basefilename" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="sensitivity" NEXT="measuredtime"/>
-        <FIELD NAME="measuredtime" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="basefilename"/>
+        <FIELD NAME="measuredtime" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="basefilename" NEXT="requirererun"/>
+        <FIELD NAME="requirererun" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="measuredtime"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -28,47 +29,36 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="moss_results" COMMENT="place to store moss result" PREVIOUS="moss_tags" NEXT="moss_plugin_setting">
+    <TABLE NAME="moss_results" COMMENT="place to store moss result" PREVIOUS="moss_tags" NEXT="moss_plugin_errors">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
         <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="cmid" NEXT="confirmed"/>
-        <FIELD NAME="confirmed" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="notuserid"/>
-        <FIELD NAME="notuserid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="如果本条记录有学生不属于本cm，则notuserid记录了这个学生的id 如果两个学生都属于本cm，则置null" PREVIOUS="confirmed" NEXT="rank"/>
-        <FIELD NAME="rank" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="notuserid" NEXT="user1id"/>
+        <FIELD NAME="confirmed" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="iscross"/>
+        <FIELD NAME="iscross" TYPE="int" LENGTH="2" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="如果本条记录有学生不属于本cm，则cross为1，且user1id为其它课程学生，否则置0" PREVIOUS="confirmed" NEXT="rank"/>
+        <FIELD NAME="rank" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="iscross" NEXT="user1id"/>
         <FIELD NAME="user1id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rank" NEXT="user2id"/>
         <FIELD NAME="user2id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user1id" NEXT="user1percent"/>
         <FIELD NAME="user1percent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user2id" NEXT="user2percent"/>
         <FIELD NAME="user2percent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user1percent" NEXT="linecount"/>
         <FIELD NAME="linecount" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user2percent" NEXT="link"/>
-        <FIELD NAME="link" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" PREVIOUS="linecount"/>
+        <FIELD NAME="link" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" PREVIOUS="linecount" NEXT="teacherid"/>
+        <FIELD NAME="teacherid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="link"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="moss_plugin_setting" COMMENT="plugin general setting" PREVIOUS="moss_results" NEXT="moss_plugin_errors">
+    <TABLE NAME="moss_plugin_errors" COMMENT="all errors the plugin encountered" PREVIOUS="moss_results">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="entryno"/>
-        <FIELD NAME="entryno" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Default entry number" PREVIOUS="id" NEXT="log"/>
-        <FIELD NAME="log" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Enabel log" PREVIOUS="entryno" NEXT="rerun"/>
-        <FIELD NAME="rerun" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Rerun after settings changed" PREVIOUS="log" NEXT="email"/>
-        <FIELD NAME="email" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Send Email to students" PREVIOUS="rerun" NEXT="text"/>
-        <FIELD NAME="text" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Show similarity text to student" PREVIOUS="email" NEXT="entrys"/>
-        <FIELD NAME="entrys" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Show result entrys to student" PREVIOUS="text" NEXT="crossdetection"/>
-        <FIELD NAME="crossdetection" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Enable cross course detection" PREVIOUS="entrys"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="moss_plugin_errors" COMMENT="all errors the plugin encountered" PREVIOUS="moss_plugin_setting">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="errordate"/>
-        <FIELD NAME="errordate" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="type"/>
-        <FIELD NAME="type" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="errordate" NEXT="describtion"/>
-        <FIELD NAME="describtion" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" PREVIOUS="type" NEXT="status"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="describtion"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="errdate"/>
+        <FIELD NAME="errdate" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="errtype"/>
+        <FIELD NAME="errtype" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="errdate" NEXT="errdescription"/>
+        <FIELD NAME="errdescription" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" PREVIOUS="errtype" NEXT="errstatus"/>
+        <FIELD NAME="errstatus" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="errdescription" NEXT="errsolution"/>
+        <FIELD NAME="errsolution" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" PREVIOUS="errstatus" NEXT="errargument"/>
+        <FIELD NAME="errargument" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" PREVIOUS="errsolution" NEXT="testable"/>
+        <FIELD NAME="testable" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="errargument"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

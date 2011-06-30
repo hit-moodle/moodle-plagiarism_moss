@@ -1,14 +1,24 @@
 <?php
 
-class file_operator{
-	
-    /**
-     * 描述：  保存$cmid所指定的反抄袭任务的base_file。
-     * 参数：  $fileid
-     *        $cmid
-     * 返回：  bool型
-     */
-    public function save_base_file($file, $cmid){
+if (!defined('MOODLE_INTERNAL')) 
+    die('Direct access to this script is forbidden.');
+    
+/**
+ * 
+ * Enter description here ...
+ * @author ycc
+ *
+ */
+class file_operator
+{
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param unknown_type $file
+	 * @param unknown_type $cmid
+	 */
+    public function save_base_file($file, $cmid)
+    {
         global $DB;
         
         //准备$fs，$context,$tag
@@ -18,27 +28,35 @@ class file_operator{
         //TODO 如果为更新，需要先删除之前的basefile
         
         //保存文件
-        $fileinfo = array('contextid' => $context->id, 'component' => 'plagiarism_moss',
-                          'filearea' => 'moss', 'itemid' => 0,
-                          'filepath' => '/'.$cmid.'/',//直接放在/$cmid/下的原因是为了方便moss cmd的准备 
-                          'filename' => $file->get_filename());   
+        $fileinfo = array('contextid' => $context->id, 
+                          'component' => 'plagiarism_moss',
+                          'filearea'  => 'moss', 
+                          'itemid'    => 0,
+                          'filepath'  => '/'.$cmid.'/',//直接放在/$cmid/下的原因是为了方便moss cmd的准备 
+                          'filename'  => $file->get_filename());   
         $new_file_record = $fs->create_file_from_storedfile($fileinfo, $file);
+        if(!isset($new_file_record))
+        {
+            mtrace('save basefile error');
+        	return false;
+        }
         return true;
     }
     
     /**
-     * 描述：  保存学生上传的作业，可以保存单文件作业也可以保存多文件作业，
-     *        如果学生为更新作业，则先删除原有的文件记录，然后转存文件。
-     * 参数：  $eventdata
-     * 返回：  $result bool型
+     * 
+     * Enter description here ...
+     * @param unknown_type $eventdata
      */
-    public function save_upload_file_files($eventdata){
+    public function save_upload_file_files($eventdata)
+    {
         global $DB;
         $result = true; 
         
         //单文件作业使用多文件作业方法转存
-        if(!empty($eventdata->file) && empty($eventdata->files)){
-                $eventdata->files[] = $eventdata->file;
+        if(!empty($eventdata->file) && empty($eventdata->files))
+        {
+            $eventdata->files[] = $eventdata->file;
         }
         
         //序列化对象,准备$fs，$context,$cmid,$userid
@@ -50,52 +68,59 @@ class file_operator{
         $userid = $eventdata->userid;
         
         //错误检查
-        if(!$DB->record_exists('course_modules', array('id' => $cmid))){
-            mtrace("cm不存在\n");
+        if(!$DB->record_exists('course_modules', array('id' => $cmid)))
         	return $result;
-        }
-        foreach($eventdata->files as $file){
+        
+        foreach($eventdata->files as $file)
+        {
             $fileid = $fs->get_file_by_id($file->get_id());
-            if(empty($fileid)){
-                mtrace("找不到文件\n");
+            if($fileid == false)
                 return $result;
-            }
         }
         
         //获取当前用户之前上传的文件（如果有的话则删除）
-        $old_file_records = $fs->get_directory_files($context->id, 'plagiarism_moss', 'moss', 0, 
-                                                    '/'.$cmid.'/'.$userid.'/');
-        if(empty($old_file_records))
-            mtrace("上传文件\n");
-        else{
-            mtrace("更新文件\n");
+        $old_file_records = $fs->get_directory_files($context->id, 
+                                                     'plagiarism_moss', 
+                                                     'moss', 
+                                                     0, 
+                                                     '/'.$cmid.'/'.$userid.'/');
+        if(!empty($old_file_records))
+        {//delete old files
             foreach($old_file_records as $record)   
                 $record->delete();
         } 
         
         //转存文件
-        foreach($eventdata->files as $file){
+        foreach($eventdata->files as $file)
+        {
             if($file->get_filename() === '.')
                 continue;
-            $fileinfo = array('contextid' => $context->id, 'component' => 'plagiarism_moss',
-                              'filearea' => 'moss', 'itemid' => 0,
-                              'filepath' => '/'.$cmid."/".$userid."/", 
-                              'filename' => $file->get_filename());   
+            
+            $fileinfo = array('contextid' => $context->id, 
+                              'component' => 'plagiarism_moss',
+                              'filearea'  => 'moss', 
+                              'itemid'    => 0,
+                              'filepath'  => '/'.$cmid."/".$userid."/", 
+                              'filename'  => $file->get_filename());
+               
             $new_file_record = $fs->create_file_from_storedfile($fileinfo, $file);
+            
             if(!isset($new_file_record))
-                mtrace("转存错误\n");
-            else 
-                mtrace("转存成功\n");
+            {
+                mtrace('create student file error');
+                return false;
+            }
         }
-        return $result;
+        return true;
     }
-	/**
-     * 描述：  保存学生上传的作业，可以保存单文件作业
-     *        如果学生为更新作业，则先删除原有的文件记录，然后转存文件。
-     * 参数：  $eventdata
-     * 返回：  $result bool型
+	
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $eventdata
      */
-    public function save_upload_file($eventdata){
+    public function save_upload_file($eventdata)
+    {
         global $DB;
         $result = true; 
         
@@ -108,49 +133,57 @@ class file_operator{
         $userid = $eventdata->userid;
         
         //错误检查
-        if(!$DB->record_exists('course_modules', array('id' => $cmid))){
+        if(!$DB->record_exists('course_modules', array('id' => $cmid)))
+        {
             mtrace("cm不存在\n");
         	return $result;
         }
+        
         $fileid = $fs->get_file_by_id($eventdata->file->get_id());
-        if(empty($fileid)){
+        if($fileid == false)
+        {
             mtrace("找不到文件\n");
             return $result;
         }
         
         //获取当前用户之前上传的文件（如果有的话则删除）
-        $old_file_records = $fs->get_directory_files($context->id, 'plagiarism_moss', 'moss', 0, 
-                                                    '/'.$cmid.'/'.$userid.'/');
+        $old_file_records = $fs->get_directory_files($context->id, 
+                                                     'plagiarism_moss', 
+                                                     'moss', 
+                                                     0, 
+                                                     '/'.$cmid.'/'.$userid.'/');
         if(empty($old_file_records))
             mtrace("上传文件\n");
-        else{
+        else
+        {
             mtrace("更新文件\n");
             foreach($old_file_records as $record)   
                 $record->delete();
         } 
         
         //转存文件
-        $fileinfo = array('contextid' => $context->id, 'component' => 'plagiarism_moss',
-                          'filearea' => 'moss', 'itemid' => 0,
-                          'filepath' => '/'.$cmid."/".$userid."/", 
-                          'filename' => $eventdata->file->get_filename());   
+        $fileinfo = array('contextid' => $context->id, 
+                          'component' => 'plagiarism_moss',
+                          'filearea'  => 'moss', 
+                          'itemid'    => 0,
+                          'filepath'  => '/'.$cmid."/".$userid."/", 
+                          'filename'  => $eventdata->file->get_filename());   
         $new_file_record = $fs->create_file_from_storedfile($fileinfo, $eventdata->file);
         if(!isset($new_file_record))
-            mtrace("转存错误\n");
-        else 
-            mtrace("转存成功\n");
+        {
+            mtrace('create student file error');
+            return false;
+        }
         return $result;
     }
-    
+
     /**
-     * 描述：  复制当前cmid的所有学生文件到/temp；
-     *        复制与cmid有同一个tag的所有cm的所有学生作业到/temp；
-     *        复制当前cmid的所有basefile。
-     *        结构：/temp/moss/$cmid/$userid/$filename
-     * 参数：  $cmid
-     * 返回：  bool型
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
      */
-    public function prepare_files($cmid){
+    public function move_files_to_temp($cmid, $trigger_err = true)
+    {
         global $DB;
         global $CFG;
         
@@ -162,62 +195,99 @@ class file_operator{
         if($cnf_xml->get_config('enable_cross-course_detection') == 'YES')
         {
             $record = $DB->get_record('moss_tags',array('cmid' => $cmid));
-            $tag = $record->tag;
-            $cmarray = $DB->get_records("moss_tags",array('tag' => $tag));
+            if($record->tag != NULL)
+            {
+            	$tag = $record->tag;
+                $records = $DB->get_records("moss_tags",array('tag' => $tag));
+                foreach($records as $re)
+                    $cmarray[$re->cmid] = $re->cmid;
+            }
+            else 
+                $cmarray = array($cmid);
         }
         else 
             $cmarray = array($cmid);
             
-        $temppath = $CFG->dataroot.'/moss';
+        $temppath = $CFG->dataroot.'/moss'.$cmid;
+        $this->remove_temp_files($temppath);
         
         //检查当前cm有没有学生上传的文件，如果没有返回false;
-        $files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'moss', 0, 
-                                     '/'.$cmid.'/', true, true, 'filepath');
+        $files = $fs->get_directory_files($context->id, 
+                                          'plagiarism_moss', 
+                                          'moss', 
+                                           0, 
+                                          '/'.$cmid.'/', 
+                                           true, 
+                                           true, 
+                                          'filepath');
         $flag = false;
-        foreach($files as $file){
-        	//有学生目录就认为存在学生上传文件
-            if($file->get_filename() == '.'){
+        foreach($files as $file)
+        {	//有学生目录就认为存学生有上传文件
+            if($file->get_filename() == '.')
+            {
                 $flag = true;
                 break;
             }
         }
-        if(!$flag){
-            mtrace('cm('.$cmid.')没有学生上传文件记录');
+        if(!$flag)
         	return false;
-        }
-            
+        
         //创建目录$CFG->dataroot./moss/ TODO 检查目录是否已经存在 
-        if(!mkdir($temppath)){
-            mtrace('创建目录'.$temppath.'失败');
+        if(!mkdir($temppath))
+        {
+        	if($trigger_err)
+        	    $this->trigger_error('Error when creating directory at file path '.$temppath, array('$cmid'=>$cmid), 11);
             return false;
         }
         
         //复制与当前cm有相同tag的所有cm的文件到$temppath(不检查文件是否存在)
-        foreach($cmarray as $cm){
-        	$files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'moss', 0, 
-                                     '/'.$cm->cmid.'/', true, true, 'filepath');
+        foreach($cmarray as $cm)
+        {
+        	print_object($cm);
+        	$files = $fs->get_directory_files($context->id, 
+        	                                  'plagiarism_moss', 
+        	                                  'moss', 
+        	                                   0, 
+                                              '/'.$cm.'/', 
+        	                                   true, 
+        	                                   true, 
+        	                                  'filepath');
             if(empty($files))
                 continue;
+            
             //创建目录$CFG->dataroot./moss/$cmid/
-            if(!mkdir($temppath.'/'.$cm->cmid.'/'))
-                mtrace('创建目录'.$temppath.'/'.$cm->cmid.'/'.'失败');
+            if(!mkdir($temppath.'/'.$cm.'/'))
+            	return false;
+        
             //TODO 确保文件树结构有序，即文件夹在文件前面。
-            foreach($files as $file){
+            foreach($files as $file)
+            {
             	//不是当前cm则basefiles不复制，只有存放在/$cmid/下的basefile的filepath才有可能是'/$cmid/'
         	    /*if(($file->get_filepath() == '/'.$cm->cmid.'/') && ($cm->cmid != $cmid))
         	          continue; 复制也无所谓，所以就复制吧。*/
-        	    if($file->get_filename() == '.'){	
+        	    if($file->get_filename() == '.')
+        	    {	
         		    if(!mkdir($temppath.$file->get_filepath()))
-        	            mtrace('创建目录'.$temppath.$file->get_filepath().'失败');
+        		    {
+        	            if($trigger_err)
+        	                $this->trigger_error('Error when creating directory at file path '.$temppath, array('$cmid'=>$cmid), 11);
+        	            return false;
+        		    }
         	    }
-        	    else{
+        	    else
+        	    {
         		    $contents = $file->get_content();
-        		    if($fh = fopen($temppath.$file->get_filepath().$file->get_filename(),'w')){
+        		    if($fh = fopen($temppath.$file->get_filepath().$file->get_filename(),'w'))
+        		    {
         			    fwrite($fh, $contents);
         		        fclose($fh);
                     }
         	        else 
-        	            mtrace('创建文件'.$temppath.$file->get_filepath().$file->get_filename().'失败');
+        	        {
+        	            if($trigger_err)
+        	                $this->trigger_error('Error when creating file at file path '.$temppath, array('$cmid'=>$cmid), 11);
+        	            return false;
+        	        }
         	    }
             }
         }
@@ -225,73 +295,430 @@ class file_operator{
     }
     
     /**
-     * 描述：  删除/temp下的临时文件，在moss返回结果后调用
-     * 参数：  $directory /temp目录
-     * 返回：  无
+     * 
+     * error trigger by caller
+     * @param unknown_type $directory
      */
-    public function delete_temp_directory($directory){
+    public function remove_temp_files($directory)
+    {
+    	$re = false;
     	//后序遍历文件树，删除所有文件和文件夹
-    	if(file_exists($directory)){//确保目录存在才能rmdir
-    	    if($dir = opendir($directory)){
-    	        while($fname = readdir($dir)){
+    	if(file_exists($directory))
+    	{//确保目录存在才能rmdir
+    	    if($dir = opendir($directory))
+    	    {
+    	        while($fname = readdir($dir))
+    	        {
     	        	if(($fname == '.') || ($fname == '..'))
     	                continue;
-    	            //是子目录，递归删除，否则只能是文件，直接删除  
-    	            if(is_dir($directory.'/'.$fname))
-    	                $this->delete_temp_directory($directory.'/'.$fname);
-    	            else 
-    	                unlink($directory.'/'.fname);
-    	            
+    	        	else 
+    	        	{//是子目录，递归删除，否则只能是文件，直接删除  
+    	                if(is_dir($directory.'/'.$fname))
+    	                    $re = $this->remove_temp_files($directory.'/'.$fname);
+    	                else 
+                            $re = unlink($directory.'/'.$fname);
+                        if($re == false)
+                            return false;
+    	        	}
     	        }
     	        closedir($dir);
-    	        rmdir($directory);
+    	        return rmdir($directory);
     	    }
+    	    return false;
     	}
+    	return true;
     }
-    
+  
     /**
-     * 描述：  删除反抄袭插件的所有文件。
-     * 参数：  无
-     * 返回：  无
+     * 
+     * Enter description here ...
      */
-    public function delete_moss_directory(){
+    public function delete_moss_directory()
+    {
     	$fs = get_file_storage();
     	$context = get_context_instance(CONTEXT_SYSTEM);
-    	$fs -> delete_area_files($context->id, 'plagiarism_moss', 'moss', 0);	
+    	$re = $fs -> delete_area_files($context->id, 
+    	                               'plagiarism_moss', 
+    	                               'moss', 
+    	                                0);	
+    	return $re;
     } 
     
     /**
-     * 描述：  在Moodle中创建文件。
-     * 参数：  $content
-     *        $filename
-     *        $path
-     * 返回：  $result bool型
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
+     * @param unknown_type $entryid
      */
-    public function create_file($content, $filename, $filepath){
-        $result = false;
-        return $result;
+    public function results_files_exist($cmid, $entryid)
+    {
+        $fs = get_file_storage();
+        $context = get_context_instance(CONTEXT_SYSTEM);
+
+        $files = $fs->get_directory_files($context->id, 
+                                          'plagiarism_moss', 
+                                          'moss_results', 
+                                           0, 
+                                          '/'.$cmid.'/'.$entryid.'/', 
+                                           true, 
+                                           true, 
+                                          'filepath'); 
+        if(!empty($files))
+            return true;
+        else
+            return false;
     }
     
     /**
-     * 描述：  解压操作系统文件目录下的zip文件。
-     * 参数：  $filename
-     *        $file_path
-     * 返回：  $result bool型
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
+     * @param unknown_type $entryid
      */
-    public function unpack_zip($filename, $file_path){
-        $result = false;
-        return $result;
+    public function remove_results_files_by_id($cmid, $entryid)
+    {
+        $fs = get_file_storage();
+        $context = get_context_instance(CONTEXT_SYSTEM);
+
+        $files = $fs->get_directory_files($context->id, 
+                                          'plagiarism_moss', 
+                                          'moss_results', 
+                                           0, 
+                                          '/'.$cmid.'/'.$entryid.'/', 
+                                           true, 
+                                           true, 
+                                          'filepath'); 
+        if(empty($files))
+            return true;
+        else 
+            foreach($files as $file)
+                try{
+            	       $file->delete();
+                }
+                catch(Exception $e)
+                {
+                	return false;
+                }
+    }
+    
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
+     */
+    public function remove_results_files_by_cm($cmid)
+    {
+        $fs = get_file_storage();
+        $context = get_context_instance(CONTEXT_SYSTEM);
+
+        $files = $fs->get_directory_files($context->id, 
+                                          'plagiarism_moss', 
+                                          'moss_results', 
+                                           0, 
+                                          '/'.$cmid.'/', 
+                                           true, 
+                                           true, 
+                                          'filepath'); 
+        if(empty($files))
+            return true;
+        else 
+            foreach($files as $file)
+                try{
+            	       $file->delete();
+                }
+                catch(Exception $e)
+                {
+                	return false;
+                }
     }
 
     /**
-     * 描述：  解压操作系统文件目录下的rar文件。
-     * 参数：  $filename
-     *        $file_path
-     * 返回：  $result bool型
+     * 
+     * Enter description here ...
      */
-    public function unpack_rar($file_path){
-        $result = false;
-        return $result;
+    public function remove_results_files_all()
+    {
+        $fs = get_file_storage();
+    	$context = get_context_instance(CONTEXT_SYSTEM);
+    	$re = $fs -> delete_area_files($context->id, 
+    	                              'plagiarism_moss', 
+    	                              'moss_results', 
+    	                               0);
+        return $re;	
+    }
+    
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
+     * @param unknown_type $entryid
+     */
+    public function save_results_files($cmid, $entryid, $trigger_err=true)
+    {
+    	//检查是否已经下载，如果是则删除
+    	$re = $this->results_files_exist($cmid, $entryid);
+    	if($re == true)
+    	    $this->remove_results_files_by_id($cmid, $entryid);
+        
+    	global $DB;
+    	global $CFG;
+        $fs = get_file_storage();
+        $context = get_context_instance(CONTEXT_SYSTEM);
+        
+    	$record = $DB->get_record('moss_results', array('id'=>$entryid));
+    	//match page url and contents
+    	$url = $record->link;
+    	//I wanna get the contents of the page above by use file_get_contents($url),but failed, don't know why
+        $match_page_contents = '<HTML>
+                                    <FRAMESET ROWS="150,*">
+                                        <FRAMESET COLS="1000,*">
+                                            <FRAME SRC="view_code.php?cmid='.$cmid.'&entryid='.$entryid.'&page=top" NAME="top" FRAMEBORDER=0>
+                                        </FRAMESET>
+                                        <FRAMESET COLS="50%,50%">
+                                            <FRAME SRC="view_code.php?cmid='.$cmid.'&entryid='.$entryid.'&page=0" NAME="0">
+                                            <FRAME SRC="view_code.php?cmid='.$cmid.'&entryid='.$entryid.'&page=1" NAME="1">
+                                        </FRAMESET>
+                                    </FRAMESET>
+                                </HTML>';
+        //save match page file
+        $fileinfo = array('contextid' => $context->id, 
+                          'component' => 'plagiarism_moss',
+                          'filearea'  => 'moss_results', 
+                          'itemid'    => 0,
+                          'filepath'  => '/'.$cmid."/".$entryid."/", 
+                          'filename'  => 'match.html');   
+        $match_page = $fs->create_file_from_string($fileinfo, $match_page_contents);
+        if(!isset($match_page))
+        {
+        	if($trigger_err)
+        	    $this->trigger_error('Error when download source code detail from moss server',
+        	                          array('cmid'=>$cmid, 'entryid'=>$entryid), 21);
+            return false;
+        }
+        //$url = http://moss.stanford.edu/results/715072715/match0.html
+        $top_url = str_replace(".html","-top.html",$url);
+        $code0_url = str_replace(".html","-0.html",$url);
+        $code1_url = str_replace(".html","-1.html",$url);
+        
+        $pattern = '/match(\d+)/';
+        if(preg_match($pattern, $url, $short_url))
+        {
+             $code0_url_short = $short_url[0]."-0.html";
+             $code1_url_short = $short_url[0]."-1.html";
+        }
+        else 
+        {
+        	if($trigger_err)
+        	    $this->trigger_error('Error when download source code detail from moss server',
+        	                          array('cmid'=>$cmid, 'entryid'=>$entryid), 21);
+            return false;
+        }
+        //get top page's contents modify it and save it
+        $code0_local_url = $CFG->wwwroot."/plagiarism/moss/result_pages/view_code.php?cmid=".$cmid."&entryid=".$entryid."&page=0";
+        $code1_local_url = $CFG->wwwroot."/plagiarism/moss/result_pages/view_code.php?cmid=".$cmid."&entryid=".$entryid."&page=1";
+        
+        $top_page_contents = file_get_contents($top_url);
+        $top_page_contents = str_replace($code0_url,
+                                         $code0_local_url,
+                                         $top_page_contents);  
+                                         
+        $top_page_contents = str_replace($code1_url,
+                                         $code1_local_url,
+                                         $top_page_contents);
+
+        $fileinfo = array('contextid' => $context->id, 
+                          'component' => 'plagiarism_moss',
+                          'filearea'  => 'moss_results', 
+                          'itemid'    => 0,
+                          'filepath'  => '/'.$cmid."/".$entryid."/", 
+                          'filename'  => 'top.html');   
+        $top_page = $fs->create_file_from_string($fileinfo, $top_page_contents);
+        if(!isset($top_page))
+        {
+        	if($trigger_err)
+        	    $this->trigger_error('Error when download source code detail from moss server',
+        	                          array('cmid'=>$cmid, 'entryid'=>$entryid), 21);
+            return false;
+        }
+        //get code 0 page's contents modify it and save it
+        $code0_page_contents = file_get_contents($code0_url);
+        $code0_page_contents = str_replace($code1_url_short,
+                                           $code1_local_url,
+                                           $code0_page_contents);
+        $fileinfo = array('contextid' => $context->id, 
+                          'component' => 'plagiarism_moss',
+                          'filearea'  => 'moss_results', 
+                          'itemid'    => 0,
+                          'filepath'  => '/'.$cmid."/".$entryid."/", 
+                          'filename'  => '0.html');   
+        $code0_page = $fs->create_file_from_string($fileinfo, $code0_page_contents);
+        if(!isset($code0_page))
+        {
+        	if($trigger_err)
+        	    $this->trigger_error('Error when download source code detail from moss server',
+        	                          array('cmid'=>$cmid, 'entryid'=>$entryid), 21);
+            return false;
+        }
+        //get code 1 page's contents modify it and save it        
+        $code1_page_contents = file_get_contents($code1_url);
+        $code1_page_contents = str_replace($code0_url_short, 
+                                           $code0_local_url, 
+                                           $code1_page_contents);
+        $fileinfo = array('contextid' => $context->id, 
+                          'component' => 'plagiarism_moss',
+                          'filearea'  => 'moss_results',  
+                          'itemid'    => 0,
+                          'filepath'  => '/'.$cmid."/".$entryid."/", 
+                          'filename'  => '1.html');   
+        $code1_page = $fs->create_file_from_string($fileinfo, $code1_page_contents);
+        if(!isset($code1_page))
+        {
+        	if($trigger_err)
+        	    $this->trigger_error('Error when download source code detail from moss server',
+        	                          array('cmid'=>$cmid, 'entryid'=>$entryid), 21);
+            return false;
+        }
+        //update database
+        $record->link = "downloaded";
+        if(!$DB->update_record('moss_results', $record)) 
+            return false;
+        else 
+            return true;
+    }
+    
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $cmid
+     * @param unknown_type $entryid
+     * @param unknown_type $page
+     */
+    public function get_results_files_contents($cmid, $entryid, $page)
+    {
+    	$fs = get_file_storage();
+        $context = get_context_instance(CONTEXT_SYSTEM);
+        $file = $fs->get_file($context->id, 
+                              'plagiarism_moss', 
+                              'moss_results', 
+                               0, 
+                              '/'.$cmid.'/'.$entryid.'/', 
+                               $page.'.html'); 
+        if($file == false)
+            return "";   
+        
+        $contents = $file->get_content();
+        return $contents;
+
+    }
+
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $filename
+     * @param unknown_type $file_path
+     */
+    public function unpack_file($filename, $file_path)
+    {
     }
   
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $description
+     * @param unknown_type $type
+     */
+    private function trigger_error($description, $arguments = NULL, $type)
+    {
+        global $CFG;
+        global $DB;
+        $err = new object();
+        $err->errdate = time();
+        $err->errtype = $type;
+        $err->errdescription = $description;
+        $err->errstatus = 1;//unsolved
+        switch ($type)
+        {
+        	case 11:
+        		$err->errsolution = 'Check directory permission.';
+        		$err->testable = 1;
+        	    break;//move files to temp error
+        	case 12:
+        		$err->errsolution = 'Check directory permission.';
+        		$err->testable = 1;
+        		break;//remove temp files error
+        	case 21:
+        		$err->errsolution = 'You can press "Test" button to see if it\'s solved, contact a programmer if unsolved.';
+        		$err->testable = 1;
+        		break;//download code detail error
+        	default: 
+        		$err->testable = 0;
+        		$err->errsolution = 'Unknown.';
+        		break;
+        }
+        if($arguments == NULL)
+            $err->errargument = 'no argument';
+        else 
+        {
+        	$str = "";
+            foreach($arguments as $name => $value)
+            {
+            	if($str == "")
+            	    $str = $name."%".$value;
+            	else 
+            	    $str .= "%".$name."%".$value;
+            }
+            $err->errargument = $str;
+        }
+        $DB->insert_record('moss_plugin_errors', $err); 
+    }
+    
+    /**
+     * 
+     * Enter description here ...
+     * @param unknown_type $type
+     * @param unknown_type $arrguments
+     */
+    public function error_test($type, $argument)
+    {
+    	global $CFG;
+        $arr = split("%",$arrguments);
+        $arguments = array();
+        if(count($arr)%2 != 0)
+            return true;
+        for($i =0; $i < count($arr); $i++)
+        {
+            $arguments[$arr[$i]] = $arr[$i+1];
+            $i += 1;
+        }
+        switch ($type)
+        {
+        	case 11://move file to temp error
+        		if($this->move_files_to_temp($arguments['cmid'], false))
+        		{
+        			$this->remove_temp_files($CFG->dataroot.'/moss'.$arguments['cmid']);
+        			return true;
+        		}
+        		else 
+        		    return false;
+        		break;
+        	case 12://remove file from temp error
+        		if($this->remove_temp_files($argument['path']))
+        		    return true;
+        		else 
+        		    return false;
+        		break;
+        	case 21://download code detail error
+        		if($this->save_results_files($argument['cmid'], $argument['entryid'], false))
+        		    return true;
+        		else
+        		    return false;
+        		break;
+        	default :
+        		return true;
+        }
+        
+    }
 }
+
+
+
