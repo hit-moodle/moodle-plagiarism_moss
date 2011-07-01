@@ -1,33 +1,42 @@
 <?php
 
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
 
-//prevent direct access
-if (!defined('MOODLE_INTERNAL')) 
-    die('Direct access to this script is forbidden.');    
+/**
+ * Anti-Plagiarism by Moss
+ *
+ * @package   local_onlinejudge
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');    
 
-//global class
-global $CFG;
 require_once($CFG->dirroot.'/plagiarism/lib.php');
-//include moss setting class
 require_once($CFG->dirroot.'/plagiarism/moss/moss_settings.php');
-//include moss operator class
 require_once($CFG->dirroot.'/plagiarism/moss/moss_operator.php');
-//include file operator class
 require_once($CFG->dirroot.'/plagiarism/moss/file_operator.php');
 
 
@@ -37,18 +46,15 @@ require_once($CFG->dirroot.'/plagiarism/moss/file_operator.php');
  * @author 
  *
  */
-class plagiarism_plugin_moss extends plagiarism_plugin 
-{
+class plagiarism_plugin_moss extends plagiarism_plugin {
 	/**
 	 * (non-PHPdoc)
 	 * @see plagiarism_plugin::print_disclosure()
 	 */
-    public function print_disclosure($cmid)
-    {
+    public function print_disclosure($cmid) {
     	global $OUTPUT;
     	global $DB;
-    	if($DB -> record_exists_select('moss_settings', 'cmid='.$cmid))
-    	{
+    	if ($DB->record_exists_select('moss_settings', 'cmid='.$cmid)) {
             $plagiarismsettings = (array)get_config('plagiarism');
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             $formatoptions = new stdClass;
@@ -62,28 +68,25 @@ class plagiarism_plugin_moss extends plagiarism_plugin
      * (non-PHPdoc)
      * @see plagiarism_plugin::save_form_elements()
      */
-    public function save_form_elements($data) 
-    {
+    public function save_form_elements($data) {
     	$setting = new moss_settings();
-        $setting->save_settings($data);  
+        $setting->save_settings($data);
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see plagiarism_plugin::get_form_elements_module()
      */
-    public function get_form_elements_module($mform, $context) 
-    {
+    public function get_form_elements_module($mform, $context) {
     	$setting = new moss_settings();
-        $setting->show_settings_form($mform, $context);      
+        $setting->show_settings_form($mform, $context);
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see plagiarism_plugin::get_links()
      */
-    public function get_links($linkarray) 
-    {
+    public function get_links($linkarray) {
         //$userid, $file, $cmid, $course, $module
         global $CFG;
         $cmid = $linkarray['cmid'];
@@ -91,18 +94,17 @@ class plagiarism_plugin_moss extends plagiarism_plugin
         $file = $linkarray['file'];
         $link = '<span class="plagiarismreport">
                      <a href= "'.$CFG->wwwroot.'/plagiarism/moss/result_pages/student_page.php?cmid='.$cmid.'&id='.$userid.'" >
-                     anti-plagiarism result link 
+                     anti-plagiarism result link
                      <a/>';//$cmid.$userid.$file;
         //add link/information about this file to $link
-        return $link;      
+        return $link;
     }
 
     /**
      * (non-PHPdoc)
      * @see plagiarism_plugin::update_status()
      */
-    public function update_status($course, $cm) 
-    { 
+    public function update_status($course, $cm) {
         global $CFG;
         echo '<a href="'.$CFG->wwwroot.'/plagiarism/moss/result_pages/view_all.php?cmid='.$cm->id.'">
               anti-plagiarism verify page
@@ -113,8 +115,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin
      * 
      * Enter description here ...
      */
-    public function cron() 
-    {
+    public function cron() {
         global $DB;
         $err_test = new plugin_error_test();
         echo 'moss plugin check error...';
@@ -123,11 +124,11 @@ class plagiarism_plugin_moss extends plagiarism_plugin
         $moss_op = new moss_operator();
         //mtrace('当前时间：'.userdate(time()));
         $current_time = time();
-        
+
         $sql = "SELECT cm.id AS cmid, am.name AS name, am.timeavailable AS timeavilable, am.timedue AS timedue
                 FROM {course_modules} AS cm, {assignment} AS am
-                WHERE cm.module=? AND 
-                      cm.instance=am.id AND 
+                WHERE cm.module=? AND
+                      cm.instance=am.id AND
                       cm.id IN
                             (SELECT DISTINCT cmid
                              FROM {moss_settings} 
@@ -136,8 +137,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin
         $params = array(1);
         //get all
         $results = $DB->get_records_sql($sql,$params);
-        foreach($results as $result)
-        {
+        foreach($results as $result) {
             //if($result->timedue > $current_time)//time to run
             //{
             	$moss_op -> connect_moss($result->cmid);
@@ -152,21 +152,17 @@ class plagiarism_plugin_moss extends plagiarism_plugin
  * @author ycc
  *
  */
-class config_xml
-{
+class config_xml {
     /**
      * 
      * Enter description here ...
      */
-    public function get_config_all()
-    {
+    public function get_config_all() {
     	global $CFG;
         $array = array();
         //if xml file not exist return default data 
-        if(file_exists($CFG->dirroot.'/plagiarism/moss/config.xml'))
-        {
-        	if(!is_readable($CFG->dirroot.'/plagiarism/moss/config.xml'))
-        	{
+        if (file_exists($CFG->dirroot.'/plagiarism/moss/config.xml')) {
+        	if (!is_readable($CFG->dirroot.'/plagiarism/moss/config.xml')) {
         	    $this->trigger_error('Configuration file "config.xml" unreadable.', 1);
                 return $this->default;        
         	}
@@ -175,19 +171,14 @@ class config_xml
             return $this->default;
         
         $doc = new DOMDocument();
-        if($doc->load($CFG->dirroot.'/plagiarism/moss/config.xml'))
-        {
+        if ($doc->load($CFG->dirroot.'/plagiarism/moss/config.xml')) {
         	$array = $this->parse_xml($doc);
-        	if($array == NULL)
-            {
+        	if ($array == NULL) {
             	$this->trigger_error('Error when parse configuration file "config.xml", some configuration tag missing.', 3);
             	return $this->default;
-            }
-            else 
+            } else 
     	        return $array;
-        }
-        else
-        {
+        } else {
         	$this->trigger_error('Error when loading Configuration file "config.xml".', 2);
             return $this->default;
         }
@@ -198,8 +189,7 @@ class config_xml
      * Enter description here ...
      * @param unknown_type $doc
      */
-    private function parse_xml($doc)
-    {
+    private function parse_xml($doc) {
     	$array = array();
         $entry_number                           = $doc->getElementsByTagName('entry_number');
         $enable_log                             = $doc->getElementsByTagName('enable_log');
