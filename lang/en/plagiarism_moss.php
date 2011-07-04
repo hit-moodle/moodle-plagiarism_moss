@@ -1,55 +1,58 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
 
 /**
+ * Anti-Plagiarism by Moss
  *
- * @package   plagiarism_new
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @package   plagiarism_moss
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 $string['moss'] = 'Moss anti-plagiarism plugin';
-$string['savedconfigsuccess'] = 'Anti-plagiarism Settings Saved';
+$string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';
 
 //general setting page
 $string['general_settings'] = 'Plugin general settings';
 $string['mossexplain'] = 'For more information on this plugin see: ';
-$string['usemoss'] ='Enable moss';
+$string['mossenabled'] ='Enable moss';
+$string['mossuserid'] ='Moss account';
+$string['mossuserid_help'] ='To obtain a Moss account, send a  mail message to <a href="mailto:moss@moss.stanford.edu">moss@moss.stanford.edu</a>. The body of the message should be in <strong>PLAIN TEXT</strong>(without any HTML tags) format and appear exactly as follows:
+
+    registeruser
+    mail username@domain
+
+After registration, you will get a reply mail which contains a perl script with one line of code just likes:
+
+    $userid=1234567890;
+
+The number is exactly your moss account.';
+
 $string['studentdisclosure'] = 'Student Disclosure';
 $string['studentdisclosure_help'] = 'This text will be displayed to all students on the file upload page.';
 $string['studentdisclosuredefault']  ='All files uploaded will be submitted to a moss plagiarism detection service';
-$string['default_entry_number'] = 'Default entry number';
-$string['default_entry_number_help'] = 'TODO';
-$string['enable_log'] = 'Enable log';
-$string['enable_log_help'] = 'TODO';
-$string['rerun'] = 'Rerun after settings changed';
-$string['rerun_help'] = 'TODO';
-$string['send_email'] = 'Send E-mail to students';
-$string['send_email_help'] = 'TODO';
-$string['similar_code'] = 'Show code to students';
-$string['similar_code_help'] = 'TODO';
-$string['result_entrys_detail'] = 'Show entrys detail to students';
-$string['result_entrys_detail_help'] = 'TODO';
-$string['cross_detection'] = 'Enable cross-course detection';
-$string['cross_detection_help'] = 'TODO';
-$string['student_appeal'] = 'Enable student appeal';
-$string['student_appeal_help'] = 'TODO';
-$string['default_students'] = 'Default students in statistics page';
-$string['default_students_help'] = 'TODO';
 
 //error log page
 $string['error_log'] = 'Plugin error log';
@@ -156,3 +159,4 @@ $string['all_relevant'] = 'All relevant entry';
 $string['complete_subgraph'] = 'Complete subgraph';
 $string['relevant_type'] = 'Choose relevant type';
 $string['relevant_type_help'] = 'TODO';
+

@@ -1,26 +1,35 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
 
 /**
+ * Anti-Plagiarism by Moss
  *
- * @package   plagiarism_new
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @package   plagiarism_moss
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 $string['moss'] = 'Moss反抄袭插件';
 $string['savedconfigsuccess'] = '配置保存成功';
@@ -28,28 +37,21 @@ $string['savedconfigsuccess'] = '配置保存成功';
 //general setting page
 $string['general_settings'] = '插件综合配置';
 $string['mossexplain'] = '详细信息请访问: ';
-$string['usemoss'] ='启动Moss';
-$string['studentdisclosure'] = '学生可见公布信息';
-$string['studentdisclosure_help'] = '这条信息将显示给所有学生。';
+$string['mossenabled'] ='启用Moss';
+$string['mossuserid'] ='Moss账号';
+$string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@moss.stanford.edu</a>发送一封邮件就能获得Moss账号。邮件正文必须是<strong>纯文本</strong>（没有任何html标记），且完全符合下面的格式：
+
+    registeruser
+    mail username@domain
+
+如果注册成功，会收到一封带有perl脚本的邮件。脚本中有一行和下面代码很相似的代码：
+
+    $userid=1234567890;
+
+其中的数字就是您能的Moss账号。';
+$string['studentdisclosure'] = '显示给学生的声明';
+$string['studentdisclosure_help'] = '这些文字会在文件上传页面显示给所有学生。';
 $string['studentdisclosuredefault']  ='所有上传的文件将通过Moss反抄袭引擎进行反抄袭检测。';
-$string['default_entry_number'] = '默认反抄袭条目';
-$string['default_entry_number_help'] = 'TODO';
-$string['enable_log'] = '启用日志';
-$string['enable_log_help'] = 'TODO';
-$string['rerun'] = '若条目设置改变重新运行Moss';
-$string['rerun_help'] = 'TODO';
-$string['send_email'] = '通过电子邮件发送反抄袭结果给学生';
-$string['send_email_help'] = 'TODO';
-$string['similar_code'] = '允许学生查看相似代码';
-$string['similar_code_help'] = 'TODO';
-$string['result_entrys_detail'] = '允许学生查看抄袭条目记录';
-$string['result_entrys_detail_help'] = 'TODO';
-$string['cross_detection'] = '启用跨课程反抄袭';
-$string['cross_detection_help'] = 'TODO';
-$string['student_appeal'] = '允许学生发申述信息';
-$string['student_appeal_help'] = 'TODO';
-$string['default_students'] = '统计页面中默认显示学生数';
-$string['default_students_help'] = 'TODO';
 
 //error log page
 $string['error_log'] = '插件错误日志';
@@ -154,3 +156,4 @@ $string['all_relevant'] = '所有相关记录';
 $string['complete_subgraph'] = '所有完全子图';
 $string['relevant_type'] = '选择相关记录类型';
 $string['relevant_type_help'] = 'TODO';
+

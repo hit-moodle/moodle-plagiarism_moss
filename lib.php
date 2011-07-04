@@ -1,6 +1,5 @@
 <?php
 
-
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
 // NOTICE OF COPYRIGHT                                                   //
@@ -27,7 +26,7 @@
 /**
  * Anti-Plagiarism by Moss
  *
- * @package   local_onlinejudge
+ * @package   plagiarism_moss
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -52,9 +51,8 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 	 * @see plagiarism_plugin::print_disclosure()
 	 */
     public function print_disclosure($cmid) {
-    	global $OUTPUT;
-    	global $DB;
-    	if ($DB->record_exists_select('moss_settings', 'cmid='.$cmid)) {
+    	global $OUTPUT, $DB;
+    	if ($DB->record_exists('moss', array('cmid' => $cmid))) {
             $plagiarismsettings = (array)get_config('plagiarism');
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             $formatoptions = new stdClass;
@@ -146,253 +144,6 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     }
 }
 
-/**
- * 
- * Enter description here ...
- * @author ycc
- *
- */
-class config_xml {
-    /**
-     * 
-     * Enter description here ...
-     */
-    public function get_config_all() {
-    	global $CFG;
-        $array = array();
-        //if xml file not exist return default data 
-        if (file_exists($CFG->dirroot.'/plagiarism/moss/config.xml')) {
-        	if (!is_readable($CFG->dirroot.'/plagiarism/moss/config.xml')) {
-        	    $this->trigger_error('Configuration file "config.xml" unreadable.', 1);
-                return $this->default;        
-        	}
-        }    
-        else//is not an error 
-            return $this->default;
-        
-        $doc = new DOMDocument();
-        if ($doc->load($CFG->dirroot.'/plagiarism/moss/config.xml')) {
-        	$array = $this->parse_xml($doc);
-        	if ($array == NULL) {
-            	$this->trigger_error('Error when parse configuration file "config.xml", some configuration tag missing.', 3);
-            	return $this->default;
-            } else 
-    	        return $array;
-        } else {
-        	$this->trigger_error('Error when loading Configuration file "config.xml".', 2);
-            return $this->default;
-        }
-    }
-
-    /**
-     * 
-     * Enter description here ...
-     * @param unknown_type $doc
-     */
-    private function parse_xml($doc) {
-    	$array = array();
-        $entry_number                           = $doc->getElementsByTagName('entry_number');
-        $enable_log                             = $doc->getElementsByTagName('enable_log');
-        $rerun                                  = $doc->getElementsByTagName('rerun_after_change');
-        $send_email                             = $doc->getElementsByTagName('send_email');
-        $show_code                              = $doc->getElementsByTagName('show_code');
-        $show_entrys_detail                     = $doc->getElementsByTagName('show_entrys_detail');   
-        $cross                                  = $doc->getElementsByTagName('enable_cross-course_detection'); 
-        $appeal                                 = $doc->getElementsByTagName('enable_student_appeal');
-        $default_students                       = $doc->getElementsByTagName('default_students_in_statistics_page');
-       
-        if(($entry_number->length == 0)||
-          ($enable_log->length == 0)||
-          ($rerun->length == 0)||
-          ($send_email->length == 0)||
-          ($show_code->length == 0)||
-          ($show_entrys_detail->length == 0)||
-          ($cross->length == 0)||
-          ($appeal->length == 0)||
-          ($default_students ->length == 0))
-         return NULL;
-                   
-        $array['entry_number']                        = $entry_number->item(0)->nodeValue;   
-        $array['enable_log']                          = $enable_log->item(0)->nodeValue;                      
-        $array['rerun_after_change']                  = $rerun->item(0)->nodeValue;           
-        $array['send_email']                          = $send_email->item(0)->nodeValue;                       
-        $array['show_code']                           = $show_code->item(0)->nodeValue;                       
-        $array['show_entrys_detail']                  = $show_entrys_detail->item(0)->nodeValue;                      
-        $array['enable_cross-course_detection']       = $cross->item(0)->nodeValue;            
-        $array['enable_student_appeal']               = $appeal->item(0)->nodeValue;
-        $array['default_students_in_statistics_page'] = $default_students->item(0)->nodeValue;
-
-    	    return $array;
-    }
-    
-    /**
-     * 
-     * Enter description here ...
-     * @param unknown_type $array
-     */
-    public function save_config($array)
-    {
-        global $CFG;
-    	$doc = new DOMDocument('1.0');
-        $doc->formatOutput = true;
-    	$root = $doc->createElement("config");
-    	$doc->appendChild($root);
-    	//expandable code
-    	foreach ($array as $name => $value)
-        {
-            $$name = $doc->createElement($name);
-            $$name->appendChild($doc->createTextNode($value));
-            $root->appendChild($$name);
-        }
-        //$config_xml = $doc->saveXML();
-        //delete config.xml if existed.
-        if(file_exists($CFG->dirroot.'/plagiarism/moss/config.xml'))
-        {
-        	$re = unlink($CFG->dirroot.'/plagiarism/moss/config.xml');
-            if($re == false)
-            {
-                $this->trigger_error('Unable to delete configuration file "config.xml".', 4);
-                return false;
-            }
-        }
-        
-        if(!$doc->save($CFG->dirroot.'/plagiarism/moss/config.xml'))
-        {
-        	$this->trigger_error('Unable to save configuration file "config.xml".', 5);
-        	return false;
-        }   
-        return true;
-    }
-    
-    /**
-     * 
-     * Enter description here ...
-     * @param unknown_type $tagname
-     */
-    public function get_config($tagname)
-    {
-    	global $CFG;
-    	//read xml file if not exist, return default 
-    	if(! file_exists($CFG->dirroot.'/plagiarism/moss/config.xml'))
-            return $this->default[$tagname];
-    	else 
-    	{
-    	    $doc = new DOMDocument();
-            if($doc->load($CFG->dirroot.'/plagiarism/moss/config.xml'))
-            {
-                $tag = $doc->getElementsByTagName($tagname);
-                if(isset($tag))
-                    return $tag->item(0)->nodeValue;
-                else
-                    return $this->default[$tagname];
-            }
-            else 
-            {
-                return $this->default[$tagname];
-            }
-        //TODO error handle
-    	}
-    }
-   
-    /**
-     * 
-     * Enter description here ...
-     */
-    public function error_test($type, $arrguments)
-    {
-        global $CFG;
-        switch($type)
-        {
-        	case 1://existed but unreadable
-        		if(is_readable($CFG->dirroot.'/plagiarism/moss/config.xml'))
-        		    return true;
-        		return false;
-        		break;
-        	case 4://unable to delete
-        	case 5://unable to create
-        		//test if directory access = "read and write";
-                $fp = fopen($CFG->dirroot.'/plagiarism/moss/config_error_test.xml','w+');
-                if($fp == false)
-                    return false;
-                fwrite($fp, 'test');
-                fclose($fp); 
-                return unlink($CFG->dirroot.'/plagiarism/moss/config_error_test.xml');
-        		break;
-        	case 2://load error
-        	case 3://parse error
-        		$doc = new DOMDocument();
-        	    if(! $doc->load($CFG->dirroot.'/plagiarism/moss/config.xml'))
-        	        return false;
-        	    if($type == 2)
-        	        return true;
-        	    else 
-        	    {	
-        	    	$array = $this->parse_xml($doc);
-        	    	if($array == NULL)
-        	    	    return false;
-        	    	else 
-        	    	    return true;
-        	    }
-        		break;
-        	default:break;
-        }
-    }
-
-    /**
-     * 
-     * Enter description here ...
-     */
-    private function trigger_error($description, $type)
-    {
-        global $CFG;
-        global $DB;
-        $records = $DB->get_records('moss_plugin_errors', array('errtype'=>$type, 'errstatus'=>1));
-        if(count($records) != 0)
-        {
-            return;
-        }
-        $err = new object();
-        $err->errdate = time();
-        $err->errtype = $type;
-        $err->errdescription = $description;
-        $err->errstatus = 1;
-
-        if(($type == 1) || ($type == 4) || ($type == 5))//unable to read; unable to delete; unable to create;
-        {
-            $err->errsolution = 'Check permission on directory :"'.$CFG->dirroot.'/plagiarism/moss/"'. 
-                                'or configuration file :"./config.xml" make sure Access = "Read and Write".';
-            $err->testable = 1;
-        }
-        else 
-        {
-            if(($type == 2) || ($type == 3))//unable to load; unable to parse
-            {    
-            	$err->errsolution = 'Check file format, file path=:"'.$CFG->dirroot.'/plagiarism/moss/config.xml"'. 
-                                    'make sure it\'s a XML file. visit "Plugin general settings" page and press "save change" button, the plugin will generate'.
-                                    'a default "config.xml" file';
-            	$err->testable = 1;
-            }
-            else
-            { 
-                $err->errsolution = 'Unknown.';
-                $err->testable = 0;
-            }
-        }
-        $err->errargument = 'no arguments';
-        $DB->insert_record('moss_plugin_errors', $err);
-    }
-    
-    private $default = array('entry_number' => 2,
-                             'enable_log' => 'YES',
-                             'rerun_after_change' => 'YES',
-                             'send_email' => 'NO',
-                             'show_code' => 'NEVER',
-                             'show_entrys_detail' => 'ALWAYS',
-                             'enable_cross-course_detection' => 'NO',
-                             'enable_student_appeal' => 'ALWAYS',
-                             'default_students_in_statistics_page' => 8);
-   
-}
 
 /**
  * 
@@ -572,5 +323,4 @@ function moss_event_mod_deleted($eventdata)
         return $re;
     }
 }
-
 
