@@ -86,19 +86,19 @@ echo $OUTPUT->header();
 if (($data = $mform->get_data()) && confirm_sesskey()) { 
 
     if (!empty($data->mossenabled)) {
-        set_config('mossenabled', $data->mossenabled, 'plagiarism_moss');
+        set_config('moss_use', $data->mossenabled, 'plagiarism');
         set_config('moss_student_disclosure', $data->moss_student_disclosure, 'plagiarism_moss');
         set_config('mossuserid', $data->mossuserid, 'plagiarism_moss');
     } else {
-        set_config('mossenabled', 0, 'plagiarism_moss');
+        set_config('moss_use', 0, 'plagiarism');
     }
 
     notify(get_string('savedconfigsuccess', 'plagiarism_moss'), 'notifysuccess');
 }
 
 $settings = array();
-if (get_config('plagiarism_moss', 'mossenabled')) {
-    $settings['mossenabled'] = get_config('plagiarism_moss', 'mossenabled');
+if (get_config('plagiarism', 'moss_use')) {
+    $settings['mossenabled'] = get_config('plagiarism', 'moss_use');
 }
 if (get_config('plagiarism_moss', 'moss_student_disclosure')) {
     $settings['moss_student_disclosure'] = get_config('plagiarism_moss', 'moss_student_disclosure');
