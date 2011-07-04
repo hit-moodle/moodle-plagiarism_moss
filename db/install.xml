@@ -1,39 +1,51 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="plagiarism/moss/db" VERSION="20110604" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
+<XMLDB PATH="plagiarism/moss/db" VERSION="20110704" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="moss_settings" COMMENT="moss settings for specific assignment" NEXT="moss_tags">
+    <TABLE NAME="moss" COMMENT="MOSS instances" NEXT="moss_configs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
-        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
-        <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="cmid" NEXT="language"/>
-        <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="sensitivity"/>
-        <FIELD NAME="sensitivity" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="language" NEXT="basefilename"/>
-        <FIELD NAME="basefilename" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="sensitivity" NEXT="measuredtime"/>
-        <FIELD NAME="measuredtime" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="basefilename" NEXT="requirererun"/>
-        <FIELD NAME="requirererun" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="measuredtime"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="timetomeasure"/>
+        <FIELD NAME="timetomeasure" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="cmid" NEXT="timemeasured"/>
+        <FIELD NAME="timemeasured" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timetomeasure" NEXT="tag"/>
+        <FIELD NAME="tag" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timemeasured"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="cmid"/>
+        <KEY NAME="cmid" TYPE="foreign-unique" FIELDS="cmid" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="tag"/>
+        <KEY NAME="tag" TYPE="foreign" FIELDS="tag" REFTABLE="moss_tags" REFFIELDS="id" PREVIOUS="cmid"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="moss_tags" COMMENT="tags to identify assignments with same task" PREVIOUS="moss_settings" NEXT="moss_results">
+    <TABLE NAME="moss_configs" COMMENT="configs for different filename patterns" PREVIOUS="moss" NEXT="moss_tags">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="tag"/>
-        <FIELD NAME="tag" TYPE="char" LENGTH="250" NOTNULL="false" SEQUENCE="false" PREVIOUS="id" NEXT="cmid"/>
-        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="tag"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="moss"/>
+        <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
+        <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="moss" NEXT="language"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="sensitivity"/>
+        <FIELD NAME="sensitivity" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="language"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="moss"/>
+        <KEY NAME="moss" TYPE="foreign" FIELDS="moss" REFTABLE="moss" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="moss_tags" COMMENT="tags to identify assignments with same task" PREVIOUS="moss_configs" NEXT="moss_results">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="id"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="name"/>
+        <KEY NAME="name" TYPE="unique" FIELDS="name" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="moss_results" COMMENT="place to store moss result" PREVIOUS="moss_tags" NEXT="moss_plugin_errors">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
-        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
-        <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="cmid" NEXT="confirmed"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="moss"/>
+        <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
+        <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="moss" NEXT="confirmed"/>
         <FIELD NAME="confirmed" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="iscross"/>
         <FIELD NAME="iscross" TYPE="int" LENGTH="2" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="如果本条记录有学生不属于本cm，则cross为1，且user1id为其它课程学生，否则置0" PREVIOUS="confirmed" NEXT="rank"/>
         <FIELD NAME="rank" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="iscross" NEXT="user1id"/>
@@ -46,7 +58,8 @@
         <FIELD NAME="teacherid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="link"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="moss"/>
+        <KEY NAME="moss" TYPE="foreign" FIELDS="moss" REFTABLE="moss" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="moss_plugin_errors" COMMENT="all errors the plugin encountered" PREVIOUS="moss_results">
