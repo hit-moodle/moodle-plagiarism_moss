@@ -151,6 +151,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $mform->disabledIf('timetomeasure', 'enabled');
 
         $mform->addElement('text', 'tag', get_string('tag', 'plagiarism_moss'));
+        $mform->addHelpButton('tag', 'tag', 'plagiarism_moss');
         $mform->setType('tag', PARAM_TEXT);
         $mform->disabledIf('tag', 'enabled');
 

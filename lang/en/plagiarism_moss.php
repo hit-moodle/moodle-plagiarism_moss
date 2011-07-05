@@ -53,6 +53,8 @@ $string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';
 $string['studentdisclosure'] = 'Student Disclosure';
 $string['studentdisclosure_help'] = 'This text will be displayed to all students on the file upload page.';
 $string['studentdisclosuredefault']  ='All files uploaded will be submitted to a moss plagiarism detection service';
+$string['tag'] = 'Tag';
+$string['tag_help'] = 'Different activities using the same tag will be measured together. Tag is helpful to prevent plagiarism among courses.';
 $string['timetomeasure']  ='Time to start measuring';
 $string['timetomeasure_help']  ='The time should be after all submissions have been submitted.';
 
@@ -78,7 +80,6 @@ $string['plugin_backup'] = 'Plugin backup';
 
 //specific setting form
 $string['activatemoss'] = 'Activate moss plagiarism';
-$string['tag'] = 'tag';
 $string['activateentry'] = 'Activate entry';
 $string['filepattern'] = 'File pattern';
 $string['language'] = 'Programming language';

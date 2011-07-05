@@ -52,6 +52,8 @@ $string['savedconfigsuccess'] = '配置保存成功';
 $string['studentdisclosure'] = '显示给学生的声明';
 $string['studentdisclosure_help'] = '这些文字会在文件上传页面显示给所有学生。';
 $string['studentdisclosuredefault']  ='所有上传的文件将通过Moss反抄袭引擎进行反抄袭检测。';
+$string['tag'] = '标签';
+$string['tag_help'] = '使用相同标签的不同活动会被一起检测抄袭。标签可以非常方便地用来防止在课程之间的抄袭行为。';
 $string['timetomeasure']  ='检测开始时间';
 $string['timetomeasure_help']  ='此时间应在所有被检测文件都已提交之后。';
 
@@ -75,7 +77,6 @@ $string['plugin_backup'] = '插件备份';
 
 //specific setting form
 $string['activatemoss'] = '启用反抄袭';
-$string['tag'] = '标签';
 $string['activateentry'] = '启用条目';
 $string['filepattern'] = '文件名样式';
 $string['language'] = '编程语言';
