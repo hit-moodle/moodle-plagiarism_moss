@@ -31,11 +31,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['moss'] = 'Moss反抄袭插件';
-$string['savedconfigsuccess'] = '配置保存成功';
-
-//general setting page
-$string['general_settings'] = '插件综合配置';
+$string['configrequired'] = '配置{$a}（必填）：';
+$string['configoptional'] = '配置{$a}（可选）：';
+$string['moss'] = 'Moss反抄袭';
+$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个程序相似性自动检测系统。';
 $string['mossexplain'] = '详细信息请访问: ';
 $string['mossenabled'] ='启用Moss';
 $string['mossuserid'] ='Moss账号';
@@ -49,9 +48,15 @@ $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@mos
     $userid=1234567890;
 
 其中的数字就是您能的Moss账号。';
+$string['savedconfigsuccess'] = '配置保存成功';
 $string['studentdisclosure'] = '显示给学生的声明';
 $string['studentdisclosure_help'] = '这些文字会在文件上传页面显示给所有学生。';
 $string['studentdisclosuredefault']  ='所有上传的文件将通过Moss反抄袭引擎进行反抄袭检测。';
+$string['timetomeasure']  ='检测开始时间';
+$string['timetomeasure_help']  ='此时间应在所有被检测文件都已提交之后。';
+
+//general setting page
+$string['general_settings'] = '插件综合配置';
 
 //error log page
 $string['error_log'] = '插件错误日志';
@@ -75,9 +80,9 @@ $string['activateentry'] = '启用条目';
 $string['filepattern'] = '文件名样式';
 $string['language'] = '编程语言';
 $string['sensitivity'] = '灵敏度';
-$string['sensitivity_help'] = '灵敏度参数设定了一段代码被忽略前可以出现的次数。一段出现在很多程序中的代码可能是合理的共享，而不是抄袭。当灵敏度被设为N，在超过N个程序中都出现的代码段会被看做是框架文件的一部分，而不会在结果中被报告。设为2，moss将只报告出现在两个程序中的相似代码段。如果想找到多个非常相似的作业，（例如，在程序设计课程的第一次作业中），那么使用3或者4，就可以发现3人或4人成组抄袭。设为1000000（或任何很大的数），moss会报告所有发现的匹配，无论它们出现的频率有多高。 这个选项对大型作业很有用，同时最好还能提供一个包含所有合法共享的代码的框架文件。缺省值是10。';
+$string['sensitivity_help'] = '灵敏度参数设定了一段代码被忽略前可以出现的次数。一段出现在很多程序中的代码可能是合理的共享，而不是抄袭。当灵敏度被设为N，在超过N个程序中都出现的代码段会被看做是框架文件的一部分，而不会在结果中被报告。设为2，moss将只报告出现在两个程序中的相似代码段。如果想找到多个非常相似的作业，（例如，在程序设计课程的第一次作业中），那么使用3或者4，就可以发现3人或4人成组抄袭。设为1000000（或任何很大的数），moss会报告所有发现的匹配，无论它们出现的频率有多高。 这个选项对大型作业很有用，同时最好还能提供一个包含所有合法共享的代码的框架文件。缺省值是20。';
 $string['basefile'] = '框架文件';
-$string['basefile_help'] = 'Moss通常会报告所有成对匹配的代码。 提供框架文件后，出现在框架文件中的代码会在匹配结果中被忽略。比如，教师为作业提供的基础代码就是一种典型的框架文件。如果您有多个框架文件，就把它们合并为一个。框架文件能改善评判结果，但没有它，也未必不能获得有价值的信息。';
+$string['basefile_help'] = 'Moss通常会报告所有成对匹配的代码。 提供框架文件后，出现在框架文件中的代码会在匹配结果中被忽略。比如，教师为作业提供的基础代码就是一种典型的框架文件。您可以同时提供多个框架文件。框架文件能改善评判结果，但没有它，也未必不能获得有价值的信息。';
 
 //view_all page
 $string['view_all_title'] = '反抄袭结果记录页面';

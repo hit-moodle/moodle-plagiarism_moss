@@ -31,11 +31,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['moss'] = 'Moss anti-plagiarism plugin';
-$string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';
-
-//general setting page
-$string['general_settings'] = 'Plugin general settings';
+$string['configrequired'] = 'Config {$a} (required):';
+$string['configoptional'] = 'Config {$a} (optional):';
+$string['moss'] = 'Moss anti-plagiarism';
+$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs.';
 $string['mossexplain'] = 'For more information on this plugin see: ';
 $string['mossenabled'] ='Enable moss';
 $string['mossuserid'] ='Moss account';
@@ -50,10 +49,16 @@ After registration, you will get a reply mail which contains a perl script with 
 
 The number is exactly your moss account.';
 
+$string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';
 $string['studentdisclosure'] = 'Student Disclosure';
 $string['studentdisclosure_help'] = 'This text will be displayed to all students on the file upload page.';
 $string['studentdisclosuredefault']  ='All files uploaded will be submitted to a moss plagiarism detection service';
+$string['timetomeasure']  ='Time to start measuring';
+$string['timetomeasure_help']  ='The time should be after all submissions have been submitted.';
 
+
+//general setting page
+$string['general_settings'] = 'Plugin general settings';
 //error log page
 $string['error_log'] = 'Plugin error log';
 $string['error_date'] = 'Error date';
@@ -78,9 +83,9 @@ $string['activateentry'] = 'Activate entry';
 $string['filepattern'] = 'File pattern';
 $string['language'] = 'Programming language';
 $string['sensitivity'] = 'Sensitivity';
-$string['sensitivity_help'] = 'Moss needs a specific sensitivity value to conduct anti-plagiarism process, the value indicate the sensitivity of the engine';
+$string['sensitivity_help'] = 'The sensitivity option sets the maximum number of times a given passage may appear before it is ignored. A passage of code that appears in many programs is probably legitimate sharing and not the result of plagiarism.  With sensitivity N, any passage appearing in more than N programs is treated as if it appeared in a base file (i.e., it is never reported). With sensitivity 2, moss reports only passages that appear in exactly two programs.  If one expects many very similar solutions (e.g., the short first assignments typical of introductory programming courses) then using 3 or 4 is a good way to eliminate all but truly unusual matches between programs while still being able to detect 3-way or 4-way plagiarism. With 1000000 (or any very large number), moss reports all matches, no matter how often they appear. The setting is most useful for large assignments where one also a base file expected to hold all legitimately shared code.  The default value is 20.';
 $string['basefile'] = 'Base file';
-$string['basefile_help'] = 'Moss normally reports all code that matches in pairs of files. but when a base file is supplied, program code that appears in the base file will not counted in matches';
+$string['basefile_help'] = 'Moss normally reports all code that matches in pairs of files. When a base file is supplied, program code that also appears in the base file is not counted in matches. A typical base file will include, for example, the instructor-supplied code for an assignment. You can provide multiple base files here. Base files improve results, but are not usually necessary for obtaining useful information.';
 
 //view_all page
 $string['view_all_title'] = 'Anti-plagiarism view all page';
