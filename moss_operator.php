@@ -3,7 +3,7 @@
 if (!defined('MOODLE_INTERNAL')) 
     die('Direct access to this script is forbidden.');
 global $CFG;   
-require_once($CFG->dirroot.'/plagiarism/moss/file_operator.php');
+require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
 require_once($CFG->dirroot.'/plagiarism/moss/lib.php');
 
 /**

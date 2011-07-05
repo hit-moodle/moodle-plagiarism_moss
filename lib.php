@@ -34,9 +34,8 @@
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');    
 
 require_once($CFG->dirroot.'/plagiarism/lib.php');
-require_once($CFG->dirroot.'/plagiarism/moss/moss_settings.php');
 require_once($CFG->dirroot.'/plagiarism/moss/moss_operator.php');
-require_once($CFG->dirroot.'/plagiarism/moss/file_operator.php');
+require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
 
 define('MOSS_MAX_PATTERNS', 3);
 
