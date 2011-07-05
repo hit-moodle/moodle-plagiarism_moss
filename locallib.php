@@ -33,7 +33,7 @@
  */
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
-require_once($CFG->dirroot.'/plagiarism/moss.php');
+require_once($CFG->dirroot.'/plagiarism/moss/moss.php');
 /**
  *
  * Enter description here ...

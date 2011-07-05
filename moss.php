@@ -118,7 +118,7 @@ class moss {
      * @return sucessful true or failed false
 	 */
     protected function call_moss() {
-        global $CFG $DB;
+        global $CFG, $DB;
 
         //delete previous results
         $this->delete_result($cmid);
