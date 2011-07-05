@@ -1,7 +1,37 @@
 <?php
 
-if (!defined('MOODLE_INTERNAL')) 
-    die('Direct access to this script is forbidden.');
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+/**
+ * Anti-Plagiarism by Moss
+ *
+ * @package   plagiarism_moss
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
     
 /**
  * 
@@ -114,68 +144,6 @@ class file_operator
         return true;
     }
 	
-    /**
-     * 
-     * Enter description here ...
-     * @param unknown_type $eventdata
-     */
-    public function save_upload_file($eventdata)
-    {
-        global $DB;
-        $result = true; 
-        
-        //序列化对象,准备$fs，$context,$cmid,$userid
-        $temp = serialize($eventdata->files);
-        $eventdata->files = unserialize($temp);
-        $fs = get_file_storage();
-        $context = get_context_instance(CONTEXT_SYSTEM);
-        $cmid = $eventdata->cmid;
-        $userid = $eventdata->userid;
-        
-        //错误检查
-        if(!$DB->record_exists('course_modules', array('id' => $cmid)))
-        {
-            mtrace("cm不存在\n");
-        	return $result;
-        }
-        
-        $fileid = $fs->get_file_by_id($eventdata->file->get_id());
-        if($fileid == false)
-        {
-            mtrace("找不到文件\n");
-            return $result;
-        }
-        
-        //获取当前用户之前上传的文件（如果有的话则删除）
-        $old_file_records = $fs->get_directory_files($context->id, 
-                                                     'plagiarism_moss', 
-                                                     'moss', 
-                                                     0, 
-                                                     '/'.$cmid.'/'.$userid.'/');
-        if(empty($old_file_records))
-            mtrace("上传文件\n");
-        else
-        {
-            mtrace("更新文件\n");
-            foreach($old_file_records as $record)   
-                $record->delete();
-        } 
-        
-        //转存文件
-        $fileinfo = array('contextid' => $context->id, 
-                          'component' => 'plagiarism_moss',
-                          'filearea'  => 'moss', 
-                          'itemid'    => 0,
-                          'filepath'  => '/'.$cmid."/".$userid."/", 
-                          'filename'  => $eventdata->file->get_filename());   
-        $new_file_record = $fs->create_file_from_storedfile($fileinfo, $eventdata->file);
-        if(!isset($new_file_record))
-        {
-            mtrace('create student file error');
-            return false;
-        }
-        return $result;
-    }
 
     /**
      * 
@@ -720,5 +688,83 @@ class file_operator
     }
 }
 
+/**
+ * Whether moss is enabled
+ *
+ * @param int cmid
+ * @return bool
+ */
+function moss_enabled($cmid = 0) {
+    global $DB;
 
+    if (!get_config('plagiarism', 'moss_use')) {
+        return false;
+    } else if ($cmid == 0) {
+        return true;
+    } else {
+        return $DB->get_field('moss', 'enabled', array('cmid' => $cmid));
+    }
+}
+
+/**
+ *
+ * Enter description here ...
+ * @param unknown_type $eventdata
+ */
+function moss_save_files($eventdata) {
+    global $DB;
+    $result = true;
+
+    if (!moss_enabled($eventdata->cmid)) {
+        return $result;
+    }
+
+    $context = get_context_instance(CONTEXT_SYSTEM);
+    $cmid = $eventdata->cmid;
+    $userid = $eventdata->userid;
+
+    // check if the module associated with this event still exists
+    if (!$DB->record_exists('course_modules', array('id' => $cmid))) {
+        return $result;
+    }
+
+    if (!empty($eventdata->file) && empty($eventdata->files)) { //single assignment type passes a single file
+        $eventdata->files[] = $eventdata->file;
+    }
+
+    $fs = get_file_storage();
+
+    // remove all old files
+    $old_files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'files', $cmid, "/$userid/", true, true);
+    foreach($old_files as $oldfile) {
+        $oldfile->delete();
+    }
+
+    // store submitted files
+    reset($eventdata->files);
+    foreach($eventdata->files as $file) {
+        if ($file->get_filename() ==='.') {
+            continue;
+        }
+        //hacky way to check file still exists
+        $fileid = $fs->get_file_by_id($file->get_id());
+        if (empty($fileid)) {
+            mtrace("nofilefound!");
+            continue;
+        }
+
+        $fileinfo = array(
+            'contextid' => $context->id,
+            'component' => 'plagiarism_moss',
+            'filearea'  => 'files',
+            'itemid'    => $cmid,
+            'filepath'  => '/'.$userid.$file->get_filepath(),
+            'filename'  => $file->get_filename());
+        $fs->create_file_from_storedfile($fileinfo, $file);
+
+        mtrace('saved file'.$file->get_filepath().$file->get_filename()." from cm $cmid and user $userid");
+    }
+
+    return $result;
+}
 

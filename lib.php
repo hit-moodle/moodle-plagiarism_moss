@@ -31,7 +31,7 @@
  * @author    Sun Zhigang
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');    
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once($CFG->dirroot.'/plagiarism/lib.php');
 require_once($CFG->dirroot.'/plagiarism/moss/moss_operator.php');
@@ -52,7 +52,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 	 */
     public function print_disclosure($cmid) {
     	global $OUTPUT, $DB;
-        if (get_config('plagiarism', 'moss_use') and $DB->get_field('moss', 'enabled', array('cmid' => $cmid))) {
+        if (moss_enabled($cmid)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
             $formatoptions = new stdClass;
             $formatoptions->noclean = true;
@@ -68,7 +68,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     public function save_form_elements($data) {
         global $DB;
 
-        if (!get_config('plagiarism', 'moss_use')) {
+        if (!moss_enabled()) {
             return;
         }
 
@@ -135,7 +135,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     public function get_form_elements_module($mform, $context) {
         global $DB;
 
-        if (!get_config('plagiarism', 'moss_use')) {
+        if (!moss_enabled()) {
             return;
         }
 
@@ -198,6 +198,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $cmid = optional_param('update', 0, PARAM_INT); //there doesn't seem to be a way to obtain the current cm a better way - $this->_cm is not available here.
         if ($cmid != 0 and $moss = $DB->get_record('moss', array('cmid'=>$cmid))) { // configed
             $mform->setDefault('enabled', $moss->enabled);
+            $mform->setDefault('timetomeasure', $moss->timetomeasure);
             $mform->setDefault('tag', $DB->get_field('moss_tags', 'name', array('id' => $moss->tag)));
             $mform->addElement('hidden', 'mossid', $moss->id);
 
@@ -261,7 +262,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
      */
     public function cron() {
         global $DB;
-        $err_test = new plugin_error_test();
+/*        $err_test = new plugin_error_test();
         echo 'moss plugin check error...';
         $err_test -> test_all();
         echo 'moss plugin check error finished.';
@@ -287,6 +288,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             	$moss_op -> connect_moss($result->cmid);
             //}   
         }
+ */
     }
 }
 
@@ -405,10 +407,8 @@ class plugin_error_test
  * Enter description here ...
  * @param unknown_type $eventdata
  */
-function moss_event_file_uploaded($eventdata) 
-{
-    $file_handler = new file_operator(); 
-    return $file_handler->save_upload_file_files($eventdata);
+function moss_event_file_uploaded($eventdata) {
+    return moss_save_files($eventdata);
 }
 
 /**
@@ -416,8 +416,18 @@ function moss_event_file_uploaded($eventdata)
  * Enter description here ...
  * @param unknown_type $eventdata
  */
-function moss_event_files_done($eventdata) 
-{
+function moss_event_files_done($eventdata) {
+    $result = true;
+    // nothing to do
+    return $result;
+}
+
+/**
+ * 
+ * Enter description here ...
+ * @param unknown_type $eventdata
+ */
+function moss_event_mod_created($eventdata) {
     $result = true;
     return $result;
 }
@@ -427,19 +437,7 @@ function moss_event_files_done($eventdata)
  * Enter description here ...
  * @param unknown_type $eventdata
  */
-function moss_event_mod_created($eventdata) 
-{
-    $result = true;
-    return $result;
-}
-
-/**
- * 
- * Enter description here ...
- * @param unknown_type $eventdata
- */
-function moss_event_mod_updated($eventdata) 
-{
+function moss_event_mod_updated($eventdata) {
     //check if duetime modified, if duetime was postponed and moss already run before
     //set rerun = 1, 
     $result = true;
@@ -451,8 +449,7 @@ function moss_event_mod_updated($eventdata)
  * Enter description here ...
  * @param unknown_type $eventdata
  */
-function moss_event_mod_deleted($eventdata) 
-{
+function moss_event_mod_deleted($eventdata) {
     //delete entrys that relevant to this cm in table 'moss_settings', 'moss_results'
     //do not delete entry in table 'moss_tag'
     //delete all result pages that downloaded from moss server
