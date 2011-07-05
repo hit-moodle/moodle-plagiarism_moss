@@ -32,9 +32,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
-    
+
+require_once($CFG->dirroot.'/plagiarism/moss.php');
 /**
- * 
+ *
  * Enter description here ...
  * @author ycc
  *
@@ -42,7 +43,7 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 class file_operator
 {
 	/**
-	 * 
+	 *
 	 * Enter description here ...
 	 * @param unknown_type $file
 	 * @param unknown_type $cmid
@@ -73,77 +74,6 @@ class file_operator
         return true;
     }
     
-    /**
-     * 
-     * Enter description here ...
-     * @param unknown_type $eventdata
-     */
-    public function save_upload_file_files($eventdata)
-    {
-        global $DB;
-        $result = true; 
-        
-        //单文件作业使用多文件作业方法转存
-        if(!empty($eventdata->file) && empty($eventdata->files))
-        {
-            $eventdata->files[] = $eventdata->file;
-        }
-        
-        //序列化对象,准备$fs，$context,$cmid,$userid
-        $temp = serialize($eventdata->files);
-        $eventdata->files = unserialize($temp);
-        $fs = get_file_storage();
-        $context = get_context_instance(CONTEXT_SYSTEM);
-        $cmid = $eventdata->cmid;
-        $userid = $eventdata->userid;
-        
-        //错误检查
-        if(!$DB->record_exists('course_modules', array('id' => $cmid)))
-        	return $result;
-        
-        foreach($eventdata->files as $file)
-        {
-            $fileid = $fs->get_file_by_id($file->get_id());
-            if($fileid == false)
-                return $result;
-        }
-        
-        //获取当前用户之前上传的文件（如果有的话则删除）
-        $old_file_records = $fs->get_directory_files($context->id, 
-                                                     'plagiarism_moss', 
-                                                     'moss', 
-                                                     0, 
-                                                     '/'.$cmid.'/'.$userid.'/');
-        if(!empty($old_file_records))
-        {//delete old files
-            foreach($old_file_records as $record)   
-                $record->delete();
-        } 
-        
-        //转存文件
-        foreach($eventdata->files as $file)
-        {
-            if($file->get_filename() === '.')
-                continue;
-            
-            $fileinfo = array('contextid' => $context->id, 
-                              'component' => 'plagiarism_moss',
-                              'filearea'  => 'moss', 
-                              'itemid'    => 0,
-                              'filepath'  => '/'.$cmid."/".$userid."/", 
-                              'filename'  => $file->get_filename());
-               
-            $new_file_record = $fs->create_file_from_storedfile($fileinfo, $file);
-            
-            if(!isset($new_file_record))
-            {
-                mtrace('create student file error');
-                return false;
-            }
-        }
-        return true;
-    }
-	
 
     /**
      * 
@@ -741,7 +671,6 @@ function moss_save_files($eventdata) {
     }
 
     // store submitted files
-    reset($eventdata->files);
     foreach($eventdata->files as $file) {
         if ($file->get_filename() ==='.') {
             continue;

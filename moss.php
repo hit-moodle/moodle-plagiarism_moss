@@ -1,10 +1,38 @@
 <?php
-//include file operator class
-if (!defined('MOODLE_INTERNAL')) 
-    die('Direct access to this script is forbidden.');
-global $CFG;   
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// NOTICE OF COPYRIGHT                                                   //
+//                                                                       //
+//                      Online Judge for Moodle                          //
+//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                                                                       //
+// Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
+//                                                                       //
+// This program is free software; you can redistribute it and/or modify  //
+// it under the terms of the GNU General Public License as published by  //
+// the Free Software Foundation; either version 3 of the License, or     //
+// (at your option) any later version.                                   //
+//                                                                       //
+// This program is distributed in the hope that it will be useful,       //
+// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
+// GNU General Public License for more details:                          //
+//                                                                       //
+//          http://www.gnu.org/copyleft/gpl.html                         //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+/**
+ * Anti-Plagiarism by Moss
+ *
+ * @package   plagiarism_moss
+ * @copyright 2011 Sun Zhigang (http://sunner.cn)
+ * @author    Sun Zhigang
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
+
 require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
-require_once($CFG->dirroot.'/plagiarism/moss/lib.php');
 
 /**
  * 
@@ -12,17 +40,86 @@ require_once($CFG->dirroot.'/plagiarism/moss/lib.php');
  * @author ycc
  *
  */
-class moss_operator
-{ 
-	/**
-	 * this function will connect moss server and save anti-plagiarism results
-	 * 
-	 * @param unknown_type $cmid
-	 */
-    public function connect_moss($cmid)
-    {
-        global $CFG;
+class moss { 
+    protected $moss;
+    protected $tempdir;
+
+    public function __construct($cmid) {
+        global $CFG, $DB;
+        $this->moss = $DB->get_record('moss', array('cmid' => $cmid));
+        $this->tempdir = $CFG->dataroot.'/temp/moss/'.$this->moss->id;
+    }
+
+    public function __destruct() {
+        if (!debugging('', DEBUG_DEVELOPER)) {
+            remove_dir($this->tempdir);
+        }
+    }
+
+    /**
+     * Measure the current course module
+     *
+     * @return bool success or not
+     */
+    public function measure() {
         global $DB;
+
+        if (!enabled()) {
+            return false;
+        }
+
+        $mosses = $DB->get_records('moss', array('cmid' => $this->moss->cmid));
+        foreach ($mosses as $moss) {
+            if ($moss->cmid == $this->moss->cmid) {
+                // current moss must be extracted lastly
+                // to overwrite other files belong to the same person
+                continue;
+            }
+            $this->extract_files($moss);
+        }
+
+        $this->extract_files();
+
+        if (!$this->call_moss()) {
+            return false;
+        }
+
+        $this->moss->timemeasured = time();
+        $DB->update_record('moss', $this->moss);
+
+        return true;
+    }
+
+    protected function extract_files($moss = null) {
+        if ($moss == null) {
+            $moss = $this->moss;
+        }
+
+        $fs = get_file_storage();
+        $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
+        foreach ($files as $file) {
+            $path = $this->tempdir.$file->get_filepath();
+            $fullpath = $path.$file->get_filename();
+            if (!check_dir_exists($path)) {
+                throw new moodle_exception('errorcreatingdirectory', '', '', $path);
+            }
+            $file->copy_content_to($fullpath);
+        }
+    }
+
+    protected function enabled() {
+        return moss_enabled($this->moss->cmid);
+    }
+
+	/**
+	 * this function will call moss script and save anti-plagiarism results
+     *
+     * TODO: finish it
+     * @return sucessful true or failed false
+	 */
+    protected function call_moss() {
+        global $CFG $DB;
+
         //delete previous results
         $this->delete_result($cmid);
     	
@@ -52,7 +149,7 @@ class moss_operator
                                     2 => array('pipe', 'w') // stderr
                                    );
             $proc = proc_open($cmd, $descriptorspec, $pipes);
-            if (!is_resource($proc)) 
+            if (!is_resource($proc))
             {
                 $this->remove_all($CFG->dataroot.'/moss'.$cmid.'/');
                 $this->trigger_error('Function proc_open() return error in file "moss_operator.php"'.
@@ -92,7 +189,7 @@ class moss_operator
         	        $this->remove_all($CFG->dataroot.'/moss'.$cmid.'/');
         	        $this->trigger_error('Can\'t find moss result link in file "moss_operator.php"'.
                                          ' call by function "connect_moss() cmid = "'.$cmid.
-                                         ' shell output = '.$out, 
+                                         ' shell output = '.$out,
                                          'To solve this error you need a programmer',
                                          23);
         	        return false;

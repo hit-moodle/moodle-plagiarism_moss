@@ -34,7 +34,6 @@
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once($CFG->dirroot.'/plagiarism/lib.php');
-require_once($CFG->dirroot.'/plagiarism/moss/moss_operator.php');
 require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
 
 define('MOSS_MAX_PATTERNS', 3);
@@ -42,7 +41,7 @@ define('MOSS_MAX_PATTERNS', 3);
 /**
  * plagiarism_plugin_moss inherit from plagiarism_plugin class, this is the most important class in plagiarism plugin,
  * Moodle platform will automatically call the function of this class.
- * @author 
+ * @author
  *
  */
 class plagiarism_plugin_moss extends plagiarism_plugin {
@@ -124,8 +123,6 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $member= 'basefile'.$index;
             file_save_draft_area_files($data->$member, $context->id, 'plagiarism_moss', 'basefiles', $config->id);
         }
-
-        //TODO: re measure?
     }
 
     /**
@@ -253,56 +250,29 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         global $CFG;
         echo '<a href="'.$CFG->wwwroot.'/plagiarism/moss/result_pages/view_all.php?cmid='.$cm->id.'">
               anti-plagiarism verify page
-              </a>'; 
+              </a>';
     }
-    
+
     /**
-     * 
+     *
      * Enter description here ...
      */
     public function cron() {
         global $DB;
-/*        $err_test = new plugin_error_test();
-        echo 'moss plugin check error...';
-        $err_test -> test_all();
-        echo 'moss plugin check error finished.';
-        $moss_op = new moss_operator();
-        //mtrace('当前时间：'.userdate(time()));
-        $current_time = time();
-
-        $sql = "SELECT cm.id AS cmid, am.name AS name, am.timeavailable AS timeavilable, am.timedue AS timedue
-                FROM {course_modules} AS cm, {assignment} AS am
-                WHERE cm.module=? AND
-                      cm.instance=am.id AND
-                      cm.id IN
-                            (SELECT DISTINCT cmid
-                             FROM {moss_settings} 
-                             WHERE measuredtime=0)"; 
-        //currently only assignment can activate anti-plagiarism 
-        $params = array(1);
-        //get all
-        $results = $DB->get_records_sql($sql,$params);
-        foreach($results as $result) {
-            //if($result->timedue > $current_time)//time to run
-            //{
-            	$moss_op -> connect_moss($result->cmid);
-            //}   
-        }
- */
     }
 }
 
 
 /**
- * 
+ *
  * Enter description here ...
  * @author ycc
  *
  */
 class plugin_error_test
-{   
+{
     /**
-     * 
+     *
      * Enter description here ...
      */
     function response($id, $echo = true)
@@ -315,13 +285,13 @@ class plugin_error_test
     	    echo $this->generatexml($id, true, $echo);
     	    return;
     	}
-    	//configuration file 
+    	//configuration file
     	if(($record->errtype >= 1) && ($record->errtype <= 5))
     	{
     		$cfg = new config_xml();
     		$re = $cfg->error_test($record->errtype, $record->errargument);
     	}
-    	//move file to temp error; remove file from temp error; download code detail error 
+    	//move file to temp error; remove file from temp error; download code detail error
     	if(($record->errtype == 11) || ($record->errtype == 12) || ($record->errtype == 21))
     	{
     		$file_op = new file_operator();
