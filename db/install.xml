@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="plagiarism/moss/db" VERSION="20110705" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
+<XMLDB PATH="plagiarism/moss/db" VERSION="20110706" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -45,22 +45,25 @@
     <TABLE NAME="moss_results" COMMENT="place to store moss result" PREVIOUS="moss_tags" NEXT="moss_plugin_errors">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="moss"/>
-        <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
-        <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="moss" NEXT="confirmed"/>
-        <FIELD NAME="confirmed" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="filepattern" NEXT="iscross"/>
-        <FIELD NAME="iscross" TYPE="int" LENGTH="2" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="如果本条记录有学生不属于本cm，则cross为1，且user1id为其它课程学生，否则置0" PREVIOUS="confirmed" NEXT="rank"/>
-        <FIELD NAME="rank" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="iscross" NEXT="user1id"/>
-        <FIELD NAME="user1id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rank" NEXT="user2id"/>
-        <FIELD NAME="user2id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user1id" NEXT="user1percent"/>
-        <FIELD NAME="user1percent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user2id" NEXT="user2percent"/>
-        <FIELD NAME="user2percent" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user1percent" NEXT="linecount"/>
-        <FIELD NAME="linecount" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="user2percent" NEXT="link"/>
-        <FIELD NAME="link" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" PREVIOUS="linecount" NEXT="teacherid"/>
-        <FIELD NAME="teacherid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="link"/>
+        <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="config"/>
+        <FIELD NAME="config" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="moss" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="config" NEXT="pair"/>
+        <FIELD NAME="pair" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="userid" NEXT="rank"/>
+        <FIELD NAME="rank" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="pair" NEXT="percentage"/>
+        <FIELD NAME="percentage" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="rank" NEXT="linescount"/>
+        <FIELD NAME="linescount" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="percentage" NEXT="link"/>
+        <FIELD NAME="link" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="linescount" NEXT="confirmed"/>
+        <FIELD NAME="confirmed" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="link" NEXT="confirmer"/>
+        <FIELD NAME="confirmer" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="confirmed" NEXT="timeconfirmed"/>
+        <FIELD NAME="timeconfirmed" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="confirmer"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="moss"/>
-        <KEY NAME="moss" TYPE="foreign" FIELDS="moss" REFTABLE="moss" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="moss" TYPE="foreign" FIELDS="moss" REFTABLE="moss" REFFIELDS="id" PREVIOUS="primary" NEXT="config"/>
+        <KEY NAME="config" TYPE="foreign" FIELDS="config" REFTABLE="moss_configs" REFFIELDS="id" PREVIOUS="moss" NEXT="userid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="config" NEXT="confirmer"/>
+        <KEY NAME="confirmer" TYPE="foreign" FIELDS="confirmer" REFTABLE="user" REFFIELDS="id" PREVIOUS="userid" NEXT="pair"/>
+        <KEY NAME="pair" TYPE="unique" FIELDS="pair" PREVIOUS="confirmer"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="moss_plugin_errors" COMMENT="all errors the plugin encountered" PREVIOUS="moss_results">
