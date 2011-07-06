@@ -261,14 +261,16 @@ while($i < $bindex)
 {
    die "Base file $opt_b[$i] does not exist. $noreq\n" unless -e "$opt_b[$i]";
    die "Base file $opt_b[$i] is not readable. $noreq\n" unless -r "$opt_b[$i]";
-   die "Base file $opt_b is not a text file. $noreq\n" unless -T "$opt_b[$i]";
+# comment out by sunner to allow non-ascii words
+#   die "Base file $opt_b is not a text file. $noreq\n" unless -T "$opt_b[$i]";
    $i++;
 }
 foreach $file (@ARGV)
 {
    die "File $file does not exist. $noreq\n" unless -e "$file";
    die "File $file is not readable. $noreq\n" unless -r "$file";
-   die "File $file is not a text file. $noreq\n" unless -T "$file";
+# comment out by sunner to allow non-ascii words
+#   die "File $file is not a text file. $noreq\n" unless -T "$file";
 }
 
 if ("@ARGV" eq '') {
