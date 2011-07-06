@@ -33,6 +33,8 @@
 
 $string['configrequired'] = '配置{$a}（必填）：';
 $string['configoptional'] = '配置{$a}（可选）：';
+$string['filepatterns'] = '文件名样式';
+$string['filepatterns_help'] = '例如：\*.c，hello.\*，a?c.java。用空格分隔多个样式。';
 $string['moss'] = 'Moss反抄袭';
 $string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个程序相似性自动检测系统。';
 $string['mossexplain'] = '详细信息请访问: ';
@@ -78,7 +80,6 @@ $string['plugin_backup'] = '插件备份';
 //specific setting form
 $string['activatemoss'] = '启用反抄袭';
 $string['activateentry'] = '启用条目';
-$string['filepattern'] = '文件名样式';
 $string['language'] = '编程语言';
 $string['sensitivity'] = '灵敏度';
 $string['sensitivity_help'] = '灵敏度参数设定了一段代码被忽略前可以出现的次数。一段出现在很多程序中的代码可能是合理的共享，而不是抄袭。当灵敏度被设为N，在超过N个程序中都出现的代码段会被看做是框架文件的一部分，而不会在结果中被报告。设为2，moss将只报告出现在两个程序中的相似代码段。如果想找到多个非常相似的作业，（例如，在程序设计课程的第一次作业中），那么使用3或者4，就可以发现3人或4人成组抄袭。设为1000000（或任何很大的数），moss会报告所有发现的匹配，无论它们出现的频率有多高。 这个选项对大型作业很有用，同时最好还能提供一个包含所有合法共享的代码的框架文件。缺省值是20。';

@@ -22,9 +22,9 @@
     <TABLE NAME="moss_configs" COMMENT="configs for different filename patterns" PREVIOUS="moss" NEXT="moss_tags">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="moss"/>
-        <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepattern"/>
-        <FIELD NAME="filepattern" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="moss" NEXT="language"/>
-        <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" PREVIOUS="filepattern" NEXT="sensitivity"/>
+        <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepatterns"/>
+        <FIELD NAME="filepatterns" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="moss" NEXT="language"/>
+        <FIELD NAME="language" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" PREVIOUS="filepatterns" NEXT="sensitivity"/>
         <FIELD NAME="sensitivity" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="language"/>
       </FIELDS>
       <KEYS>

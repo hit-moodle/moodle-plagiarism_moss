@@ -33,6 +33,8 @@
 
 $string['configrequired'] = 'Config {$a} (required):';
 $string['configoptional'] = 'Config {$a} (optional):';
+$string['filepatterns'] = 'Filename patterns';
+$string['filepatterns_help'] = 'E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns.';
 $string['moss'] = 'Moss anti-plagiarism';
 $string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs.';
 $string['mossexplain'] = 'For more information on this plugin see: ';
@@ -81,7 +83,6 @@ $string['plugin_backup'] = 'Plugin backup';
 //specific setting form
 $string['activatemoss'] = 'Activate moss plagiarism';
 $string['activateentry'] = 'Activate entry';
-$string['filepattern'] = 'File pattern';
 $string['language'] = 'Programming language';
 $string['sensitivity'] = 'Sensitivity';
 $string['sensitivity_help'] = 'The sensitivity option sets the maximum number of times a given passage may appear before it is ignored. A passage of code that appears in many programs is probably legitimate sharing and not the result of plagiarism.  With sensitivity N, any passage appearing in more than N programs is treated as if it appeared in a base file (i.e., it is never reported). With sensitivity 2, moss reports only passages that appear in exactly two programs.  If one expects many very similar solutions (e.g., the short first assignments typical of introductory programming courses) then using 3 or 4 is a good way to eliminate all but truly unusual matches between programs while still being able to detect 3-way or 4-way plagiarism. With 1000000 (or any very large number), moss reports all matches, no matter how often they appear. The setting is most useful for large assignments where one also a base file expected to hold all legitimately shared code.  The default value is 20.';

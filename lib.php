@@ -105,10 +105,10 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $member = 'sensitivity'.$index;
             $config->sensitivity = $data->$member;
 
-            $member = 'filepattern'.$index;
-            $config->filepattern = str_replace('..', '', $data->$member); // filter out .. to for safety
-            if ($index == 0 and empty($config->filepattern)) {
-                $config->filepattern = '*';
+            $member = 'filepatterns'.$index;
+            $config->filepatterns = str_replace('..', '', $data->$member); // filter out .. to for safety
+            if ($index == 0 and empty($config->filepatterns)) {
+                $config->filepatterns = '*';
             }
 
             $member= 'configid'.$index;
@@ -161,9 +161,10 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $subheader = html_writer::tag('strong', $subheader);
             $mform->addElement('static', 'subheader', $subheader);
 
-            $mform->addElement('text', 'filepattern'.$index, get_string('filepattern', 'plagiarism_moss'));
-            $mform->setType('filepattern'.$index, PARAM_TEXT);
-            $mform->disabledIf('filepattern'.$index, 'enabled');
+            $mform->addElement('text', 'filepatterns'.$index, get_string('filepatterns', 'plagiarism_moss'));
+            $mform->addHelpButton('filepatterns'.$index, 'filepatterns', 'plagiarism_moss');
+            $mform->setType('filepatterns'.$index, PARAM_TEXT);
+            $mform->disabledIf('filepatterns'.$index, 'enabled');
 
             $choices = array('ada'     => 'Ada',              'ascii'      => 'ASCII',
                              'a8086'   => 'a8086 assembly',   'c'          => 'C',
@@ -202,7 +203,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $subconfigs = $DB->get_records('moss_configs', array('moss'=>$moss->id));
             $index = 0;
             foreach ($subconfigs as $subconfig) {
-                $mform->setDefault('filepattern'.$index, $subconfig->filepattern);
+                $mform->setDefault('filepatterns'.$index, $subconfig->filepatterns);
                 $mform->setDefault('language'.$index, $subconfig->language);
                 $mform->setDefault('sensitivity'.$index, $subconfig->sensitivity);
                 $mform->addElement('hidden', 'configid'.$index, $subconfig->id);
@@ -217,7 +218,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         } else { // new config
             $mform->setDefault('enabled', 0);
             $mform->setDefault('tag', '');
-            $mform->setDefault('filepattern0', '*.c');
+            $mform->setDefault('filepatterns0', '*.c');
             $mform->setDefault('language0', 'c');
             $mform->setDefault('sensitivity0', 20);
             // leave other subconfig empty
