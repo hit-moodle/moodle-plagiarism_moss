@@ -159,12 +159,12 @@ use IO::Socket;
 $server = 'moss.stanford.edu';
 $port = '7690';
 $noreq = "Request not sent.";
-$usage = "usage: moss [-x] [-l language] [-d] [-b basefile1] ... [-b basefilen] [-m #] [-c \"string\"] file1 file2 file3 ...";
+$usage = "usage: moss [-u userid] [-x] [-l language] [-d] [-b basefile1] ... [-b basefilen] [-m #] [-c \"string\"] file1 file2 file3 ...";
 
 #
 # The userid is used to authenticate your queries to the server; don't change it!
 #
-$userid=580031178;
+$userid=0;
 
 #
 # Process the command line options.  This is done in a non-standard
@@ -231,6 +231,17 @@ while (@ARGV && ($_ = $ARGV[0]) =~ /^-(.)(.*)/) {
        next;
    }
    #
+   # Set userid. A moodle moss plugin hack
+   #
+   if ($first eq "u") {
+       if ($rest eq '') {
+           die "No argument for option -u.\n" unless @ARGV;
+           $rest = shift(@ARGV);
+       }
+       $userid = $rest;
+       next;
+   }
+   #
    # Override the name of the server.  This is used for testing this script.
    #
    if ($first eq "s") {
@@ -245,6 +256,10 @@ while (@ARGV && ($_ = $ARGV[0]) =~ /^-(.)(.*)/) {
        next;
    }
    die "Unrecognized option -$first.  $usage\n";
+}
+
+if ("$userid" eq '0') {
+   die "No valid userid provided.\n $usage";
 }
 
 #
