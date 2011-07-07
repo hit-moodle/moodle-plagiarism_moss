@@ -4,8 +4,8 @@
 //                                                                       //
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
-//                      Online Judge for Moodle                          //
-//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                   Moss Anti-Plagiarism for Moodle                     //
+//         https://github.com/hit-moodle/moodle-plagiarism_moss          //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -119,7 +119,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
                 $config->id = $DB->insert_record('moss_configs', $config);
             }
 
-            $context = get_context_instance(CONTEXT_MODULE, $data->coursemodule);
+            $context = get_system_context();
             $member= 'basefile'.$index;
             file_save_draft_area_files($data->$member, $context->id, 'plagiarism_moss', 'basefiles', $config->id);
         }
@@ -208,7 +208,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
                 $mform->setDefault('sensitivity'.$index, $subconfig->sensitivity);
                 $mform->addElement('hidden', 'configid'.$index, $subconfig->id);
 
-                $context = get_context_instance(CONTEXT_MODULE, $cmid); // the context passed through function call is a course context
+                $context = get_system_context();
                 $draftitemid = 0;
                 file_prepare_draft_area($draftitemid, $context->id, 'plagiarism_moss', 'basefiles', $subconfig->id);
                 $mform->setDefault('basefile'.$index, $draftitemid);
@@ -255,11 +255,17 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     }
 
     /**
-     *
-     * Enter description here ...
+     * Hook for cron
      */
     public function cron() {
         global $DB;
+
+        $select  = 'timetomeasure > timemeasured AND enabled = 1';
+        $mosses = $DB->get_records_select('moss', $select);
+        foreach ($mosses as $moss) {
+            $moss_obj = new moss($moss->cmid);
+            $moss_obj->measure();
+        }
     }
 }
 

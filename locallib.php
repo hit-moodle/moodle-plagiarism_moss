@@ -4,8 +4,8 @@
 //                                                                       //
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
-//                      Online Judge for Moodle                          //
-//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                   Moss Anti-Plagiarism for Moodle                     //
+//         https://github.com/hit-moodle/moodle-plagiarism_moss          //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -653,11 +653,6 @@ function moss_save_files($eventdata) {
     $cmid = $eventdata->cmid;
     $userid = $eventdata->userid;
 
-    // check if the module associated with this event still exists
-    if (!$DB->record_exists('course_modules', array('id' => $cmid))) {
-        return $result;
-    }
-
     if (!empty($eventdata->file) && empty($eventdata->files)) { //single assignment type passes a single file
         $eventdata->files[] = $eventdata->file;
     }
@@ -690,8 +685,6 @@ function moss_save_files($eventdata) {
             'filepath'  => '/'.$userid.$file->get_filepath(),
             'filename'  => $file->get_filename());
         $fs->create_file_from_storedfile($fileinfo, $file);
-
-        mtrace('saved file'.$file->get_filepath().$file->get_filename()." from cm $cmid and user $userid");
     }
 
     return $result;

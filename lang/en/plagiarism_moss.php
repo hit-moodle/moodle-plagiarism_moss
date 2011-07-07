@@ -3,8 +3,8 @@
 //                                                                       //
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
-//                      Online Judge for Moodle                          //
-//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                   Moss Anti-Plagiarism for Moodle                     //
+//         https://github.com/hit-moodle/moodle-plagiarism_moss          //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -34,7 +34,7 @@
 $string['configrequired'] = 'Config {$a} (required):';
 $string['configoptional'] = 'Config {$a} (optional):';
 $string['filepatterns'] = 'Filename patterns';
-$string['filepatterns_help'] = 'E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns.';
+$string['filepatterns_help'] = 'E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
 $string['moss'] = 'Moss anti-plagiarism';
 $string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs.';
 $string['mossexplain'] = 'For more information on this plugin see: ';

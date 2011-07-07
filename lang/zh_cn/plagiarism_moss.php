@@ -3,8 +3,8 @@
 //                                                                       //
 // NOTICE OF COPYRIGHT                                                   //
 //                                                                       //
-//                      Online Judge for Moodle                          //
-//        https://github.com/hit-moodle/moodle-local_onlinejudge         //
+//                   Moss Anti-Plagiarism for Moodle                     //
+//         https://github.com/hit-moodle/moodle-plagiarism_moss          //
 //                                                                       //
 // Copyright (C) 2009 onwards  Sun Zhigang  http://sunner.cn             //
 //                                                                       //
@@ -33,8 +33,8 @@
 
 $string['configrequired'] = '配置{$a}（必填）：';
 $string['configoptional'] = '配置{$a}（可选）：';
-$string['filepatterns'] = '文件名样式';
-$string['filepatterns_help'] = '例如：\*.c，hello.\*，a?c.java。用空格分隔多个样式。';
+$string['filepatterns'] = '文件名通配符';
+$string['filepatterns_help'] = '例如：\*.c，hello.\*，a?c.java。用空格分隔多个通配符。留空表示禁用此条配置。';
 $string['moss'] = 'Moss反抄袭';
 $string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个程序相似性自动检测系统。';
 $string['mossexplain'] = '详细信息请访问: ';
