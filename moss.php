@@ -229,10 +229,13 @@ class moss {
             return false;
         }
 
-        // save to db
         if (!isset($UNITTEST)) { // testcase can not construct course structure
             $context = get_context_instance(CONTEXT_COURSE, $this->moss->course);
         }
+
+        $filepatterns = $DB->get_field('moss_configs', 'filepatterns', array('id' => $configid));
+        $filepatterns = explode(' ', $filepatterns);
+        $fs = get_file_storage(); 
         $rank = 1;
         foreach ($matches as $result) {
             $result['moss'] = $this->moss->id;
@@ -254,8 +257,27 @@ class moss {
 
             $result1->id = $DB->insert_record('moss_results', $result1);
             $result2->pair = $result1->id;
-            $result1->pair = $DB->insert_record('moss_results', $result2);
+            $result2->id = $DB->insert_record('moss_results', $result2);
+            $result1->pair = $result2->id;
             $DB->update_record('moss_results', $result1);
+
+            // update moss_matched_files db
+            for ($i=1; $i<=2; $i++) {
+                $userid = eval('return $result'.$i.'->userid;');
+                $resultid = eval('return $result'.$i.'->id;');
+
+                $files = $fs->get_directory_files(get_system_context()->id, 'plagiarism_moss', 'files', $this->moss->cmid, "/$userid/");
+                foreach ($files as $file) {
+                    foreach ($filepatterns as $pattern) {
+                        if (fnmatch($pattern, $file->get_filename())) {
+                            $obj = new stdClass();
+                            $obj->result = $resultid;
+                            $obj->contenthash = $file->get_contenthash();
+                            $DB->insert_record('moss_matched_files', $obj);
+                        }
+                    }
+                }
+            }
 
             $rank++;
         }

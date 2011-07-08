@@ -71,7 +71,7 @@
         <INDEX NAME="rank" UNIQUE="false" FIELDS="rank"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="moss_plugin_errors" COMMENT="all errors the plugin encountered" PREVIOUS="moss_results">
+    <TABLE NAME="moss_plugin_errors" COMMENT="all errors the plugin encountered" PREVIOUS="moss_results" NEXT="moss_matched_files">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="errdate"/>
         <FIELD NAME="errdate" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="errtype"/>
@@ -85,6 +85,20 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="moss_matched_files" COMMENT="Files matched" PREVIOUS="moss_plugin_errors">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="result"/>
+        <FIELD NAME="result" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="contenthash"/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" PREVIOUS="result"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="result"/>
+        <KEY NAME="result" TYPE="foreign" FIELDS="result" REFTABLE="moss_results" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="contenthash" UNIQUE="false" FIELDS="contenthash"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

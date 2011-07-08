@@ -99,46 +99,60 @@ class plagiarism_moss_test extends UnitTestCase {
             array('userid' => 4, 'cmid' => 1)
         );
         $contents = array(
-            '/file1.txt' => 'What is Moss?
+            array(
+                '/file1.txt' => 'What is Moss?
 
             Moss (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs. To date, the main application of Moss has been in detecting plagiarism in programming classes. Since its development in 1994, Moss has been very effective in this role. The algorithm behind moss is a significant improvement over other cheating detection algorithms (at least, over those known to us).',
-            '/file2.txt' => 'What is Moss?
+                '/source1.c' => 'What is Moss?
+
+                Moss (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs. To date, the main application of Moss has been in detecting plagiarism in programming classes. Since its development in 1994, Moss has been very effective in this role. The algorithm behind moss is a significant improvement over other cheating detection algorithms (at least, over those known to us).'
+            ),
+            array(
+                '/file2.txt' => 'What is Moss?
 
             Moss (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs. To date, the main application of Moss has been in detecting plagiarism in programming classes. Since its development in 1994, Moss has been very effective in this role. The algorithm behind moss is a significant improvement over other cheating detection algorithms (at least, over those known to us).',
-            '/file3.txt' => 'What is Moss?
+                '/source2.c' => 'What is Moss?
+
+                Moss (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs. To date, the main application of Moss has been in detecting plagiarism in programming classes. Since its development in 1994, Moss has been very effective in this role. The algorithm behind moss is a significant improvement over other cheating detection algorithms (at least, over those known to us).'
+            ),
+            array('/file3.txt' => 'What is Moss?
 
             Moss (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs. To date, the main application of Moss has been in detecting plagiarism in programming classes. Since its development in 1994, Moss has been very effective in this role. The algorithm behind moss is a significant improvement over other cheating detection algorithms (at least, over those known to us).
             Languages
 
                 Moss can currently analyze code written in the following languages:
-                C, C++, Java, C#, Python, Visual Basic, Javascript, FORTRAN, ML, Haskell, Lisp, Scheme, Pascal, Modula2, Ada, Perl, TCL, Matlab, VHDL, Verilog, Spice, MIPS assembly, a8086 assembly, a8086 assembly, MIPS assembly, HCL2.',
-            '/file4.txt' => 'Languages
+                C, C++, Java, C#, Python, Visual Basic, Javascript, FORTRAN, ML, Haskell, Lisp, Scheme, Pascal, Modula2, Ada, Perl, TCL, Matlab, VHDL, Verilog, Spice, MIPS assembly, a8086 assembly, a8086 assembly, MIPS assembly, HCL2.'),
+            array('/file4.txt' => 'Languages
 
                 Moss can currently analyze code written in the following languages:
-                C, C++, Java, C#, Python, Visual Basic, Javascript, FORTRAN, ML, Haskell, Lisp, Scheme, Pascal, Modula2, Ada, Perl, TCL, Matlab, VHDL, Verilog, Spice, MIPS assembly, a8086 assembly, a8086 assembly, MIPS assembly, HCL2.'
+                C, C++, Java, C#, Python, Visual Basic, Javascript, FORTRAN, ML, Haskell, Lisp, Scheme, Pascal, Modula2, Ada, Perl, TCL, Matlab, VHDL, Verilog, Spice, MIPS assembly, a8086 assembly, a8086 assembly, MIPS assembly, HCL2.')
         );
 
         $fs = get_file_storage();
         $i = 0;
-        foreach ($contents as $key => $content) {
-            $file_record = new stdClass();
-            $file_record->contextid = 1;
-            $file_record->component = 'test';
-            $file_record->filearea = 'test';
-            $file_record->filepath = dirname($key).'/';
-            $file_record->filename = basename($key);
-            $file_record->itemid = $i;
-            $fs->create_file_from_string($file_record, $content);
+        $files = array();
+        foreach ($contents as $oneuser) {
+            foreach ($oneuser as $key => $content) {
+                $file_record = new stdClass();
+                $file_record->contextid = 1;
+                $file_record->component = 'test';
+                $file_record->filearea = 'test';
+                $file_record->filepath = dirname($key).'/';
+                $file_record->filename = basename($key);
+                $file_record->itemid = $i;
+                $fs->create_file_from_string($file_record, $content);
+            }
+            $files[] = $fs->get_area_files(1, 'test', 'test', $i, 'sortorder, filename', false);
+            $i++;
         }
-        $files = $fs->get_area_files(1, 'test', 'test', false, 'sortorder, filename', false);
 
         foreach($events as $i => & $event) {
             $event = (object)$event;
-            $event->file = current($files);
+            $event->files = current($files);
             next($files);
         }
 
-        $this->add_config(1);
+        $this->add_config(1, '*.txt');
         $this->trigger(1, $events);
 	}
 
