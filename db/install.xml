@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="plagiarism/moss/db" VERSION="20110707" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
+<XMLDB PATH="plagiarism/moss/db" VERSION="20110708" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -11,7 +11,9 @@
         <FIELD NAME="timetomeasure" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="cmid" NEXT="timemeasured"/>
         <FIELD NAME="timemeasured" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timetomeasure" NEXT="tag"/>
         <FIELD NAME="tag" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timemeasured" NEXT="enabled"/>
-        <FIELD NAME="enabled" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="tag"/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="tag" NEXT="coursename"/>
+        <FIELD NAME="coursename" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Cache course name" PREVIOUS="enabled" NEXT="modulename"/>
+        <FIELD NAME="modulename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Cache activity module name" PREVIOUS="coursename"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="cmid"/>

@@ -72,9 +72,11 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         }
 
         $moss = new stdClass();
-        $moss->enabled = $data->enabled;
-        $moss->timetomeasure = $data->timetomeasure;
+        $moss->enabled = empty($data->enabled) ? 0 : 1;
+        $moss->timetomeasure = $data->timetomeasure; //TODO: activity due date
         $moss->cmid = $data->coursemodule;
+        $moss->modulename = $data->name;
+        $moss->coursename = $DB->get_field('course', 'shortname', array('id' => $data->course));
 
         // process tag
         if (empty($data->tag)) {
@@ -96,12 +98,17 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $data->mossid = $DB->insert_record('moss', $moss);
         }
 
+        if (!$moss->enabled) {
+            // disabled moss keep old configs
+            return;
+        }
+
         // sub configs
         for($index = 0; $index < MOSS_MAX_PATTERNS; $index++) {
             $config = new stdClass();
             $config->moss = $data->mossid;
             $member = 'language'.$index;
-            $config->language = $data->$member;
+            $config->language = isset($data->$member) ? $data->$member : 'c';
             $member = 'sensitivity'.$index;
             $config->sensitivity = $data->$member;
 
@@ -263,6 +270,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $select  = 'timetomeasure > timemeasured AND enabled = 1';
         $mosses = $DB->get_records_select('moss', $select);
         foreach ($mosses as $moss) {
+            mtrace("Moss measure $moss->modulename ($moss->cmid) in $moss->coursename");
             $moss_obj = new moss($moss->cmid);
             $moss_obj->measure();
         }
@@ -417,6 +425,7 @@ function moss_event_mod_created($eventdata) {
 function moss_event_mod_updated($eventdata) {
     //check if duetime modified, if duetime was postponed and moss already run before
     //set rerun = 1, 
+    // TODO: update coursename and modulename
     $result = true;
     return $result;    
 }
