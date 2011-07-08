@@ -41,7 +41,7 @@ define('MOSS_MAX_PATTERNS', 3);
 /**
  * plagiarism_plugin_moss inherit from plagiarism_plugin class, this is the most important class in plagiarism plugin,
  * Moodle platform will automatically call the function of this class.
- * @author
+ * @author Sun Zhigang
  *
  */
 class plagiarism_plugin_moss extends plagiarism_plugin {
@@ -99,7 +99,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         }
 
         if (!$moss->enabled) {
-            // disabled moss keep old configs
+            // disabled moss keepa old configs
             return;
         }
 
@@ -233,32 +233,20 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     }
 
     /**
-     * (non-PHPdoc)
-     * @see plagiarism_plugin::get_links()
+     * hook to allow plagiarism specific information to be displayed beside a submission 
+     *
+     * @param array  $linkarraycontains all relevant information for the plugin to generate a link
+     * @return string
      */
     public function get_links($linkarray) {
-        //$userid, $file, $cmid, $course, $module
-        global $CFG;
-        $cmid = $linkarray['cmid'];
-        $userid = $linkarray['userid'];
-        $file = $linkarray['file'];
-        $link = '<span class="plagiarismreport">
-                     <a href= "'.$CFG->wwwroot.'/plagiarism/moss/result_pages/student_page.php?cmid='.$cmid.'&id='.$userid.'" >
-                     anti-plagiarism result link
-                     <a/>';//$cmid.$userid.$file;
-        //add link/information about this file to $link
-        return $link;
-    }
+        global $DB;
 
-    /**
-     * (non-PHPdoc)
-     * @see plagiarism_plugin::update_status()
-     */
-    public function update_status($course, $cm) {
-        global $CFG;
-        echo '<a href="'.$CFG->wwwroot.'/plagiarism/moss/result_pages/view_all.php?cmid='.$cm->id.'">
-              anti-plagiarism verify page
-              </a>';
+        if (!moss_enabled($linkarray['cmid'])) {
+            return '';
+        }
+
+        $link = '';
+        return $link;
     }
 
     /**
