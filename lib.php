@@ -60,9 +60,8 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     	}
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see plagiarism_plugin::save_form_elements()
+    /* hook to save plagiarism specific settings on a module settings page
+     * @param object $data - data from an mform submission.
      */
     public function save_form_elements($data) {
         global $DB;
@@ -99,7 +98,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         }
 
         if (!$moss->enabled) {
-            // disabled moss keepa old configs
+            // disabled mosses keep old configs
             return;
         }
 
@@ -113,7 +112,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $config->sensitivity = $data->$member;
 
             $member = 'filepatterns'.$index;
-            $config->filepatterns = str_replace('..', '', $data->$member); // filter out .. to for safety
+            $config->filepatterns = str_replace('\\', '_', str_replace('/', '_', $data->$member)); // filter out path chars
             if ($index == 0 and empty($config->filepatterns)) {
                 $config->filepatterns = '*';
             }
