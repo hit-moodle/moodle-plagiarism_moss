@@ -54,9 +54,9 @@ function moss_enabled($cmid = 0) {
 }
 
 /**
+ * Save files in $eventdata to moss file area
  *
- * Enter description here ...
- * @param unknown_type $eventdata
+ * @param object $eventdata
  */
 function moss_save_files($eventdata) {
     global $DB;
