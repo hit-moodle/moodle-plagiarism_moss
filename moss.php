@@ -42,9 +42,11 @@ class moss {
     protected $tempdir;
 
     public function __construct($cmid) {
-        global $CFG, $DB;
+        global $CFG, $DB, $UNITTEST;
         $this->moss = $DB->get_record('moss', array('cmid' => $cmid));
-        $this->moss->course = $DB->get_field('course_modules', 'course', array('id' => $this->moss->cmid));
+        if (!isset($UNITTEST)) { // testcase can not construct course structure
+            $this->moss->course = $DB->get_field('course_modules', 'course', array('id' => $this->moss->cmid));
+        }
         $this->tempdir = $CFG->dataroot.'/temp/moss/'.$this->moss->id;
     }
 
@@ -206,7 +208,7 @@ class moss {
      * @return true or false
      */
     protected function save_results($url, $configid) {
-    	global $DB;
+        global $DB, $UNITTEST;
 
         mtrace("Processing $url");
 
@@ -228,8 +230,11 @@ class moss {
         }
 
         // save to db
-        $context = get_context_instance(CONTEXT_COURSE, $this->moss->course);
-        foreach ($matches as $rank => $result) {
+        if (!isset($UNITTEST)) { // testcase can not construct course structure
+            $context = get_context_instance(CONTEXT_COURSE, $this->moss->course);
+        }
+        $rank = 1;
+        foreach ($matches as $result) {
             $result['moss'] = $this->moss->id;
             $result['config'] = $configid;
             $result['rank'] = $rank + 1;
@@ -240,13 +245,19 @@ class moss {
             $result2->userid = $result['user2'];
             $result2->percentage = $result['percentage2'];
 
-            // keep enrolled users only
-            if (is_enrolled($context, $result1->userid) or is_enrolled($context, $result2->userid)) {
-                $result1->id = $DB->insert_record('moss_results', $result1);
-                $result2->pair = $result1->id;
-                $result1->pair = $DB->insert_record('moss_results', $result2);
-                $DB->update_record('moss_results', $result1);
+            if (!isset($UNITTEST)) { // testcase can not construct course structure
+                // skip unenrolled users
+                if (!is_enrolled($context, $result1->userid) and !is_enrolled($context, $result2->userid)) {
+                    continue;
+                }
             }
+
+            $result1->id = $DB->insert_record('moss_results', $result1);
+            $result2->pair = $result1->id;
+            $result1->pair = $DB->insert_record('moss_results', $result2);
+            $DB->update_record('moss_results', $result1);
+
+            $rank++;
         }
 
         mtrace("Got $rank pairs");

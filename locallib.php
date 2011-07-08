@@ -99,8 +99,9 @@ function moss_save_files($eventdata) {
             'component' => 'plagiarism_moss',
             'filearea'  => 'files',
             'itemid'    => $cmid,
-            'filepath'  => '/'.$userid.$file->get_filepath(),
-            'filename'  => $file->get_filename());
+            'filepath'  => "/$userid/",
+            // save /abc/def/ghi.c as abc_def_ghi.c
+            'filename'  => str_replace('/', '_', ltrim($file->get_filepath(), '/')).$file->get_filename());
         $fs->create_file_from_storedfile($fileinfo, $file);
     }
 
