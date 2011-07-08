@@ -207,7 +207,7 @@ class moss {
     protected function save_results($url, $configid) {
     	global $DB;
 
-        mtrace("processing $url");
+        mtrace("Processing $url");
 
         if (!$result_page = download_file_content($url)) {
             mtrace("can not read $url");
@@ -245,6 +245,8 @@ class moss {
             $result1->pair = $DB->insert_record('moss_results', $result2);
             $DB->update_record('moss_results', $result1);
         }
+
+        mtrace("Got $rank pairs");
 
         return true;
     }

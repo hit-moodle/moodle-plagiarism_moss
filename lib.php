@@ -267,13 +267,15 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     public function cron() {
         global $DB;
 
+        mtrace('Moss begins');
         $select  = 'timetomeasure > timemeasured AND enabled = 1';
         $mosses = $DB->get_records_select('moss', $select);
         foreach ($mosses as $moss) {
-            mtrace("Moss measure $moss->modulename ($moss->cmid) in $moss->coursename");
+            mtrace("Measure $moss->modulename ($moss->cmid) in $moss->coursename");
             $moss_obj = new moss($moss->cmid);
             $moss_obj->measure();
         }
+        mtrace('Moss done');
     }
 }
 
