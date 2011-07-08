@@ -44,6 +44,7 @@ class moss {
     public function __construct($cmid) {
         global $CFG, $DB;
         $this->moss = $DB->get_record('moss', array('cmid' => $cmid));
+        $this->moss->course = $DB->get_field('course_modules', 'course', array('id' => $this->moss->cmid));
         $this->tempdir = $CFG->dataroot.'/temp/moss/'.$this->moss->id;
     }
 
@@ -227,9 +228,8 @@ class moss {
         }
 
         // save to db
+        $context = get_context_instance(CONTEXT_COURSE, $this->moss->course);
         foreach ($matches as $rank => $result) {
-            //TODO: ignore result when both users are not in the course
-
             $result['moss'] = $this->moss->id;
             $result['config'] = $configid;
             $result['rank'] = $rank + 1;
@@ -240,17 +240,20 @@ class moss {
             $result2->userid = $result['user2'];
             $result2->percentage = $result['percentage2'];
 
-            $result1->id = $DB->insert_record('moss_results', $result1);
-            $result2->pair = $result1->id;
-            $result1->pair = $DB->insert_record('moss_results', $result2);
-            $DB->update_record('moss_results', $result1);
+            // keep enrolled users only
+            if (is_enrolled($context, $result1->userid) or is_enrolled($context, $result2->userid)) {
+                $result1->id = $DB->insert_record('moss_results', $result1);
+                $result2->pair = $result1->id;
+                $result1->pair = $DB->insert_record('moss_results', $result2);
+                $DB->update_record('moss_results', $result1);
+            }
         }
 
         mtrace("Got $rank pairs");
 
         return true;
     }
-	
+
     /**
      * 
      * Enter description here ...
