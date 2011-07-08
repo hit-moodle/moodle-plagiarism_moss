@@ -61,7 +61,7 @@ class moss {
     public function measure() {
         global $DB;
 
-        if (!$this->enabled()) {
+        if (!moss_enabled($this->moss->cmid)) {
             return false;
         }
 
@@ -102,10 +102,6 @@ class moss {
             }
             $file->copy_content_to($fullpath);
         }
-    }
-
-    protected function enabled() {
-        return moss_enabled($this->moss->cmid);
     }
 
 	/**
