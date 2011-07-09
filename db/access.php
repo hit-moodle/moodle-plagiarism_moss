@@ -1,7 +1,7 @@
 <?php
 $capabilities = array(
 
-    'moodle/moss:viewselfresult'    => array(
+    'plagiarism/moss:viewunconfirmed'    => array(
          'captype'        => 'read',
          'contextlevel'   => CONTEXT_MODULE,
          'archetypes' => array(
@@ -12,18 +12,7 @@ $capabilities = array(
          )
     ),
 
-    'moodle/moss:viewunconfirmed'    => array(
-         'captype'        => 'read',
-         'contextlevel'   => CONTEXT_MODULE,
-         'archetypes' => array(
-             'student'        => CAP_ALLOW,
-             'teacher'        => CAP_ALLOW,
-             'editingteacher' => CAP_ALLOW,
-             'manager'        => CAP_ALLOW
-         )
-    ),
-
-    'moodle/moss:viewallresults'    => array(
+    'plagiarism/moss:viewallresults'    => array(
          'captype'        => 'read',
          'contextlevel'   => CONTEXT_MODULE,
          'archetypes' => array(
@@ -33,7 +22,7 @@ $capabilities = array(
          )
     ),
 
-    'moodle/moss:viewdiff'    => array(
+    'plagiarism/moss:viewdiff'    => array(
          'captype'        => 'read',
          'contextlevel'   => CONTEXT_MODULE,
          'archetypes' => array(
@@ -43,7 +32,7 @@ $capabilities = array(
          )
     ),
 
-    'moodle/moss:confirm'    => array(
+    'plagiarism/moss:confirm'    => array(
          'captype'        => 'write',
          'contextlevel'   => CONTEXT_MODULE,
          'archetypes' => array(
