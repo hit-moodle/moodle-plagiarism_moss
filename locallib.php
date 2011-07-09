@@ -58,7 +58,7 @@ function moss_enabled($cmid = 0) {
  *
  * @param object $eventdata
  */
-function moss_save_files($eventdata) {
+function moss_save_files_from_event($eventdata) {
     global $DB;
     $result = true;
 
@@ -66,14 +66,25 @@ function moss_save_files($eventdata) {
         return $result;
     }
 
-    $context = get_context_instance(CONTEXT_SYSTEM);
-    $cmid = $eventdata->cmid;
-    $userid = $eventdata->userid;
-
     if (!empty($eventdata->file) && empty($eventdata->files)) { //single assignment type passes a single file
         $eventdata->files[] = $eventdata->file;
     }
 
+    moss_save_storedfiles($eventdata->files, $eventdata->cmid, $eventdata->userid);
+
+    return $result;
+}
+
+/**
+ * Save storedfiles into moss
+ *
+ * The function will clean all previous stored files
+ * @param array $storedfiles
+ * @param int $cmid
+ * @param int $userid
+ */
+function moss_save_storedfiles($storedfiles, $cmid, $userid) {
+    $context = get_system_context();
     $fs = get_file_storage();
 
     // remove all old files
@@ -82,9 +93,9 @@ function moss_save_files($eventdata) {
         $oldfile->delete();
     }
 
-    // store submitted files
-    foreach($eventdata->files as $file) {
-        if ($file->get_filename() ==='.') {
+    // store files
+    foreach($storedfiles as $file) {
+        if ($file->get_filename() === '.') {
             continue;
         }
         //hacky way to check file still exists
@@ -104,7 +115,32 @@ function moss_save_files($eventdata) {
             'filename'  => str_replace('/', '_', ltrim($file->get_filepath(), '/')).$file->get_filename());
         $fs->create_file_from_storedfile($fileinfo, $file);
     }
-
-    return $result;
 }
 
+/**
+ * Import all submissions of specified assignment into moss
+ *
+ * @param int $cmid
+ * @return number of submissions imported, or false on failed
+ */
+function moss_import_assignment($cmid) {
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/mod/assignment/lib.php');
+
+    $cm = get_coursemodule_from_id('assignment', $cmid);
+    if (empty($cm)) {
+        return false;
+    }
+
+    $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    $fs = get_file_storage();
+    $assignment = $DB->get_record('assignment', array('id' => $cm->instance), '*', MUST_EXIST);
+    $submissions = assignment_get_all_submissions($assignment);
+
+    foreach ($submissions as $submission) {
+        $files = $fs->get_area_files($context->id, 'mod_assignment', 'submission', $submission->id, "timemodified", false);
+        moss_save_storedfiles($files, $cmid, $submission->userid);
+    }
+
+    return count($submissions);
+}

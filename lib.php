@@ -382,7 +382,7 @@ class plugin_error_test
  * @param unknown_type $eventdata
  */
 function moss_event_file_uploaded($eventdata) {
-    return moss_save_files($eventdata);
+    return moss_save_files_from_event($eventdata);
 }
 
 /**
