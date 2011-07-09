@@ -59,6 +59,7 @@ $string['tag'] = 'Tag';
 $string['tag_help'] = 'Different activities using the same tag will be measured together. Tag is helpful to prevent plagiarism among courses.';
 $string['timetomeasure']  ='Time to start measuring';
 $string['timetomeasure_help']  ='The time should be after all submissions have been submitted.';
+$string['unsupportedmodule']  ='Moss does not support this module.';
 
 
 //general setting page

@@ -59,6 +59,7 @@ $string['tag'] = '标签';
 $string['tag_help'] = '使用相同标签的不同活动会被一起检测抄袭。标签可以非常方便地用来防止在课程之间的抄袭行为。';
 $string['timetomeasure']  ='检测开始时间';
 $string['timetomeasure_help']  ='此时间应在所有被检测文件都已提交之后。';
+$string['unsupportedmodule']  ='Moss不支持此模块。';
 
 //general setting page
 $string['general_settings'] = '插件综合配置';

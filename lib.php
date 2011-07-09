@@ -265,7 +265,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $result->count = count($results);
             $title = get_string('resultlinktitle', 'plagiarism_moss', $result);
 
-            $params = array('cmid' => $linkarray['cmid'], 'userid' => $linkarray['userid']);
+            $params = array('id' => $linkarray['cmid'], 'user' => $linkarray['userid']);
             $url = new moodle_url('/plagiarism/moss/view.php', $params);
 
             $link = html_writer::link($url, $text, array('title' => $title));
