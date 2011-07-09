@@ -143,6 +143,7 @@ class moss {
             $err = stream_get_contents($pipes[2]);
             $rval = proc_close($proc);
             if ($rval != 0) {
+                mtrace($out);
                 mtrace($err);
                 return false;
             }
@@ -150,6 +151,7 @@ class moss {
             $url_p = '/http:\/\/moss\.stanford\.edu\/results\/\d+/';
             if (!preg_match($url_p, $out, $match)) {
                 mtrace($out);
+                mtrace($err);
                 return false;
             }
 
