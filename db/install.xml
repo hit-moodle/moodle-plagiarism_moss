@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="plagiarism/moss/db" VERSION="20110708" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
+<XMLDB PATH="plagiarism/moss/db" VERSION="20110709" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -44,7 +44,7 @@
         <KEY NAME="name" TYPE="unique" FIELDS="name" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="moss_results" COMMENT="place to store moss result" PREVIOUS="moss_tags" NEXT="moss_plugin_errors">
+    <TABLE NAME="moss_results" COMMENT="place to store moss result" PREVIOUS="moss_tags" NEXT="moss_matched_files">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="moss"/>
         <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="config"/>
@@ -71,22 +71,7 @@
         <INDEX NAME="rank" UNIQUE="false" FIELDS="rank"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="moss_plugin_errors" COMMENT="all errors the plugin encountered" PREVIOUS="moss_results" NEXT="moss_matched_files">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="errdate"/>
-        <FIELD NAME="errdate" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="errtype"/>
-        <FIELD NAME="errtype" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="errdate" NEXT="errdescription"/>
-        <FIELD NAME="errdescription" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" PREVIOUS="errtype" NEXT="errstatus"/>
-        <FIELD NAME="errstatus" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="errdescription" NEXT="errsolution"/>
-        <FIELD NAME="errsolution" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" PREVIOUS="errstatus" NEXT="errargument"/>
-        <FIELD NAME="errargument" TYPE="char" LENGTH="250" NOTNULL="true" SEQUENCE="false" PREVIOUS="errsolution" NEXT="testable"/>
-        <FIELD NAME="testable" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="errargument"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="moss_matched_files" COMMENT="Files matched" PREVIOUS="moss_plugin_errors">
+    <TABLE NAME="moss_matched_files" COMMENT="Files matched" PREVIOUS="moss_results">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="result"/>
         <FIELD NAME="result" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="contenthash"/>
