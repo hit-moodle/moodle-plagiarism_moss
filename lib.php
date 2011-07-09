@@ -240,11 +240,37 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     public function get_links($linkarray) {
         global $DB;
 
+        $link = '';
         if (!moss_enabled($linkarray['cmid'])) {
-            return '';
+            return $link;
         }
 
-        $link = '';
+        $sql = 'SELECT r.*
+                FROM {moss_results} r
+                LEFT JOIN {moss_matched_files} f ON r.id = f.result
+                WHERE f.contenthash = :contenthash AND r.userid = :userid AND r.moss = :mossid
+                ORDER BY r.rank ASC
+                ';
+        $params = array(
+            'userid'      => $linkarray['userid'],
+            'contenthash' => $linkarray['file']->get_contenthash(),
+            'mossid'      => $DB->get_field('moss', 'id', array('cmid' => $linkarray['cmid']))
+        );
+
+        $results = $DB->get_records_sql($sql, $params);
+        if (!empty($results)){
+            $result = current($results);
+            $text = $result->percentage.'%'."($result->linesmatched)";
+
+            $result->count = count($results);
+            $title = get_string('resultlinktitle', 'plagiarism_moss', $result);
+
+            $params = array('cmid' => $linkarray['cmid'], 'userid' => $linkarray['userid']);
+            $url = new moodle_url('/plagiarism/moss/view.php', $params);
+
+            $link = html_writer::link($url, $text, array('title' => $title));
+        }
+
         return $link;
     }
 
@@ -255,8 +281,8 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         global $DB;
 
         mtrace('Moss begins');
-        $select  = 'timetomeasure > timemeasured AND enabled = 1';
-        $mosses = $DB->get_records_select('moss', $select);
+        $select  = 'timetomeasure < ? AND timetomeasure > timemeasured AND enabled = 1';
+        $mosses = $DB->get_records_select('moss', $select, array(time()));
         foreach ($mosses as $moss) {
             mtrace("Measure $moss->modulename ($moss->cmid) in $moss->coursename");
             $moss_obj = new moss($moss->cmid);

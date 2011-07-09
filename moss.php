@@ -218,7 +218,7 @@ class moss {
         }
 
         preg_match_all(
-            '/(?P<link>http:\/\/moss\.stanford\.edu\/results\/\d+\/match\d+\.html)">.+\/(?P<user1>\d+)\/ \((?P<percentage1>\d+)%\).+\/(?P<user2>\d+)\/ \((?P<percentage2>\d+)%\).+right>(?P<linesmatched>\d+)/Us',
+            '/(?P<link>http:\/\/moss\.stanford\.edu\/results\/\d+\/match\d+\.html)">.+\/(?P<user1>\d+)\/ \((?P<percentage1>\d+)%\).+\/(?P<user2>\d+)\/ \((?P<percentage2>\d+)%\).+right>(?P<linesmatched>\d+)\\n/Us',
             $result_page,
             $matches,
             PREG_SET_ORDER
@@ -288,12 +288,17 @@ class moss {
     }
 
     /**
-     * 
-     * Enter description here ...
-     * @param unknown_type $cmid
+     * Clean current stored results
      */
     protected function clean_results() {
         global $DB;
+
+        $sql = 'DELETE FROM {moss_matched_files}
+                WHERE result in (
+                    SELECT id FROM {moss_results}
+                    WHERE moss = ?
+                )';
+        $DB->execute($sql, array($this->moss->id));
         $DB->delete_records('moss_results', array('moss' => $this->moss->id));
         //TODO: remove cached pages
     }

@@ -50,6 +50,7 @@ After registration, you will get a reply mail which contains a perl script with 
     $userid=1234567890;
 
 The number is exactly your moss account.';
+$string['resultlinktitle'] = 'Up to {$a->percentage}% ({$a->linesmatched} lines) of this file is similar with other {$a->count} user(s)';
 $string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';
 $string['studentdisclosure'] = 'Student Disclosure';
 $string['studentdisclosure_help'] = 'This text will be displayed to all students on the file upload page.';
