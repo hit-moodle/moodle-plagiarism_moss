@@ -35,6 +35,8 @@ $string['configrequired'] = '配置{$a}（必填）：';
 $string['configoptional'] = '配置{$a}（可选）：';
 $string['filepatterns'] = '文件名通配符';
 $string['filepatterns_help'] = 'Glob格式。例如：\*.c，hello.\*，a?c.java。用空格分隔多个通配符。留空表示禁用此条配置。';
+$string['matchedlines'] = '相似行数';
+$string['matchedusers'] = '相似用户';
 $string['moss'] = 'Moss反抄袭';
 $string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个程序相似性自动检测系统。';
 $string['mossexplain'] = '详细信息请访问: ';
@@ -50,6 +52,7 @@ $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@mos
     $userid=1234567890;
 
 其中的数字就是您能的Moss账号。';
+$string['percentage'] = '相似率';
 $string['resultlinktitle'] = '此文件有至多{$a->percentage}%（{$a->linesmatched}行）的内容与其他{$a->count}名用户相似';
 $string['savedconfigsuccess'] = '配置保存成功';
 $string['studentdisclosure'] = '显示给学生的声明';

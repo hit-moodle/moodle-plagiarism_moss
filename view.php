@@ -81,9 +81,10 @@ $output->can_viewunconfirmed = has_capability('plagiarism/moss:viewunconfirmed',
 $output->can_confirm = has_capability('plagiarism/moss:confirm', $context);
 
 if ($userid) {
-    echo $output->user_result($userid, $cmid);
+    $user = $DB->get_record('user', array('id' => $userid));
+    echo $output->user_result($user, $moss);
 } else {
-    echo $output->cm_result($cmid);
+    echo $output->cm_result($moss);
 }
 
 echo $output->footer();

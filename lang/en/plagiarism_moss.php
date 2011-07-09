@@ -35,6 +35,8 @@ $string['configrequired'] = 'Config {$a} (required):';
 $string['configoptional'] = 'Config {$a} (optional):';
 $string['filepatterns'] = 'Filename patterns';
 $string['filepatterns_help'] = 'Glob format. E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
+$string['matchedlines'] = 'Matched lines';
+$string['matchedusers'] = 'Matched users';
 $string['moss'] = 'Moss anti-plagiarism';
 $string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs.';
 $string['mossexplain'] = 'For more information on this plugin see: ';
@@ -50,6 +52,7 @@ After registration, you will get a reply mail which contains a perl script with 
     $userid=1234567890;
 
 The number is exactly your moss account.';
+$string['percentage'] = 'Similarity';
 $string['resultlinktitle'] = 'Up to {$a->percentage}% ({$a->linesmatched} lines) of this file is similar with other {$a->count} user(s)';
 $string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';
 $string['studentdisclosure'] = 'Student Disclosure';
