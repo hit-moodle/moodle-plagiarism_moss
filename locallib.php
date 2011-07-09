@@ -144,3 +144,4 @@ function moss_import_assignment($cmid) {
 
     return count($submissions);
 }
+
