@@ -24,7 +24,8 @@
 ///////////////////////////////////////////////////////////////////////////
 
 /**
- * Import all submissions of specified assignment into moss
+ * Trigger assessable_file_uploaded and assessable_files_done events of
+ * specified assignment
  *
  * @package   plagiarism_moss
  * @copyright 2011 Sun Zhigang (http://sunner.cn)
@@ -40,8 +41,8 @@ require_once($CFG->libdir.'/clilib.php');      // cli only functions
 require_once($CFG->dirroot.'/plagiarism/moss/lib.php');
 
 // now get cli options
-$longoptions  = array('help'=>false);
-$shortoptions = array('h'=>'help');
+$longoptions  = array('help'=>false, 'nodone'=>false);
+$shortoptions = array('h'=>'help', 'n'=>'nodone');
 list($options, $unrecognized) = cli_get_params($longoptions, $shortoptions);
 
 if ($unrecognized) {
@@ -54,26 +55,27 @@ if ($unrecognized) {
 
 if ($options['help'] or !isset($cmid)) {
     $help =
-"Import all submissions of specified assignment into moss.
+"Trigger assessable_file_uploaded and assessable_files_done events of specified assignment.
 
-import_assignment.php cmid
+trigger_assignment_events.php cmid
 
 Options:
 -h, --help            Print out this help
+-n, --nodone          Do not trigger assessable_files_done event
 
 Example:
-\$sudo -u www-data /usr/bin/php plagiarism/moss/cli/import_assignment.php 1234
+\$sudo -u www-data /usr/bin/php plagiarism/moss/cli/trigger_assignment_events.php 1234
 ";
 
     echo $help;
     die;
 }
 
-$count = moss_import_assignment($cmid);
+$count = moss_trigger_assignment_events($cmid, !$options['nodone']);
 
 if ($count === false) {
-    cli_error('Import failed!');
+    cli_error('Failed!');
 } else {
-    mtrace("$count submission(s) imported.");
+    mtrace("$count submission(s) are found and events are triggered.");
 }
 

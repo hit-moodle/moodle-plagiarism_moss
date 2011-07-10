@@ -70,7 +70,9 @@ function moss_save_files_from_event($eventdata) {
         $eventdata->files[] = $eventdata->file;
     }
 
-    moss_save_storedfiles($eventdata->files, $eventdata->cmid, $eventdata->userid);
+    if (isset($eventdata->files)) {
+        moss_save_storedfiles($eventdata->files, $eventdata->cmid, $eventdata->userid);
+    }
 
     return $result;
 }
@@ -118,12 +120,13 @@ function moss_save_storedfiles($storedfiles, $cmid, $userid) {
 }
 
 /**
- * Import all submissions of specified assignment into moss
+ * Trigger assessable_file_uploaded and assessable_files_done events of specified assignment.
  *
  * @param int $cmid
- * @return number of submissions imported, or false on failed
+ * @param bool $trigger_done whether trigger assessable_files_done event. Advanced upload assignment only.
+ * @return number of submissions found, or false on failed
  */
-function moss_import_assignment($cmid) {
+function moss_trigger_assignment_events($cmid, $trigger_done = true) {
     global $DB, $CFG;
     require_once($CFG->dirroot.'/mod/assignment/lib.php');
 
@@ -139,7 +142,24 @@ function moss_import_assignment($cmid) {
 
     foreach ($submissions as $submission) {
         $files = $fs->get_area_files($context->id, 'mod_assignment', 'submission', $submission->id, "timemodified", false);
-        moss_save_storedfiles($files, $cmid, $submission->userid);
+        $eventdata = new stdClass();
+        $eventdata->modulename   = 'assignment';
+        $eventdata->cmid         = $cmid;
+        $eventdata->itemid       = $submission->id;
+        $eventdata->courseid     = $cm->course;
+        $eventdata->userid       = $submission->userid;
+        if ($files) {
+            if ($assignment->assignmenttype == 'upload') {
+                $eventdata->files = $files;
+            } else { // uploadsingle
+                $eventdata->file = current($files);
+            }
+        }
+        events_trigger('assessable_file_uploaded', $eventdata);
+        if ($trigger_done and $assignment->assignmenttype == 'upload') {
+            unset($eventdata->files);
+            events_trigger('assessable_files_done', $eventdata);
+        }
     }
 
     return count($submissions);
