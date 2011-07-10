@@ -91,7 +91,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
                 // other user
                 $other = $DB->get_record('user', array('id' => $match->other));
-                $cells[] = new html_table_cell($this->user($other));
+                $cells[] = new html_table_cell($this->user($other).$this->confirmed($match->pair));
 
                 // percentage and linesmatched
                 $percentage = $match->percentage.'%';
@@ -106,7 +106,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 $cells[] = new html_table_cell($linesmatched);
 
                 // confirm
-                $cells[] = new html_table_cell($match->confirmed);
+                $cells[] = new html_table_cell($this->confirmed($match));
 
                 if ($first_match) { // first row of the filepatterns
                     $pattern_cell = new html_table_cell($config->filepatterns);
@@ -148,12 +148,31 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             $url = $PAGE->url;
             $url->param('user', $user->id);
             $output .= html_writer::link($url, fullname($user));
-            //TODO confirm button
         } else {
             $output .= fullname($user);
         }
 
         return $output;
+    }
+
+    protected function confirmed($result) {
+        global $DB;
+
+        if (!is_object($result)) { // $result is id
+            $result = $DB->get_record('moss_results', array('id' => $result));
+        }
+
+        if (!is_enrolled($this->context, $result->userid)) { // show nothing for unenrolled users
+            return '';
+        }
+    )
+        if ($result->confirmed) {
+            $icon = $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'));
+        } else {
+            $icon = $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss'));
+        }
+
+        return $icon;
     }
 }
 

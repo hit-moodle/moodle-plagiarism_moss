@@ -33,6 +33,7 @@
 
 $string['configrequired'] = 'Config {$a} (required):';
 $string['configoptional'] = 'Config {$a} (optional):';
+$string['confirmed'] = 'Confirmed';
 $string['filepatterns'] = 'Filename patterns';
 $string['filepatterns_help'] = 'Glob format. E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
 $string['matchedlines'] = 'Matched lines';
@@ -62,6 +63,7 @@ $string['tag'] = 'Tag';
 $string['tag_help'] = 'Different activities using the same tag will be measured together. Tag is helpful to prevent plagiarism among courses.';
 $string['timetomeasure']  ='Time to start measuring';
 $string['timetomeasure_help']  ='The time should be after all submissions have been submitted.';
+$string['unconfirmed'] = 'Unconfirmed';
 $string['unsupportedmodule']  ='Moss does not support this module.';
 
 
@@ -131,8 +133,6 @@ $string['relevant_entry'] = 'Relevant entry';
 $string['view_code'] = 'View code';
 $string['confirm'] = 'Confirm';
 $string['unconfirm'] = 'Unconfirm';
-$string['unconfirmed'] = 'Unconfirmed';
-$string['confirmed'] = 'Confirmed';
 $string['undo_redo_describtion'] = 'Press "Undo" button to reverse an operation...';
 //hidden label
 $string['confirm_prompt'] = "Are you sure you want to confirm this entry ?";

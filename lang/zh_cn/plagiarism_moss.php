@@ -33,6 +33,7 @@
 
 $string['configrequired'] = '配置{$a}（必填）：';
 $string['configoptional'] = '配置{$a}（可选）：';
+$string['confirmed'] = '已确认';
 $string['filepatterns'] = '文件名通配符';
 $string['filepatterns_help'] = 'Glob格式。例如：\*.c，hello.\*，a?c.java。用空格分隔多个通配符。留空表示禁用此条配置。';
 $string['matchedlines'] = '相似行数';
@@ -62,6 +63,7 @@ $string['tag'] = '标签';
 $string['tag_help'] = '使用相同标签的不同活动会被一起检测抄袭。标签可以非常方便地用来防止在课程之间的抄袭行为。';
 $string['timetomeasure']  ='检测开始时间';
 $string['timetomeasure_help']  ='此时间应在所有被检测文件都已提交之后。';
+$string['unconfirmed'] = '未确认';
 $string['unsupportedmodule']  ='Moss不支持此模块。';
 
 //general setting page
@@ -129,8 +131,6 @@ $string['relevant_entry'] = '相关记录';
 $string['view_code'] = '查看代码';
 $string['confirm'] = '确定抄袭';
 $string['unconfirm'] = '取消确定';
-$string['unconfirmed'] = '未确定';
-$string['confirmed'] = '已确定';
 $string['undo_redo_describtion'] = '点击“撤销”按钮来取消上一步操作...';
 //hidden label
 $string['confirm_prompt'] = '您确定这两个学生有抄袭行为吗？';
