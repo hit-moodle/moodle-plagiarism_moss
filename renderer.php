@@ -55,7 +55,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     function user_stats($user) {
         global $DB;
 
-        $sql = 'SELECT DISTINCT moss
+        $sql = 'SELECT COUNT(DISTINCT moss)
                 FROM {moss_results}
                 WHERE userid = ? AND confirmed = 1';
         $a->total = $DB->count_records_sql($sql, array($user->id));
