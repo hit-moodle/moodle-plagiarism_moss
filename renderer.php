@@ -159,7 +159,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     }
 
     protected function confirmed($result) {
-        global $DB;
+        global $DB, $PAGE;
 
         if (!is_object($result)) { // $result is id
             $result = $DB->get_record('moss_results', array('id' => $result));
@@ -170,12 +170,19 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         }
 
         if ($result->confirmed) {
-            $icon = $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'));
+            $output = $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'));
         } else {
-            $icon = $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss'));
+            $output = $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss'));
         }
 
-        return $icon;
+        if ($this->can_confirm) {
+            $url = $PAGE->url;
+            $url->param('result', $result->id);
+            $url->param('confirm', !$result->confirmed);
+            $output = html_writer::link($url, $output);
+        }
+
+        return $output;
     }
 }
 

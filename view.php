@@ -58,6 +58,18 @@ require_login($course, true, $cm);
 
 $context = get_context_instance(CONTEXT_MODULE, $cmid);
 
+// confirm
+$result  = optional_param('result', 0, PARAM_INT);
+if ($result) {
+    require_capability('plagiarism/moss:confirm', $context);
+    $r = new stdClass();
+    $r->id = $result;
+    $r->confirmed = required_param('confirm', PARAM_BOOL);
+    $r->confirmer = $USER->id;
+    $r->timeconfirmed = time();
+    $DB->update_record('moss_results', $r);
+}
+
 if ($userid != $USER->id) {
     require_capability('plagiarism/moss:viewallresults', $context);
 }
