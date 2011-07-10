@@ -55,7 +55,7 @@ $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@mos
 其中的数字就是您能的Moss账号。';
 $string['noresults'] = '没有与{$a}有关的抄袭记录';
 $string['percentage'] = '相似率';
-$string['resultlinktitle'] = '此文件有至多{$a->percentage}%（{$a->linesmatched}行）的内容与其他{$a->count}名用户相似';
+$string['resultlinktitle'] = '有至多{$a->percentage}%（{$a->linesmatched}行）的内容与其他{$a->count}名用户相似';
 $string['savedconfigsuccess'] = '配置保存成功';
 $string['studentdisclosure'] = '显示给学生的声明';
 $string['studentdisclosure_help'] = '这些文字会在文件上传页面显示给所有学生。';
