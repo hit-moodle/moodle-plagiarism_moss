@@ -149,17 +149,13 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     protected function user($user) {
         global $PAGE;
 
-        $output = '';
-
         if (is_enrolled($this->context, $user)) {
             $url = $PAGE->url;
             $url->param('user', $user->id);
-            $output .= html_writer::link($url, fullname($user));
         } else {
-            $output .= fullname($user);
+            $url = new moodle_url('/user/view.php', array('id' => $user->id));
         }
-
-        return $output;
+        return html_writer::link($url, fullname($user));
     }
 
     protected function confirmed($result) {
