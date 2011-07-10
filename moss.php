@@ -68,7 +68,7 @@ class moss {
             return false;
         }
 
-        $mosses = $DB->get_records('moss', array('tag' => $this->moss->tag));
+        $mosses = $DB->get_records_select('moss', 'tag = ? AND tag != 0', array($this->moss->tag));
         foreach ($mosses as $moss) {
             if ($moss->cmid == $this->moss->cmid) {
                 // current moss must be extracted lastly
