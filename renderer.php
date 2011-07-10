@@ -52,10 +52,22 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $this->can_confirm = has_capability('plagiarism/moss:confirm', $this->context);
     }
 
+    function user_stats($user) {
+        global $DB;
+
+        $sql = 'SELECT DISTINCT moss
+                FROM {moss_results}
+                WHERE userid = ? AND confirmed = 1';
+        $a->total = $DB->count_records_sql($sql, array($user->id));
+        $a->fullname = fullname($user);
+
+        return $this->container(get_string('confirmedresults', 'plagiarism_moss', $a));
+    }
+
     function user_result($user) {
         global $DB;
 
-        $output = '';
+        $output = $this->user_stats($user);
 
         $table = new html_table();
 

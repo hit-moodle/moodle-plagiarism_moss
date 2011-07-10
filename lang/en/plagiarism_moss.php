@@ -34,6 +34,7 @@
 $string['configrequired'] = 'Config {$a} (required):';
 $string['configoptional'] = 'Config {$a} (optional):';
 $string['confirmed'] = 'Confirmed';
+$string['confirmedresults'] = '{$a->fullname} has confirmed plagiarism records in <strong>{$a->total}</strong> activities.';
 $string['filepatterns'] = 'Filename patterns';
 $string['filepatterns_help'] = 'Glob format. E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
 $string['matchedlines'] = 'Matched lines';
