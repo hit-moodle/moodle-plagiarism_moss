@@ -76,15 +76,13 @@ $output = $PAGE->get_renderer('plagiarism_moss');
 /// Output starts here
 echo $output->header();
 
-$output->can_viewdiff = has_capability('plagiarism/moss:viewdiff', $context);
-$output->can_viewunconfirmed = has_capability('plagiarism/moss:viewunconfirmed', $context);
-$output->can_confirm = has_capability('plagiarism/moss:confirm', $context);
+$output->moss = $moss;
 
 if ($userid) {
     $user = $DB->get_record('user', array('id' => $userid));
-    echo $output->user_result($user, $moss);
+    echo $output->user_result($user);
 } else {
-    echo $output->cm_result($moss);
+    echo $output->cm_result();
 }
 
 echo $output->footer();
