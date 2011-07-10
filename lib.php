@@ -248,9 +248,11 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $sql = 'SELECT r.*
                 FROM {moss_results} r
                 LEFT JOIN {moss_matched_files} f ON r.id = f.result
-                WHERE f.contenthash = :contenthash AND r.userid = :userid AND r.moss = :mossid
-                ORDER BY r.rank ASC
-                ';
+                WHERE f.contenthash = :contenthash AND r.userid = :userid AND r.moss = :mossid ';
+        if (!has_capability('plagiarism/moss:viewunconfirmed', get_context_instance(CONTEXT_MODULE, $linkarray['cmid']))) {
+            $sql .= 'AND r.confirmed = 1 ';
+        }
+        $sql .= 'ORDER BY r.rank ASC';
         $params = array(
             'userid'      => $linkarray['userid'],
             'contenthash' => $linkarray['file']->get_contenthash(),

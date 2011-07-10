@@ -80,8 +80,11 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             $sql = 'SELECT r1.*, r2.userid AS other
                 FROM {moss_results} r1
                 LEFT JOIN {moss_results} r2 ON r1.pair = r2.id
-                WHERE r1.userid = ? AND r1.moss = ? AND r1.config = ?
-                ORDER BY rank ASC';
+                WHERE r1.userid = ? AND r1.moss = ? AND r1.config = ? ';
+            if (!$this->can_viewunconfirmed) {
+                $sql .= 'AND r1.confirmed = 1 ';
+            }
+            $sql .= 'ORDER BY rank ASC';
             $params = array($user->id, $this->moss->id, $config->id);
             $matches = $DB->get_records_sql($sql, $params);
 
@@ -128,7 +131,11 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             }
         }
 
-        $output .= html_writer::table($table);
+        if (empty($table->data)) {
+            $output .= $this->notification(get_string('noresults', 'plagiarism_moss', fullname($user)));
+        } else {
+            $output .= html_writer::table($table);
+        }
 
         return $output;
     }
@@ -165,7 +172,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         if (!is_enrolled($this->context, $result->userid)) { // show nothing for unenrolled users
             return '';
         }
-    )
+
         if ($result->confirmed) {
             $icon = $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'));
         } else {

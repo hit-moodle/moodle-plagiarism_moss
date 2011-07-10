@@ -53,6 +53,7 @@ $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@mos
     $userid=1234567890;
 
 其中的数字就是您能的Moss账号。';
+$string['noresults'] = '没有与{$a}有关的抄袭记录';
 $string['percentage'] = '相似率';
 $string['resultlinktitle'] = '此文件有至多{$a->percentage}%（{$a->linesmatched}行）的内容与其他{$a->count}名用户相似';
 $string['savedconfigsuccess'] = '配置保存成功';
