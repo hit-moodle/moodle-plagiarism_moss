@@ -238,7 +238,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
      * @return string
      */
     public function get_links($linkarray) {
-        global $DB;
+        global $DB, $OUTPUT;
 
         $link = '';
         if (!moss_enabled($linkarray['cmid'])) {
@@ -262,7 +262,16 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $results = $DB->get_records_sql($sql, $params);
         if (!empty($results)){
             $result = current($results);
+
             $text = $result->percentage.'%'."($result->linesmatched)";
+            $icon = $OUTPUT->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss'));
+            foreach ($results as $r) {
+                if ($r->confirmed) {
+                    $icon = $OUTPUT->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'));
+                    break;
+                }
+            }
+            $text .= $icon;
 
             $result->count = count($results);
             $title = get_string('resultlinktitle', 'plagiarism_moss', $result);
