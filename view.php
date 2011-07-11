@@ -61,6 +61,7 @@ $context = get_context_instance(CONTEXT_MODULE, $cmid);
 // confirm
 $result  = optional_param('result', 0, PARAM_INT);
 if ($result) {
+    require_sesskey();
     require_capability('plagiarism/moss:confirm', $context);
     $r = new stdClass();
     $r->id = $result;
@@ -68,6 +69,10 @@ if ($result) {
     $r->confirmer = $USER->id;
     $r->timeconfirmed = time();
     $DB->update_record('moss_results', $r);
+
+    if (optional_param('ajax', 0, PARAM_BOOL)) {
+        die;
+    }
 }
 
 if ($userid != $USER->id) {
@@ -76,14 +81,18 @@ if ($userid != $USER->id) {
 
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
+
 $modname = get_string('modulename', $cm->modname);
 $activityname = $DB->get_field($cm->modname, 'name', array('id' => $cm->instance));
 $pagetitle = strip_tags($course->shortname.': '.$modname.': '.format_string($activityname,true).': '.get_string('moss', 'plagiarism_moss'));
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->shortname);
+
 $PAGE->navbar->add(get_string('moss', 'plagiarism_moss'));
 
 $output = $PAGE->get_renderer('plagiarism_moss');
+
+$PAGE->requires->js_init_call('M.plagiarism_moss.init', $output->get_confirm_htmls());
 
 /// Output starts here
 echo $output->header();

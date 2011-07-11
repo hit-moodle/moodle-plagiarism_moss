@@ -37,10 +37,11 @@ defined('MOODLE_INTERNAL') || die();
  * moss result page renderer class
  */
 class plagiarism_moss_renderer extends plugin_renderer_base {
-    protected $can_viewdiff = false;
-    protected $can_confirm = false;
-    protected $can_viewunconfirmed = false;
-    protected $context = null;
+    protected $can_viewdiff;
+    protected $can_confirm;
+    protected $can_viewunconfirmed;
+    protected $context;
+    protected $confirm_htmls;
     var $moss = null;
 
     public function __construct(moodle_page $page, $target) {
@@ -50,6 +51,11 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $this->can_viewdiff = has_capability('plagiarism/moss:viewdiff', $this->context);
         $this->can_viewunconfirmed = has_capability('plagiarism/moss:viewunconfirmed', $this->context);
         $this->can_confirm = has_capability('plagiarism/moss:confirm', $this->context);
+
+        $this->confirm_htmls = array (
+            $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss')),
+            $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'))
+        );
     }
 
     function user_stats($user) {
@@ -106,7 +112,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
                 // other user
                 $other = $DB->get_record('user', array('id' => $match->other));
-                $cells[] = new html_table_cell($this->user($other).$this->confirmed($match->pair));
+                $cells[] = new html_table_cell($this->user($other).$this->confirm_button($match->pair));
 
                 // percentage and linesmatched
                 $percentage = $match->percentage.'%';
@@ -121,7 +127,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 $cells[] = new html_table_cell($linesmatched);
 
                 // confirm
-                $cells[] = new html_table_cell($this->confirmed($match));
+                $cells[] = new html_table_cell($this->confirm_button($match));
 
                 if ($first_match) { // first row of the filepatterns
                     $pattern_cell = new html_table_cell($config->filepatterns);
@@ -170,7 +176,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         return html_writer::link($url, fullname($user));
     }
 
-    protected function confirmed($result) {
+    protected function confirm_button($result) {
         global $DB, $PAGE;
 
         if (!is_object($result)) { // $result is id
@@ -181,20 +187,21 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             return '';
         }
 
-        if ($result->confirmed) {
-            $output = $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'));
-        } else {
-            $output = $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss'));
-        }
+        $output = $this->confirm_htmls[$result->confirmed];
 
         if ($this->can_confirm) {
             $url = $PAGE->url;
+            $url->param('sesskey', sesskey());
             $url->param('result', $result->id);
             $url->param('confirm', !$result->confirmed);
-            $output = html_writer::link($url, $output);
+            $output = html_writer::link($url, $output, array('class' => 'confirmbutton'));
         }
 
         return $output;
+    }
+
+    public function get_confirm_htmls() {
+        return $this->confirm_htmls;
     }
 }
 
