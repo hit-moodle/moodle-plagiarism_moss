@@ -35,6 +35,7 @@ $string['configrequired'] = '配置{$a}（必填）：';
 $string['configoptional'] = '配置{$a}（可选）：';
 $string['confirmed'] = '已确认';
 $string['confirmedresults'] = '{$a->fullname}在<strong>{$a->total}</strong>项活动中有已确认的抄袭记录。';
+$string['confirmmessage'] = '您确定一定以及肯定这是抄袭吗？';
 $string['filepatterns'] = '文件名通配符';
 $string['filepatterns_help'] = 'Glob格式。例如：\*.c，hello.\*，a?c.java。用空格分隔多个通配符。留空表示禁用此条配置。';
 $string['matchedlines'] = '相似行数';

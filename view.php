@@ -92,7 +92,15 @@ $PAGE->navbar->add(get_string('moss', 'plagiarism_moss'));
 
 $output = $PAGE->get_renderer('plagiarism_moss');
 
-$PAGE->requires->js_init_call('M.plagiarism_moss.init', $output->get_confirm_htmls());
+$jsmodule = array(
+    'name'     => 'plagiarism_moss',
+    'fullpath' => '/plagiarism/moss/module.js',
+    'requires' => array('base', 'io', 'node', 'json'),
+    'strings' => array(
+        array('confirmmessage', 'plagiarism_moss')
+    )
+);
+$PAGE->requires->js_init_call('M.plagiarism_moss.init', $output->get_confirm_htmls(), false, $jsmodule);
 
 /// Output starts here
 echo $output->header();

@@ -13,11 +13,14 @@ M.plagiarism_moss.confirm_button_clicked = function(e) {
     var uri = sp[0];
     var data = sp[1];
 
-    if (data.charAt(data.length-1) == '1') { // confirmed now
+    if (data.charAt(data.length-1) == '1') { // unconfirmed now
+        if (!confirm(M.util.get_string('confirmmessage', 'plagiarism_moss'))) {
+            return;
+        }
         var newdata = data.substring(0, data.indexOf('confirm=')) + 'confirm=0';
         button.set('href', uri + '?' + newdata);
         var confirm_html = M.plagiarism_moss.confirmed_html;
-    } else {
+    } else { // confirmed now
         var newdata = data.substring(0, data.indexOf('confirm=')) + 'confirm=1';
         button.set('href', uri + '?' + newdata);
         var confirm_html = M.plagiarism_moss.unconfirmed_html;
