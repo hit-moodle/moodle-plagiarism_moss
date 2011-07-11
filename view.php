@@ -84,7 +84,7 @@ $PAGE->set_pagelayout('standard');
 
 $modname = get_string('modulename', $cm->modname);
 $activityname = $DB->get_field($cm->modname, 'name', array('id' => $cm->instance));
-$pagetitle = strip_tags($course->shortname.': '.$modname.': '.format_string($activityname,true).': '.get_string('moss', 'plagiarism_moss'));
+$pagetitle = strip_tags(format_string($activityname, true).': '.get_string('moss', 'plagiarism_moss'));
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->shortname);
 
