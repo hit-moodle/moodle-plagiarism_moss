@@ -167,11 +167,15 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     }
 
     protected function user($user) {
-        global $PAGE;
+        global $PAGE, $COURSE;
 
         if (is_enrolled($this->context, $user)) {
-            $url = $PAGE->url;
-            $url->param('user', $user->id);
+            if (has_capability('plagiarism/moss:viewallresults', $this->context)) {
+                $url = $PAGE->url;
+                $url->param('user', $user->id);
+            } else {
+                $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $COURSE->id));
+            }
         } else {
             $url = new moodle_url('/user/view.php', array('id' => $user->id));
         }
