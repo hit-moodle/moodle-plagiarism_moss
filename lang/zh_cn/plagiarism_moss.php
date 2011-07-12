@@ -45,10 +45,19 @@ $string['filepatterns'] = '文件名通配符';
 $string['filepatterns_help'] = 'Glob格式。例如：\*.c，hello.\*，a?c.java。用空格分隔多个通配符。留空表示禁用此条配置。';
 $string['matchedlines'] = '相似行数';
 $string['matchedusers'] = '相似用户';
+$string['messageprovider:moss_updates'] = 'Moss反抄袭通知';
+$string['messageconfirmedhtml'] = '您在课程“{$a->coursename}”中的活动“{$a->modulename}”里提交的文件被确认为“<em>抄袭</em>”。<br />
+访问<a href="{$a->link}">{$a->link}</a>了解更多细节。';
+$string['messageconfirmedtext'] = '您在课程“{$a->coursename}”中的活动“{$a->modulename}”里提交的文件被确认为“抄袭”。
+访问 {$a->link} 了解更多细节。';
+$string['messageunconfirmedhtml'] = '您在课程“{$a->coursename}”中的活动“{$a->modulename}”里提交的文件被确认为“<em>不是</em>”抄袭。<br />
+访问<a href="{$a->link}">{$a->link}</a>了解更多细节。';
+$string['messageunconfirmedtext'] = '您在课程“{$a->coursename}”中的活动“{$a->modulename}”里提交的文件被确认为“不是”抄袭。
+访问 {$a->link} 了解更多细节。';
 $string['moss'] = 'Moss反抄袭';
 $string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个程序相似性自动检测系统。';
 $string['moss:confirm'] = '确认抄袭行为';
-$string['moss:viewallresult'] = '查看所有人的结果';
+$string['moss:viewallresults'] = '查看所有人的结果';
 $string['moss:viewdiff'] = '查看成对比较视图';
 $string['moss:viewunconfirmed'] = '查看未确认的结果';
 $string['mossexplain'] = '详细信息请访问: ';
@@ -67,6 +76,7 @@ $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@mos
 $string['nocmresults'] = '此活动没有抄袭记录';
 $string['nouserresults'] = '没有与{$a}有关的抄袭记录';
 $string['percentage'] = '相似率';
+$string['pluginname'] = 'Moss反抄袭';
 $string['resultlinktitle'] = '有至多{$a->percentage}%（{$a->linesmatched}行）的内容与其他{$a->count}名用户相似';
 $string['savedconfigsuccess'] = '配置保存成功';
 $string['tag'] = '标签';

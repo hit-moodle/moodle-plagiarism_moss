@@ -45,10 +45,20 @@ $string['filepatterns'] = 'Filename patterns';
 $string['filepatterns_help'] = 'Glob format. E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
 $string['matchedlines'] = 'Matched lines';
 $string['matchedusers'] = 'Matched users';
+$string['messageprovider:moss_updates'] = 'Moss anti-plagiarism notifications';
+$string['messagesubject'] = 'Moss anti-plagiarism notification';
+$string['messageconfirmedhtml'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as <em>plagiarism</em>. <br />
+Visit <a href="{$a->link}">{$a->link}</a> for details.';
+$string['messageconfirmedtext'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as PLAGIARISM. 
+Visit {$a->link} for details.';
+$string['messageunconfirmedhtml'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as <em>not</em> plagiarism. <br />
+Visit <a href="{$a->link}">{$a->link}</a> for details.';
+$string['messageunconfirmedtext'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as NOT plagiarism. 
+Visit {$a->link} for details.';
 $string['moss'] = 'Moss anti-plagiarism';
 $string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs.';
 $string['moss:confirm'] = 'Confirm plagiarism';
-$string['moss:viewallresult'] = 'View results of everyone';
+$string['moss:viewallresults'] = 'View results of everyone';
 $string['moss:viewdiff'] = 'View pair compare';
 $string['moss:viewunconfirmed'] = 'View unconfirmed results';
 $string['mossexplain'] = 'For more information on this plugin see: ';
@@ -67,6 +77,7 @@ The number is exactly your moss account.';
 $string['nocmresults'] = 'No plagiarism records in this activity';
 $string['nouserresults'] = 'No plagiarism records related with {$a}';
 $string['percentage'] = 'Similarity';
+$string['pluginname'] = 'Moss anti-plagiarism';
 $string['resultlinktitle'] = 'Up to {$a->percentage}% ({$a->linesmatched} lines) is similar with other {$a->count} user(s)';
 $string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';
 $string['tag'] = 'Tag';

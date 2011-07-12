@@ -165,3 +165,49 @@ function moss_trigger_assignment_events($cmid, $trigger_done = true) {
     return count($submissions);
 }
 
+/**
+ * Sent notification
+ *
+ * @param object $result
+ */
+function moss_message_send($result) {
+    global $DB, $CFG;
+
+    $teacher = $DB->get_record('user', array('id' => $result->confirmer));
+    $user = $DB->get_record('user', array('id' => $result->userid));
+
+    $subject = get_string('messagesubject', 'plagiarism_moss');
+
+    $moss = $DB->get_record('moss', array('id' => $result->moss));
+    $moss->link = $CFG->wwwroot."/plagiarism/moss/view.php?id=$moss->cmid&user=$result->userid";
+    $html = '';
+    if ($result->confirmed) {
+        $text = get_string('messageconfirmedtext', 'plagiarism_moss', $moss);
+        if ($user->mailformat == 1) {  // HTML
+            $html = get_string('messageconfirmedhtml', 'plagiarism_moss', $moss);
+        }
+    } else {
+        $text = get_string('messageunconfirmedtext', 'plagiarism_moss', $moss);
+        if ($user->mailformat == 1) {  // HTML
+            $html = get_string('messageunconfirmedhtml', 'plagiarism_moss', $moss);
+        }
+    }
+
+    $eventdata = new stdClass();
+    $eventdata->modulename       = 'moss';
+    $eventdata->userfrom         = $teacher;
+    $eventdata->userto           = $user;
+    $eventdata->subject          = $subject;
+    $eventdata->fullmessage      = $text;
+    $eventdata->fullmessageformat = FORMAT_PLAIN;
+    $eventdata->fullmessagehtml  = $html;
+    $eventdata->smallmessage     = $subject;
+
+    $eventdata->name            = 'moss_updates';
+    $eventdata->component       = 'plagiarism_moss';
+    $eventdata->notification    = 1;
+    $eventdata->contexturl      = $moss->link;
+    $eventdata->contexturlname  = $moss->modulename;
+
+    message_send($eventdata);
+}
