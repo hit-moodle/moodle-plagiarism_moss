@@ -31,6 +31,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['clicktoviewresults'] = '点击此处查看结果。';
 $string['configrequired'] = '配置{$a}（必填）：';
 $string['configoptional'] = '配置{$a}（可选）：';
 $string['confirmed'] = '已确认';
@@ -38,7 +39,7 @@ $string['confirmedresults'] = '{$a->fullname}在<strong>{$a->total}</strong>项�
 $string['confirmmessage'] = '您确定一定以及肯定这是抄袭吗？';
 $string['disclosurehasmeasured']  ='已于{$a->timemeasured}对所有上传的文件进行了抄袭检测。';
 $string['disclosurelastmeasured']  ='将于{$a->timetomeasure}对所有上传的文件再次进行抄袭检测。{$a->timemeasured}之前上传的文件已经检测过。';
-$string['disclosuremeasuredsoon']  ='很快将对所有上传的文件进行抄袭检测。';
+$string['disclosuremeasuredsoon']  ='很快将对所有上传的文件进行抄袭检测。{$a->timemeasured}之前上传的文件已经检测过。';
 $string['disclosurenevermeasured']  ='将于{$a->timetomeasure}对所有上传的文件进行抄袭检测。';
 $string['filepatterns'] = '文件名通配符';
 $string['filepatterns_help'] = 'Glob格式。例如：\*.c，hello.\*，a?c.java。用空格分隔多个通配符。留空表示禁用此条配置。';
@@ -63,7 +64,8 @@ $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@mos
     $userid=1234567890;
 
 其中的数字就是您能的Moss账号。';
-$string['noresults'] = '没有与{$a}有关的抄袭记录';
+$string['nocmresults'] = '此活动没有抄袭记录';
+$string['nouserresults'] = '没有与{$a}有关的抄袭记录';
 $string['percentage'] = '相似率';
 $string['resultlinktitle'] = '有至多{$a->percentage}%（{$a->linesmatched}行）的内容与其他{$a->count}名用户相似';
 $string['savedconfigsuccess'] = '配置保存成功';

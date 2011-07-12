@@ -114,7 +114,9 @@ if ($userid) {
     $user = $DB->get_record('user', array('id' => $userid));
     echo $output->user_result($user);
 } else {
-    echo $output->cm_result();
+    $from = optional_param('from', 0, PARAM_INT);
+    $count = optional_param('count', 30, PARAM_INT);
+    echo $output->cm_result($from, $count);
 }
 
 echo $output->footer();

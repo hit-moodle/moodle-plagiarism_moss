@@ -5,6 +5,7 @@ M.plagiarism_moss.Y = {};
 
 M.plagiarism_moss.confirm_button_clicked = function(e) {
     e.preventDefault();
+    Y = M.plagiarism_moss.Y;
 
     var button = e.currentTarget;
     var link = button.get('href');
@@ -18,11 +19,9 @@ M.plagiarism_moss.confirm_button_clicked = function(e) {
             return;
         }
         var newdata = data.substring(0, data.indexOf('confirm=')) + 'confirm=0';
-        button.set('href', uri + '?' + newdata);
         var confirm_html = M.plagiarism_moss.confirmed_html;
     } else { // confirmed now
         var newdata = data.substring(0, data.indexOf('confirm=')) + 'confirm=1';
-        button.set('href', uri + '?' + newdata);
         var confirm_html = M.plagiarism_moss.unconfirmed_html;
     }
 
@@ -31,9 +30,12 @@ M.plagiarism_moss.confirm_button_clicked = function(e) {
         method : 'GET',
         data : data
     }
-    M.plagiarism_moss.Y.io(uri, cfg);
+    Y.io(uri, cfg);
 
-    button.set('innerHTML', confirm_html);
+    id = button.get('id');
+    buttons = Y.all('#'+id);
+    buttons.set('innerHTML', confirm_html);
+    buttons.set('href', uri + '?' + newdata);
 }
 
 M.plagiarism_moss.init = function(Y, unconfirmed_html, confirmed_html) {

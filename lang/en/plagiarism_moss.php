@@ -31,6 +31,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['clicktoviewresults'] = 'Click here to view results.';
 $string['configrequired'] = 'Config {$a} (required):';
 $string['configoptional'] = 'Config {$a} (optional):';
 $string['confirmed'] = 'Confirmed';
@@ -38,7 +39,7 @@ $string['confirmedresults'] = '{$a->fullname} has confirmed plagiarism records i
 $string['confirmmessage'] = 'Are you sure this is plagiarism?';
 $string['disclosurehasmeasured']  ='All files submitted here has been measured by a plagiarism detection service at {$a->timemeasured}.';
 $string['disclosurelastmeasured']  ='All files submitted here will be measured again by a plagiarism detection service at {$a->timetomeasure}. All files submitted before {$a->timemeasured} has been measured.';
-$string['disclosuremeasuredsoon']  ='All files submitted here will be measured soon by a plagiarism detection service.';
+$string['disclosuremeasuredsoon']  ='All files submitted here will be measured SOON by a plagiarism detection service. All files submitted before {$a->timemeasured} has been measured.';
 $string['disclosurenevermeasured']  ='All files submitted here will be measured by a plagiarism detection service at {$a->timetomeasure}.';
 $string['filepatterns'] = 'Filename patterns';
 $string['filepatterns_help'] = 'Glob format. E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
@@ -63,7 +64,8 @@ After registration, you will get a reply mail which contains a perl script with 
     $userid=1234567890;
 
 The number is exactly your moss account.';
-$string['noresults'] = 'No plagiarism records related with {$a}';
+$string['nocmresults'] = 'No plagiarism records in this activity';
+$string['nouserresults'] = 'No plagiarism records related with {$a}';
 $string['percentage'] = 'Similarity';
 $string['resultlinktitle'] = 'Up to {$a->percentage}% ({$a->linesmatched} lines) is similar with other {$a->count} user(s)';
 $string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';

@@ -83,11 +83,8 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             get_string('matchedusers', 'plagiarism_moss'),
             get_string('percentage', 'plagiarism_moss'),
             get_string('matchedlines', 'plagiarism_moss'),
+            get_string('confirm')
         );
-
-        if ($this->can_viewunconfirmed || $this->can_confirm) {
-            $table->head[] = get_string('confirm');
-        }
 
         $configs = $DB->get_records('moss_configs', array('moss' => $this->moss->id));
         foreach ($configs as $config) {
@@ -152,7 +149,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         }
 
         if (empty($table->data)) {
-            $output .= $this->notification(get_string('noresults', 'plagiarism_moss', fullname($user)));
+            $output .= $this->notification(get_string('nouserresults', 'plagiarism_moss', fullname($user)));
         } else {
             $output .= html_writer::table($table);
         }
@@ -160,17 +157,69 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    function cm_result() {
+    /**
+     * List all results in a course module
+     */
+    function cm_result($from, $count) {
+        global $DB, $CFG;
         $output = '';
+
+        /// find out current groups mode
+        $cm = get_coursemodule_from_id('', $this->moss->cmid);
+        $groupmode = groups_get_activity_groupmode($cm);
+        $currentgroup = groups_get_activity_group($cm, true);
+        $output .= groups_print_activity_menu($cm, $CFG->wwwroot . '/plagiarism/moss/view.php?id=' . $cm->id, true);
+
+        $table = new html_table();
+        $table->head = array(
+            get_string('user').'1',
+            get_string('percentage', 'plagiarism_moss'),
+            get_string('matchedlines', 'plagiarism_moss'),
+            get_string('user').'2',
+            get_string('percentage', 'plagiarism_moss'),
+            get_string('matchedlines', 'plagiarism_moss'),
+            get_string('filepatterns', 'plagiarism_moss')
+        );
+
+        $configs = $DB->get_records('moss_configs', array('moss' => $this->moss->id));
+        $results = $DB->get_records('moss_results', array('moss' => $this->moss->id), 'rank, userid ASC');
+
+        $skiplists = array();
+        foreach ($results as $result) {
+            if (in_array($result->id, $skiplists)) {
+                continue;
+            }
+            $result2 = $results[$result->pair];
+
+            $user1cells = $this->fill_result_in_cells($result);
+            $user2cells = $this->fill_result_in_cells($result2);
+            if (!is_enrolled($this->context, $result->userid)) {
+                $cells = array_merge($user2cells, $user1cells);
+            } else {
+                $cells = array_merge($user1cells, $user2cells);
+            }
+
+            $skiplists[] = $result->pair;
+
+            $cells[] = $configs[$result->config]->filepatterns;
+
+            $table->data[] = new html_table_row($cells);
+        }
+
+        if (empty($table->data)) {
+            $output .= $this->notification(get_string('nocmresults', 'plagiarism_moss'));
+        } else {
+            $output .= html_writer::table($table);
+        }
 
         return $output;
     }
 
     protected function user($user) {
-        global $PAGE, $COURSE;
+        global $PAGE, $COURSE, $USER;
 
         if (is_enrolled($this->context, $user)) {
-            if (has_capability('plagiarism/moss:viewallresults', $this->context)) {
+            if ($user->id == $USER->id or has_capability('plagiarism/moss:viewallresults', $this->context)) {
                 $url = $PAGE->url;
                 $url->param('user', $user->id);
             } else {
@@ -200,7 +249,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             $url->param('sesskey', sesskey());
             $url->param('result', $result->id);
             $url->param('confirm', !$result->confirmed);
-            $output = html_writer::link($url, $output, array('class' => 'confirmbutton'));
+            $output = html_writer::link($url, $output, array('class' => 'confirmbutton', 'id' => "user$result->userid-config$result->config"));
         }
 
         return $output;
@@ -208,6 +257,29 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
     public function get_confirm_htmls() {
         return $this->confirm_htmls;
+    }
+
+    protected function fill_result_in_cells($result) {
+        global $DB;
+        $cells = array();
+
+        // user name
+        $user = $DB->get_record('user', array('id' => $result->userid), 'id, firstname, lastname, idnumber');
+        $cells[] = new html_table_cell($this->user($user).$this->confirm_button($result));
+
+        // percentage and linesmatched
+        $percentage = $result->percentage.'%';
+        $linesmatched = $result->linesmatched;
+        if ($this->can_viewdiff) {
+            $url = new moodle_url($result->link);
+            $attributes = array('target' => '_blank');
+            $percentage = html_writer::link($url, $percentage, $attributes);
+            $linesmatched = html_writer::link($url, $linesmatched, $attributes);
+        }
+        $cells[] = new html_table_cell($percentage);
+        $cells[] = new html_table_cell($linesmatched);
+
+        return $cells;
     }
 }
 
