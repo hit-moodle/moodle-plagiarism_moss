@@ -63,12 +63,15 @@ $result  = optional_param('result', 0, PARAM_INT);
 if ($result) {
     require_sesskey();
     require_capability('plagiarism/moss:confirm', $context);
-    $r = new stdClass();
-    $r->id = $result;
+    $r = $DB->get_record('moss_results', array('id' => $result), 'moss, config, userid');
     $r->confirmed = required_param('confirm', PARAM_BOOL);
     $r->confirmer = $USER->id;
     $r->timeconfirmed = time();
-    $DB->update_record('moss_results', $r);
+    $results = $DB->get_records('moss_results', array('moss' => $r->moss, 'config' => $r->config, 'userid' => $r->userid), 'id');
+    foreach ($results as $o) {
+        $r->id = $o->id;
+        $DB->update_record('moss_results', $r);
+    }
 
     if (optional_param('ajax', 0, PARAM_BOOL)) {
         die;

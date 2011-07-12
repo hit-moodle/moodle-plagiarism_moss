@@ -126,10 +126,12 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 $cells[] = new html_table_cell($percentage);
                 $cells[] = new html_table_cell($linesmatched);
 
-                // confirm
-                $cells[] = new html_table_cell($this->confirm_button($match));
-
                 if ($first_match) { // first row of the filepatterns
+                    // confirm button
+                    $confirmcell = new html_table_cell($this->confirm_button($match));
+                    $confirmcell->rowspan = count($matches);
+                    $cells[] = $confirmcell;
+
                     $pattern_cell = new html_table_cell($config->filepatterns);
                     $pattern_cell->rowspan = count($matches);
                     $cells = array_merge(array($pattern_cell), $cells);
@@ -137,7 +139,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 }
 
                 if (empty($table->data)) { //first row
-                    $user_text = $this->user_picture($user, array('popup' => true)).html_writer::empty_tag('br').fullname($user);
+                    $user_text = $this->user_picture($user).html_writer::empty_tag('br').fullname($user);
                     $cell = new html_table_cell($user_text);
                     $rowcount = &$cell->rowspan; // assign it later
                     $rowcount = 0;
