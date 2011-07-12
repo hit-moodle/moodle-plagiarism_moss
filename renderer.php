@@ -80,9 +80,10 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $table->head = array(
             get_string('user'),
             get_string('filepatterns', 'plagiarism_moss'),
-            get_string('matchedusers', 'plagiarism_moss'),
+            get_string('confirm'),
             get_string('percentage', 'plagiarism_moss'),
             get_string('matchedlines', 'plagiarism_moss'),
+            get_string('matchedusers', 'plagiarism_moss'),
             get_string('confirm')
         );
 
@@ -107,10 +108,6 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             foreach ($matches as $match) {
                 $cells = array();
 
-                // other user
-                $other = $DB->get_record('user', array('id' => $match->other));
-                $cells[] = new html_table_cell($this->user($other).$this->confirm_button($match->pair));
-
                 // percentage and linesmatched
                 $percentage = $match->percentage.'%';
                 $linesmatched = $match->linesmatched;
@@ -123,15 +120,21 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 $cells[] = new html_table_cell($percentage);
                 $cells[] = new html_table_cell($linesmatched);
 
+                // other user
+                $other = $DB->get_record('user', array('id' => $match->other));
+                $cells[] = new html_table_cell($this->user($other));
+                $cells[] = new html_table_cell($this->confirm_button($match->pair));
+
                 if ($first_match) { // first row of the filepatterns
                     // confirm button
                     $confirmcell = new html_table_cell($this->confirm_button($match));
                     $confirmcell->rowspan = count($matches);
-                    $cells[] = $confirmcell;
 
                     $pattern_cell = new html_table_cell($config->filepatterns);
                     $pattern_cell->rowspan = count($matches);
-                    $cells = array_merge(array($pattern_cell), $cells);
+
+                    $cells = array_merge(array($pattern_cell, $confirmcell), $cells);
+
                     $first_match = false;
                 }
 
@@ -173,9 +176,11 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $table = new html_table();
         $table->head = array(
             get_string('user').'1',
+            get_string('confirm'),
             get_string('percentage', 'plagiarism_moss'),
             get_string('matchedlines', 'plagiarism_moss'),
             get_string('user').'2',
+            get_string('confirm'),
             get_string('percentage', 'plagiarism_moss'),
             get_string('matchedlines', 'plagiarism_moss'),
             get_string('filepatterns', 'plagiarism_moss')
@@ -265,7 +270,8 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
         // user name
         $user = $DB->get_record('user', array('id' => $result->userid), 'id, firstname, lastname, idnumber');
-        $cells[] = new html_table_cell($this->user($user).$this->confirm_button($result));
+        $cells[] = new html_table_cell($this->user($user));
+        $cells[] = new html_table_cell($this->confirm_button($result));
 
         // percentage and linesmatched
         $percentage = $result->percentage.'%';
