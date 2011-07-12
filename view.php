@@ -33,18 +33,34 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
 
-$cmid = required_param('id', PARAM_INT);  // Course Module ID
+$cmid = optional_param('id', 0, PARAM_INT);  // Course Module ID
+$mossid = optional_param('moss', 0, PARAM_INT);  // Moss ID
 $userid  = optional_param('user', 0, PARAM_INT);   // User ID
 
-if (! $cm = get_coursemodule_from_id('', $cmid)) {
-    print_error('invalidcoursemodule');
-}
-if (! $moss = $DB->get_record("moss", array('cmid'=>$cmid))) {
-    print_error('unsupportedmodule', 'plagiarism_moss');
-}
-if (! $course = $DB->get_record("course", array("id"=>$cm->course))) {
-    print_error('coursemisconf', 'assignment');
+if ($cmid) {
+    if (! $cm = get_coursemodule_from_id('', $cmid)) {
+        print_error('invalidcoursemodule');
+    }
+    if (! $moss = $DB->get_record("moss", array('cmid'=>$cmid))) {
+        print_error('unsupportedmodule', 'plagiarism_moss');
+    }
+    if (! $course = $DB->get_record("course", array("id"=>$cm->course))) {
+        print_error('coursemisconf', 'assignment');
+    }
+} else if ($moss) {
+    if (! $moss = $DB->get_record("moss", array('cmid'=>$cmid))) {
+        print_error('unsupportedmodule', 'plagiarism_moss');
+    }
+    if (! $cm = get_coursemodule_from_id('', $moss->cmid)) {
+        print_error('invalidcoursemodule');
+    }
+    if (! $course = $DB->get_record("course", array("id"=>$cm->course))) {
+        print_error('coursemisconf', 'assignment');
+    }
+} else {
+    require_param('id', PARAM_INT);
 }
 
 $url = new moodle_url('/plagiarism/moss/view.php');
@@ -72,6 +88,8 @@ if ($result) {
         $r->id = $o->id;
         $DB->update_record('moss_results', $r);
     }
+
+    moss_message_send($r);
 
     if (optional_param('ajax', 0, PARAM_BOOL)) {
         die;
