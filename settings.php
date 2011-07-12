@@ -47,12 +47,6 @@ class moss_global_settings_form extends moodleform {
         $mform->addElement('checkbox', 'mossenabled', get_string('mossenabled', 'plagiarism_moss'));
         $mform->setDefault('mossenabled', false);
 
-        $mform->addElement('textarea', 'moss_student_disclosure', get_string('studentdisclosure','plagiarism_moss'),'wrap="virtual" rows="6" cols="50"');
-        $mform->addHelpButton('moss_student_disclosure', 'studentdisclosure', 'plagiarism_moss');
-        $mform->setDefault('moss_student_disclosure', get_string('studentdisclosuredefault','plagiarism_moss'));
-        $mform->setType('moss_student_disclosure', PARAM_TEXT);
-        $mform->disabledIf('moss_student_disclosure', 'mossenabled');
-
         $mform->addElement('text', 'mossuserid', get_string('mossuserid', 'plagiarism_moss'));
         $mform->addHelpButton('mossuserid', 'mossuserid', 'plagiarism_moss');
         $mform->setDefault('mossuserid', '');
@@ -87,7 +81,6 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
 
     if (!empty($data->mossenabled)) {
         set_config('moss_use', $data->mossenabled, 'plagiarism');
-        set_config('moss_student_disclosure', $data->moss_student_disclosure, 'plagiarism_moss');
         set_config('mossuserid', $data->mossuserid, 'plagiarism_moss');
     } else {
         set_config('moss_use', 0, 'plagiarism');
@@ -99,9 +92,6 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
 $settings = array();
 if (get_config('plagiarism', 'moss_use')) {
     $settings['mossenabled'] = get_config('plagiarism', 'moss_use');
-}
-if (get_config('plagiarism_moss', 'moss_student_disclosure')) {
-    $settings['moss_student_disclosure'] = get_config('plagiarism_moss', 'moss_student_disclosure');
 }
 if (get_config('plagiarism_moss', 'mossuserid')) {
     $settings['mossuserid'] = get_config('plagiarism_moss', 'mossuserid');

@@ -53,9 +53,25 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     	global $OUTPUT, $DB;
         if (moss_enabled($cmid)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
-            $formatoptions = new stdClass;
-            $formatoptions->noclean = true;
-            echo format_text(get_config('plagiarism_moss', 'moss_student_disclosure'), FORMAT_MOODLE, $formatoptions);
+
+            $moss = $DB->get_record('moss', array('cmid' => $cmid), 'timetomeasure, timemeasured');
+            $a->timetomeasure = userdate($moss->timetomeasure);
+            $a->timemeasured = userdate($moss->timemeasured);
+            if ($moss->timetomeasure > time()) {
+                if ($moss->timemeasured == 0) {
+                    $disclosure = get_string('disclosurenevermeasured', 'plagiarism_moss', $a);
+                } else {
+                    $disclosure = get_string('disclosurelastmeasured', 'plagiarism_moss', $a);
+                }
+            } else {
+                if ($moss->timemeasured < $moss->timetomeasure) {
+                    $disclosure = get_string('disclosuremeasuredsoon', 'plagiarism_moss', $a);
+                } else {
+                    $disclosure = get_string('disclosurehasmeasured', 'plagiarism_moss', $a);
+                }
+            }
+
+            echo format_text($disclosure, FORMAT_MOODLE);
             echo $OUTPUT->box_end();
     	}
     }
