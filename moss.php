@@ -48,6 +48,10 @@ class moss {
             $this->moss->course = $DB->get_field('course_modules', 'course', array('id' => $this->moss->cmid));
         }
         $this->tempdir = $CFG->dataroot.'/temp/moss/'.$this->moss->id;
+        if ($CFG->ostype == 'WINDOWS') {
+            // the tempdir will be passed to cygwin which require '/' path spliter
+            $this->tempdir = str_replace('\\', '/', $this->tempdir);
+        }
     }
 
     public function __destruct() {
@@ -182,7 +186,15 @@ class moss {
                 continue;
             }
 
-            $cmd = $CFG->dirroot.'/plagiarism/moss/moss';
+            if ($CFG->ostype == 'WINDOWS') {
+                $cygwin = get_config('plagiarism_moss', 'cygwinpath');
+                $perl = $cygwin.'\\bin\\perl.exe';
+                $moss = $CFG->dirroot.'\\plagiarism\\moss\\moss';
+                $cmd = str_replace(' ', '\\ ', $CFG->dirroot.'\\plagiarism\\moss\\moss.bat');
+                $cmd .= ' "'.$perl.'" "'.$moss.'"';
+            } else {
+                $cmd = '"'.$CFG->dirroot.'/plagiarism/moss/moss'.'"';
+            }
             $cmd .= ' -d';
             $cmd .= ' -u '.get_config('plagiarism_moss', 'mossuserid');;
             $cmd .= ' -l '.$setting->language;
@@ -192,11 +204,14 @@ class moss {
             foreach ($basefiles as $basefile) {
                 $realpath = $this->tempdir.'/'.$setting->id.'_'.$basefile->get_filename();
                 $basefile->copy_content_to($realpath);
-                $cmd .= ' -b '.realpath;
+                $cmd .= ' -b "'.$realpath.'"';
             }
             $filepatterns = explode(' ', $setting->filepatterns);
             foreach ($filepatterns as $filepattern) {
-                $cmd .= ' '.$this->tempdir.'/*/'.$filepattern;
+                $cmd .= ' '.str_replace(' ', '\\ ', $this->tempdir.'/*/'.$filepattern);
+            }
+            if (debugging('', DEBUG_DEVELOPER)) {
+                mtrace($cmd);
             }
             $cmds[$setting->id] = $cmd;
         }

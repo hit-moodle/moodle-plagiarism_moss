@@ -39,6 +39,8 @@ require_once($CFG->dirroot.'/lib/formslib.php');
 class moss_global_settings_form extends moodleform {
 
     function definition() {
+        global $CFG;
+
         $mform =& $this->_form;
 
         $helplink = get_string('mossexplain', 'plagiarism_moss');
@@ -52,6 +54,13 @@ class moss_global_settings_form extends moodleform {
         $mform->setDefault('mossuserid', '');
         $mform->disabledIf('mossuserid', 'mossenabled');
 
+        if ($CFG->ostype == 'WINDOWS') {
+            $mform->addElement('text', 'cygwinpath', get_string('cygwinpath', 'plagiarism_moss'));
+            $mform->setDefault('cygwinpath', 'C:\cygwin');
+            $mform->setType('cygwinpath', PARAM_RAW);
+            $mform->disabledIf('cygwinpath', 'mossenabled');
+        }
+
         $this->add_action_buttons(false);
     }
 
@@ -61,6 +70,9 @@ class moss_global_settings_form extends moodleform {
         if (!empty($data['mossenabled'])) {
             if (!is_numeric($data['mossuserid'])) {
                 $errors['mossuserid'] = get_string('err_numeric', 'form');
+            }
+            if (!is_executable($data['cygwinpath'].'\\bin\\perl.exe')) {
+                $errors['cygwinpath'] = get_string('err_cygwinpath', 'plagiarism_moss');
             }
         }
 
@@ -82,6 +94,7 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
     if (!empty($data->mossenabled)) {
         set_config('moss_use', $data->mossenabled, 'plagiarism');
         set_config('mossuserid', $data->mossuserid, 'plagiarism_moss');
+        set_config('cygwinpath', $data->cygwinpath, 'plagiarism_moss');
     } else {
         set_config('moss_use', 0, 'plagiarism');
     }
@@ -90,11 +103,12 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
 }
 
 $settings = array();
-if (get_config('plagiarism', 'moss_use')) {
-    $settings['mossenabled'] = get_config('plagiarism', 'moss_use');
+if ($moss_use = get_config('plagiarism', 'moss_use')) {
+    $settings['mossenabled'] = $moss_use;
 }
-if (get_config('plagiarism_moss', 'mossuserid')) {
-    $settings['mossuserid'] = get_config('plagiarism_moss', 'mossuserid');
+$moss_configs = (array)get_config('plagiarism_moss');
+foreach ($moss_configs as $key => $config) {
+    $settings[$key] = $config;
 }
 $mform->set_data($settings);
 
