@@ -239,7 +239,7 @@ class moss {
 
         $filepatterns = $DB->get_field('moss_configs', 'filepatterns', array('id' => $configid));
         $filepatterns = explode(' ', $filepatterns);
-        $fs = get_file_storage(); 
+        $fs = get_file_storage();
         $rank = 1;
         foreach ($matches as $result) {
             $result['moss'] = $this->moss->id;
@@ -308,7 +308,7 @@ class moss {
     }
 
     /**
-     * 
+     *
      * Enter description here ...
      * @param unknown_type $description
      * @param unknown_type $type
@@ -330,14 +330,14 @@ class moss {
         }
         else
         {
-        	$err->testable = 0; 
+        	$err->testable = 0;
             $err->errargument = 'no argument';
         }
-        $DB->insert_record('moss_plugin_errors', $err); 
+        $DB->insert_record('moss_plugin_errors', $err);
     }
 
     /**
-     * 
+     *
      * Enter description here ...
      * @param unknown_type $type
      * @param unknown_type $arrguments
@@ -349,11 +349,11 @@ class moss {
             $fp = fopen($argument, 'r');
             if(!$fp)
                 return false;
-            else 
+            else
                 return true;
         }
         else
             return true;
-        
+
     }
 }
