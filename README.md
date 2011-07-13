@@ -25,7 +25,8 @@ Installation & Upgrading
 2. Make sure the directory name of this plugin is `moss`. If not, rename it.
 3. Put `moss` into `MOODLE_PATH/plagiarism/`.
 4. Login your site as admin and the plugin will be installed/upgraded.
-5. Access `http://your.site.domain/plagiarism/moss/settings.php` to enable & setup.
+5. Access `http://YOUR.MOODLE.DOMAIN/admin/settings.php?section=optionalsubsystems` to enable plagiarism.
+6. Access `http://YOUR.MOODLE.DOMAIN/plagiarism/moss/settings.php` to enable & setup.
 
 
 Usage
