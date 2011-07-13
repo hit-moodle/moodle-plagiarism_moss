@@ -55,7 +55,7 @@ class moss_global_settings_form extends moodleform {
         $this->add_action_buttons(false);
     }
 
-    function validation($data, $files) { 
+    function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
         if (!empty($data['mossenabled'])) {
@@ -74,10 +74,10 @@ $context = get_context_instance(CONTEXT_SYSTEM);
 require_capability('moodle/site:config', $context, $USER->id);
 
 $mform = new moss_global_settings_form();
-    
+
 echo $OUTPUT->header();
 
-if (($data = $mform->get_data()) && confirm_sesskey()) { 
+if (($data = $mform->get_data()) && confirm_sesskey()) {
 
     if (!empty($data->mossenabled)) {
         set_config('moss_use', $data->mossenabled, 'plagiarism');
@@ -97,7 +97,7 @@ if (get_config('plagiarism_moss', 'mossuserid')) {
     $settings['mossuserid'] = get_config('plagiarism_moss', 'mossuserid');
 }
 $mform->set_data($settings);
-    
+
 echo $OUTPUT->box_start();
 $mform->display();
 echo $OUTPUT->box_end();
