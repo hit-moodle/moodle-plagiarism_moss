@@ -103,7 +103,9 @@ class moss {
             if (!check_dir_exists($path)) {
                 throw new moodle_exception('errorcreatingdirectory', '', '', $path);
             }
-            $file->copy_content_to($fullpath);
+            // Convert content charset to UTF-8 if necessary
+            $content = mb_convert_encoding($file->get_content(), 'UTF-8', 'UTF-8, '.get_string('localewincharset', 'langconfig'));
+            file_put_contents($fullpath, $content);
         }
     }
 
