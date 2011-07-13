@@ -34,7 +34,7 @@
 $string['clicktoviewresults'] = '点击此处查看结果。';
 $string['configrequired'] = '配置{$a}（必填）：';
 $string['configoptional'] = '配置{$a}（可选）：';
-$string['confirmed'] = '已确认';
+$string['confirmed'] = '已确认为抄袭';
 $string['confirmedresults'] = '{$a->fullname}在<strong>{$a->total}</strong>项活动中有已确认的抄袭记录。';
 $string['confirmmessage'] = '您确定一定以及肯定这是抄袭吗？';
 $string['disclosurehasmeasured']  ='已于{$a->timemeasured}对所有上传的文件进行了抄袭检测。';
@@ -60,7 +60,7 @@ $string['moss:confirm'] = '确认抄袭行为';
 $string['moss:viewallresults'] = '查看所有人的结果';
 $string['moss:viewdiff'] = '查看成对比较视图';
 $string['moss:viewunconfirmed'] = '查看未确认的结果';
-$string['mossexplain'] = '详细信息请访问: ';
+$string['mossexplain'] = '<a href="https://github.com/hit-moodle/moodle-plagiarism_moss">Moss反抄袭插件</a>由<a href="http://www.hit.edu.cn/">哈尔滨工业大学</a>开发。反抄袭引擎使用<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a>。';
 $string['mossenabled'] ='启用Moss';
 $string['mossuserid'] ='Moss账号';
 $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@moss.stanford.edu</a>发送一封邮件就能获得Moss账号。邮件正文必须是<strong>纯文本</strong>（没有任何html标记），且完全符合下面的格式：

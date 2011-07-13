@@ -34,7 +34,7 @@
 $string['clicktoviewresults'] = 'Click here to view results.';
 $string['configrequired'] = 'Config {$a} (required):';
 $string['configoptional'] = 'Config {$a} (optional):';
-$string['confirmed'] = 'Confirmed';
+$string['confirmed'] = 'Confirmed plagiarism';
 $string['confirmedresults'] = '{$a->fullname} has confirmed plagiarism records in <strong>{$a->total}</strong> activities.';
 $string['confirmmessage'] = 'Are you sure this is plagiarism?';
 $string['disclosurehasmeasured']  ='All files submitted here has been measured by a plagiarism detection service at {$a->timemeasured}.';
@@ -61,7 +61,7 @@ $string['moss:confirm'] = 'Confirm plagiarism';
 $string['moss:viewallresults'] = 'View results of everyone';
 $string['moss:viewdiff'] = 'View pair compare';
 $string['moss:viewunconfirmed'] = 'View unconfirmed results';
-$string['mossexplain'] = 'For more information on this plugin see: ';
+$string['mossexplain'] = '<a href="https://github.com/hit-moodle/moodle-plagiarism_moss">Moss Anti-Plagiarism Plugin</a> is developped by <a href="http://www.hit.edu.cn/">Harbin Institute of Technology</a>. The plagiarism engine is <a href="http://theory.stanford.edu/~aiken/moss/">Moss</a>.';
 $string['mossenabled'] ='Enable moss';
 $string['mossuserid'] ='Moss account';
 $string['mossuserid_help'] ='To obtain a Moss account, send a  mail message to <a href="mailto:moss@moss.stanford.edu">moss@moss.stanford.edu</a>. The body of the message should be in <strong>PLAIN TEXT</strong>(without any HTML tags) format and appear exactly as follows:
