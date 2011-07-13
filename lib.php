@@ -193,7 +193,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $mform->setType('filepatterns'.$index, PARAM_TEXT);
             $mform->disabledIf('filepatterns'.$index, 'enabled');
 
-            $choices = array('ada'     => 'Ada',              'ascii'      => 'ASCII',
+            $choices = array('ada'     => 'Ada',              'ascii'      => 'Plain text',
                              'a8086'   => 'a8086 assembly',   'c'          => 'C',
                              'cc'      => 'C++',              'csharp'     => 'C#',
                              'fortran' => 'FORTRAN',          'haskell'    => 'Haskell',
