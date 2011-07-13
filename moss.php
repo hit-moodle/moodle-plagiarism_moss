@@ -306,54 +306,5 @@ class moss {
         $DB->delete_records('moss_results', array('moss' => $this->moss->id));
         //TODO: remove cached pages
     }
-
-    /**
-     *
-     * Enter description here ...
-     * @param unknown_type $description
-     * @param unknown_type $type
-     */
-    private function trigger_error($description, $errsolution = NULL, $type, $argument)
-    {
-        global $CFG;
-        global $DB;
-        $err = new object();
-        $err->errdate = time();
-        $err->errtype = $type;
-        $err->errdescription = $description;
-        $err->errstatus = 1;//unsolved
-        $err->errsolution = $errsolution;
-        if($type == 25)
-        {
-        	$err->testable = 1;
-            $err->errargument = $argument;
-        }
-        else
-        {
-        	$err->testable = 0;
-            $err->errargument = 'no argument';
-        }
-        $DB->insert_record('moss_plugin_errors', $err);
-    }
-
-    /**
-     *
-     * Enter description here ...
-     * @param unknown_type $type
-     * @param unknown_type $arrguments
-     */
-    public function error_test($type, $argument)
-    {
-        if($type == 25)
-        {
-            $fp = fopen($argument, 'r');
-            if(!$fp)
-                return false;
-            else
-                return true;
-        }
-        else
-            return true;
-
-    }
 }
+
