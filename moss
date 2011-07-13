@@ -282,8 +282,9 @@ while($i < $bindex)
 }
 foreach $file (@ARGV)
 {
-   die "File $file does not exist. $noreq\n" unless -e "$file";
-   die "File $file is not readable. $noreq\n" unless -r "$file";
+# change 'die' to 'print' by sunner to skip some glob format filenames
+   print "File $file does not exist. $noreq\n" unless -e "$file";
+   print "File $file is not readable. $noreq\n" unless -r "$file";
 # comment out by sunner to allow non-ascii words
 #   die "File $file is not a text file. $noreq\n" unless -T "$file";
 }
@@ -313,6 +314,7 @@ sub read_from_server {
 
 sub upload_file {
    local ($file, $id, $lang) = @_;
+   return unless -r "$file"; # skip unreadable files
 #
 # The stat function does not seem to give correct filesizes on windows, so
 # we compute the size here via brute force.
