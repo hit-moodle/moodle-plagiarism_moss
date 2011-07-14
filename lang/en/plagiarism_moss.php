@@ -61,7 +61,7 @@ Visit <a href="{$a->link}">{$a->link}</a> for details.';
 $string['messageunconfirmedtext'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as NOT plagiarism.
 Visit {$a->link} for details.';
 $string['moss'] = 'Moss anti-plagiarism';
-$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs.';
+$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs and plain text files.';
 $string['moss:confirm'] = 'Confirm plagiarism';
 $string['moss:viewallresults'] = 'View results of everyone';
 $string['moss:viewdiff'] = 'View pair compare';
