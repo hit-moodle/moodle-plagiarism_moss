@@ -65,14 +65,17 @@ class moss_global_settings_form extends moodleform {
     }
 
     function validation($data, $files) {
+        global $CFG;
         $errors = parent::validation($data, $files);
 
         if (!empty($data['mossenabled'])) {
             if (!is_numeric($data['mossuserid'])) {
                 $errors['mossuserid'] = get_string('err_numeric', 'form');
             }
-            if (!is_executable($data['cygwinpath'].'\\bin\\perl.exe')) {
-                $errors['cygwinpath'] = get_string('err_cygwinpath', 'plagiarism_moss');
+            if ($CFG->ostype == 'WINDOWS') {
+                if (!is_executable($data['cygwinpath'].'\\bin\\perl.exe')) {
+                    $errors['cygwinpath'] = get_string('err_cygwinpath', 'plagiarism_moss');
+                }
             }
         }
 
@@ -94,7 +97,9 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
     if (!empty($data->mossenabled)) {
         set_config('moss_use', $data->mossenabled, 'plagiarism');
         set_config('mossuserid', $data->mossuserid, 'plagiarism_moss');
-        set_config('cygwinpath', $data->cygwinpath, 'plagiarism_moss');
+        if ($CFG->ostype == 'WINDOWS') {
+            set_config('cygwinpath', $data->cygwinpath, 'plagiarism_moss');
+        }
     } else {
         set_config('moss_use', 0, 'plagiarism');
     }
