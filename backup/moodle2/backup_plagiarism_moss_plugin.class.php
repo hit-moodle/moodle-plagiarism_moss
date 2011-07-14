@@ -32,13 +32,13 @@ class backup_plagiarism_moss_plugin extends backup_plagiarism_plugin {
         $tag->set_source_sql($sql, array(backup::VAR_PARENTID));
 
         $mosses = new backup_nested_element('mosses');
-        $moss = new backup_nested_element('moss', array('id'), array('cmid', 'timetomeasure', 'timemeasured', 'tag', 'enabled', 'coursename', 'modulename'));
+        $moss = new backup_nested_element('moss', array('id'), array('cmid', 'timetomeasure', 'timemeasured', 'tag', 'sensitivity', 'enabled', 'coursename', 'modulename'));
         $pluginwrapper->add_child($mosses);
         $mosses->add_child($moss);
         $moss->set_source_table('moss', array('cmid' => backup::VAR_PARENTID));
 
         $configs = new backup_nested_element('configs');
-        $config = new backup_nested_element('config', array('id'), array('moss', 'filepatterns', 'language', 'sensitivity'));
+        $config = new backup_nested_element('config', array('id'), array('moss', 'filepatterns', 'language'));
         $moss->add_child($configs);
         $configs->add_child($config);
         $config->set_source_table('moss_configs', array('moss' => backup::VAR_PARENTID));

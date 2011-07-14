@@ -189,16 +189,18 @@ class moss {
             if ($CFG->ostype == 'WINDOWS') {
                 $cygwin = get_config('plagiarism_moss', 'cygwinpath');
                 $perl = $cygwin.'\\bin\\perl.exe';
-                $moss = $CFG->dirroot.'\\plagiarism\\moss\\moss';
+                $mossscrpit = $CFG->dirroot.'\\plagiarism\\moss\\moss';
                 $cmd = str_replace(' ', '\\ ', $CFG->dirroot.'\\plagiarism\\moss\\moss.bat');
-                $cmd .= ' "'.$perl.'" "'.$moss.'"';
+                $cmd .= ' "'.$perl.'" "'.$mossscrpit.'"';
             } else {
                 $cmd = '"'.$CFG->dirroot.'/plagiarism/moss/moss'.'"';
             }
             $cmd .= ' -d';
             $cmd .= ' -u '.get_config('plagiarism_moss', 'mossuserid');;
             $cmd .= ' -l '.$setting->language;
-            $cmd .= ' -m '.$setting->sensitivity;
+            if (!empty($this->moss->sensitivity)) {
+                $cmd .= ' -m '.$this->moss->sensitivity;
+            }
 
             $basefiles = $fs->get_area_files($context->id, 'plagiarism_moss', 'basefiles', $setting->id, 'filename', false);
             foreach ($basefiles as $basefile) {

@@ -81,7 +81,8 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     	}
     }
 
-    /* hook to save plagiarism specific settings on a module settings page
+    /**
+     * Hook to save plagiarism specific settings on a module settings page
      * @param object $data - data from an mform submission.
      */
     public function save_form_elements($data) {
@@ -95,6 +96,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $moss->enabled = empty($data->enabled) ? 0 : 1;
         $moss->timetomeasure = $data->timetomeasure; //TODO: activity due date
         $moss->cmid = $data->coursemodule;
+        $moss->sensitivity = $data->sensitivity;
         $moss->modulename = $data->name;
         $moss->coursename = $DB->get_field('course', 'shortname', array('id' => $data->course));
 
@@ -129,8 +131,6 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $config->moss = $data->mossid;
             $member = 'language'.$index;
             $config->language = isset($data->$member) ? $data->$member : 'c';
-            $member = 'sensitivity'.$index;
-            $config->sensitivity = $data->$member;
 
             $member = 'filepatterns'.$index;
             $config->filepatterns = str_replace('\\', '_', str_replace('/', '_', $data->$member)); // filter out path chars
@@ -178,6 +178,12 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $mform->setType('tag', PARAM_TEXT);
         $mform->disabledIf('tag', 'enabled');
 
+        $mform->addElement('text', 'sensitivity', get_string('sensitivity', 'plagiarism_moss'), 'size = "10"');
+        $mform->addHelpButton('sensitivity', 'sensitivity', 'plagiarism_moss');
+        $mform->setType('sensitivity', PARAM_NUMBER);
+        $mform->addRule('sensitivity', null, 'numeric', null, 'client');
+        $mform->disabledIf('sensitivity', 'enabled');
+
         // multi configs
         for($index = 0; $index < MOSS_MAX_PATTERNS; $index++) {
             if ($index == 0) {
@@ -208,12 +214,6 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $mform->addElement('select', 'language'.$index, get_string('language', 'plagiarism_moss'), $choices);
             $mform->disabledIf('language'.$index, 'enabled');
 
-            $mform->addElement('text', 'sensitivity'.$index, get_string('sensitivity', 'plagiarism_moss'), 'size = "10"');
-            $mform->addHelpButton('sensitivity'.$index, 'sensitivity', 'plagiarism_moss');
-            $mform->setType('sensitivity'.$index, PARAM_NUMBER);
-            $mform->addRule('sensitivity'.$index, null, 'numeric', null, 'client');
-            $mform->disabledIf('sensitivity'.$index, 'enabled');
-
             $mform->addElement('filemanager', 'basefile'.$index, get_string('basefile', 'plagiarism_moss'), null, array('subdirs' => 0));
             $mform->addHelpButton('basefile'.$index, 'basefile', 'plagiarism_moss');
             $mform->disabledIf('basefile'.$index, 'enabled');
@@ -225,6 +225,9 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $mform->setDefault('enabled', $moss->enabled);
             $mform->setDefault('timetomeasure', $moss->timetomeasure);
             $mform->setDefault('tag', $DB->get_field('moss_tags', 'name', array('id' => $moss->tag)));
+            if (!empty($moss->sensitivity)) {
+                $mform->setDefault('sensitivity', $moss->sensitivity);
+            }
             $mform->addElement('hidden', 'mossid', $moss->id);
 
             $subconfigs = $DB->get_records('moss_configs', array('moss'=>$moss->id));
@@ -232,7 +235,6 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             foreach ($subconfigs as $subconfig) {
                 $mform->setDefault('filepatterns'.$index, $subconfig->filepatterns);
                 $mform->setDefault('language'.$index, $subconfig->language);
-                $mform->setDefault('sensitivity'.$index, $subconfig->sensitivity);
                 $mform->addElement('hidden', 'configid'.$index, $subconfig->id);
 
                 $context = get_system_context();
@@ -247,7 +249,6 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $mform->setDefault('tag', '');
             $mform->setDefault('filepatterns0', '*.c');
             $mform->setDefault('language0', 'c');
-            $mform->setDefault('sensitivity0', 20);
             // leave other subconfig empty
         }
     }

@@ -68,10 +68,10 @@ class plagiarism_moss_test extends UnitTestCase {
         set_config('moss_use', 1, 'plagiarism');
 
         $mosses = array(
-            array('cmid' => 1, 'tag' => 1, 'enabled' => 0, 'timetomeasure' => time()),
-            array('cmid' => 2, 'tag' => 1, 'enabled' => 0, 'timetomeasure' => time()),
-            array('cmid' => 3, 'tag' => 1, 'enabled' => 0, 'timetomeasure' => time()),
-            array('cmid' => 4, 'tag' => 2, 'enabled' => 0, 'timetomeasure' => time()),
+            array('cmid' => 1, 'tag' => 1, 'enabled' => 0, 'timetomeasure' => time(), 'sensitivity' => 10),
+            array('cmid' => 2, 'tag' => 1, 'enabled' => 0, 'timetomeasure' => time(), 'sensitivity' => 10),
+            array('cmid' => 3, 'tag' => 1, 'enabled' => 0, 'timetomeasure' => time(), 'sensitivity' => 10),
+            array('cmid' => 4, 'tag' => 2, 'enabled' => 0, 'timetomeasure' => time(), 'sensitivity' => 10),
         );
         $tags = array(
             array('name' => 'test1'),
@@ -157,7 +157,7 @@ class plagiarism_moss_test extends UnitTestCase {
         $this->trigger(1, $events);
 	}
 
-    function add_config($cmid, $filepatterns = '*', $language = 'ascii', $sensitivity = 10) {
+    function add_config($cmid, $filepatterns = '*', $language = 'ascii') {
         global $DB;
         $moss = $cmid; // Yes, they should be same
         $DB->insert_record(
@@ -166,7 +166,6 @@ class plagiarism_moss_test extends UnitTestCase {
                 'moss' => $moss,
                 'filepatterns' => $filepatterns,
                 'language' => $language,
-                'sensitivity' => $sensitivity
             )
         );
     }
