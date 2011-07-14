@@ -61,7 +61,9 @@ On Windows
 Usage
 =====
 
-In the activity setting page of any moodle module which supports plagiarism API (now, assignment only), there should be settings for Moss Anti-Plagiarism. Follow the inline help.
+First, make sure the cron job of your moodle works well. Check <http://docs.moodle.org/20/en/Cron> for details.
+
+In the activity setting page of any moodle module which supports plagiarism API (now, assignment only), there should be settings for Moss Anti-Plagiarism. Follow the inline help and enjoy it.
 
 
 Links
