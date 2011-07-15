@@ -36,6 +36,13 @@ $string['basefile_help'] = 'Moss通常会报告所有成对匹配的代码。 �
 $string['clicktoviewresults'] = '点击此处查看结果。';
 $string['configrequired'] = '配置{$a}（必填）：';
 $string['configoptional'] = '配置{$a}（可选）：';
+$string['confirm'] = '确认';
+$string['confirm_help'] = '此用户已被确认为抄袭者吗？
+
+* 已确认为抄袭 - 是的，他/她是个抄袭者
+* 未确认 - 不，他/她不是抄袭者
+
+教师可以点击图标更改状态。每次点击都会向对应的用户发送通知消息。';
 $string['confirmed'] = '已确认为抄袭';
 $string['confirmedresults'] = '{$a->fullname}在<strong>{$a->total}</strong>项活动中有已确认的抄袭记录。';
 $string['confirmmessage'] = '您确定一定以及肯定这是抄袭吗？';

@@ -36,6 +36,13 @@ $string['basefile_help'] = 'Moss normally reports all code that matches in pairs
 $string['clicktoviewresults'] = 'Click here to view results.';
 $string['configrequired'] = 'Config {$a} (required):';
 $string['configoptional'] = 'Config {$a} (optional):';
+$string['confirm'] = 'Confirm';
+$string['confirm_help'] = 'This user is confirmed as a cheater or not.
+
+* Confirmed plagiarism - yes, he/she is a cheater
+* Unconfirmed - no, he/she is not a cheater
+
+The icon is clickable for teachers. Every click will send a notification to corresponding user.';
 $string['confirmed'] = 'Confirmed plagiarism';
 $string['confirmedresults'] = '{$a->fullname} has confirmed plagiarism records in <strong>{$a->total}</strong> activities.';
 $string['confirmmessage'] = 'Are you sure this is plagiarism?';
