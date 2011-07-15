@@ -41,6 +41,7 @@ $string['confirm_help'] = 'This user is confirmed as a cheater or not.
 
 * Confirmed plagiarism - yes, he/she is a cheater
 * Unconfirmed - no, he/she is not a cheater
+* No icon - the user is not enrolled to this course
 
 The icon is clickable for teachers. Every click will send a notification to corresponding user.';
 $string['confirmed'] = 'Confirmed plagiarism';
