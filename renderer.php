@@ -247,6 +247,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 $nextlink = html_writer::link($url, get_string('next'));
             }
             $pager = new html_table_cell($prevlink.' '.$nextlink);
+            $pager->attributes['class'] = 'pager';
             $pager->colspan = count($table->head);
             $table->data[] = new html_table_row(array($pager));
             $output .= html_writer::table($table);
