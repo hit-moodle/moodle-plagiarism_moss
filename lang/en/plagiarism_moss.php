@@ -41,9 +41,7 @@ $string['confirmedresults'] = '{$a->fullname} has confirmed plagiarism records i
 $string['confirmmessage'] = 'Are you sure this is plagiarism?';
 $string['cygwinpath'] = 'Path to Cygwin installation';
 $string['disclosurehasmeasured']  ='All files submitted here has been measured by a plagiarism detection service at {$a->timemeasured}.';
-$string['disclosurelastmeasured']  ='All files submitted here will be measured again by a plagiarism detection service at {$a->timetomeasure}. All files submitted before {$a->timemeasured} has been measured.';
-$string['disclosuremeasuredsoon']  ='All files submitted here will be measured SOON by a plagiarism detection service. ';
-$string['disclosurenevermeasured']  ='All files submitted here will be measured by a plagiarism detection service at {$a->timetomeasure}.';
+$string['disclosurenevermeasured']  ='All files submitted here will be measured by a plagiarism detection service.';
 $string['err_cygwinpath']  ='Bad Cygwin path or perl for Cygwin is not installed';
 $string['filepatterns'] = 'Filename patterns';
 $string['filepatterns_help'] = 'Glob format. E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
@@ -90,7 +88,10 @@ $string['sensitivity_help'] = 'The sensitivity option sets the maximum number of
 $string['tag'] = 'Tag';
 $string['tag_help'] = 'Different activities using the same tag will be measured together. Tag is helpful to prevent plagiarism among courses.';
 $string['timetomeasure']  ='Time to start measuring';
-$string['timetomeasure_help']  ='The time should be after all submissions have been submitted.';
+$string['timetomeasure_help']  ='Set the time to measure all submissions to detect plagiarism. If not set, the measure will occur after the activity\'s due time.
+
+The measure will be executed only once against all existing submissions. If you want to measure again, reset the time.';
+
 $string['unconfirmed'] = 'Unconfirmed';
 $string['unsupportedmodule']  ='Moss does not support this module.';
 

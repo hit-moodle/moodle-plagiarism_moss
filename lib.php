@@ -55,20 +55,11 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
 
             $moss = $DB->get_record('moss', array('cmid' => $cmid), 'timetomeasure, timemeasured');
-            $a->timetomeasure = userdate($moss->timetomeasure);
             $a->timemeasured = userdate($moss->timemeasured);
-            if ($moss->timetomeasure > time()) {
-                if ($moss->timemeasured == 0) {
-                    $disclosure = get_string('disclosurenevermeasured', 'plagiarism_moss', $a);
-                } else {
-                    $disclosure = get_string('disclosurelastmeasured', 'plagiarism_moss', $a);
-                }
+            if ($moss->timemeasured == 0) {
+                $disclosure = get_string('disclosurenevermeasured', 'plagiarism_moss', $a);
             } else {
-                if ($moss->timemeasured < $moss->timetomeasure) {
-                    $disclosure = get_string('disclosuremeasuredsoon', 'plagiarism_moss', $a);
-                } else {
-                    $disclosure = get_string('disclosurehasmeasured', 'plagiarism_moss', $a);
-                }
+                $disclosure = get_string('disclosurehasmeasured', 'plagiarism_moss', $a);
             }
 
             if ($moss->timemeasured != 0 and has_capability('plagiarism/moss:viewallresults', get_context_instance(CONTEXT_MODULE, $cmid))) {
@@ -169,7 +160,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 
         $mform->addElement('checkbox', 'enabled', get_string('mossenabled', 'plagiarism_moss'));
 
-        $mform->addElement('date_time_selector', 'timetomeasure', get_string('timetomeasure', 'plagiarism_moss'));
+        $mform->addElement('date_time_selector', 'timetomeasure', get_string('timetomeasure', 'plagiarism_moss'), array('optional' => true));
         $mform->addHelpButton('timetomeasure', 'timetomeasure', 'plagiarism_moss');
         $mform->disabledIf('timetomeasure', 'enabled');
 
@@ -313,15 +304,35 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     public function cron() {
         global $DB;
 
-        mtrace('Moss begins');
-        $select  = 'timetomeasure < ? AND timetomeasure > timemeasured AND enabled = 1';
+        mtrace('---Moss begins---');
+
+        // get mosses measure on specified time
+        $select  = 'timetomeasure < ? AND timetomeasure > timemeasured AND enabled = 1 AND timetomeasure != 0';
         $mosses = $DB->get_records_select('moss', $select, array(time()));
+
+        // get mosses measure on activity due date
+        $duemosses = $DB->get_records('moss', array('enabled' => 1, 'timetomeasure' => 0));
+        foreach ($duemosses as $moss) {
+            if ($cm = get_coursemodule_from_id('', $moss->cmid)) {
+                switch ($cm->modname) {
+                case 'assignment':
+                    $duedate = $DB->get_field('assignment', 'timedue', array('id' => $cm->instance));
+                }
+                if (!empty($duedate)) {
+                    if ($moss->timemeasured < $duedate and $duedate < time()) {
+                        // measure it
+                        $mosses[] = $moss;
+                    }
+                }
+            }
+        }
+
         foreach ($mosses as $moss) {
             mtrace("Measure $moss->modulename ($moss->cmid) in $moss->coursename");
             $moss_obj = new moss($moss->cmid);
             $moss_obj->measure();
         }
-        mtrace('Moss done');
+        mtrace('---Moss done---');
     }
 }
 
