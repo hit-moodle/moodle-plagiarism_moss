@@ -133,8 +133,8 @@ if ($userid) {
     echo $output->user_result($user);
 } else {
     $from = optional_param('from', 0, PARAM_INT);
-    $count = optional_param('count', 30, PARAM_INT);
-    echo $output->cm_result($from, $count);
+    $num = optional_param('num', 30, PARAM_INT);
+    echo $output->cm_result($from, $num);
 }
 
 echo $output->footer();

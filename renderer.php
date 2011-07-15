@@ -163,8 +163,8 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     /**
      * List all results in a course module
      */
-    function cm_result($from, $count) {
-        global $DB, $CFG;
+    function cm_result($from=0, $num=30) {
+        global $DB, $CFG, $PAGE;
         $output = '';
 
         /// find out current groups mode
@@ -204,7 +204,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             $where .= "AND (r1.userid IN ($userids) OR r2.userid IN ($userids)) ";
         }
 
-        $results = $DB->get_records_sql($select.$where.$orderby, array($this->moss->id));
+        $results = $DB->get_records_sql($select.$where.$orderby, array($this->moss->id), $from, $num);
 
         foreach ($results as $result) {
             $user2result = clone($result);
@@ -231,6 +231,24 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         if (empty($table->data)) {
             $output .= $this->notification(get_string('nocmresults', 'plagiarism_moss'));
         } else {
+            // append pager line
+            $prevlink = '';
+            $nextlink = '';
+            if ($from != 0) {
+                $url = clone($PAGE->url);
+                $newfrom = $from-$num >= 0 ? $from-$num : 0;
+                $url->param('from', $newfrom);
+                $prevlink = html_writer::link($url, get_string('previous'));
+            }
+            if ($num <= count($results)) {
+                $url = clone($PAGE->url);
+                $newfrom = $from+$num;
+                $url->param('from', $newfrom);
+                $nextlink = html_writer::link($url, get_string('next'));
+            }
+            $pager = new html_table_cell($prevlink.' '.$nextlink);
+            $pager->colspan = count($table->head);
+            $table->data[] = new html_table_row(array($pager));
             $output .= html_writer::table($table);
         }
 
