@@ -187,27 +187,44 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         );
 
         $configs = $DB->get_records('moss_configs', array('moss' => $this->moss->id));
-        $results = $DB->get_records('moss_results', array('moss' => $this->moss->id), 'rank, userid ASC');
 
-        $skiplists = array();
-        foreach ($results as $result) {
-            if (in_array($result->id, $skiplists)) {
-                continue;
+        $select = 'SELECT r1.*,
+                          r2.userid AS userid2, r2.percentage AS percentage2, r2.linesmatched AS linesmatched2,
+                          r2.confirmed AS confirmed2, r2.confirmer AS confirmer2, r2.timeconfirmed AS timeconfirmed2
+                   FROM {moss_results} r1 LEFT JOIN {moss_results} r2 ON r1.pair = r2.id ';
+        $where = 'WHERE r1.moss = ? ';
+        $orderby = 'ORDER BY r1.rank, r1.userid ASC';
+        if ($currentgroup) {
+            if ($users = groups_get_members($currentgroup, 'u.id', 'u.id')) {
+                $users = array_keys($users);
+                $userids = implode(',',$users);
+            } else {
+                $userids = '0';
             }
-            $result2 = $results[$result->pair];
+            $where .= "AND (r1.userid IN ($userids) OR r2.userid IN ($userids)) ";
+        }
+
+        $results = $DB->get_records_sql($select.$where.$orderby, array($this->moss->id));
+
+        foreach ($results as $result) {
+            $user2result = clone($result);
+            $user2result->userid = $result->userid2;
+            $user2result->percentage = $result->percentage2;
+            $user2result->linesmatched = $result->linesmatched2;
+            $user2result->confirmed = $result->confirmed2;
+            $user2result->confirmer = $result->confirmer2;
+            $user2result->timeconfirmed = $result->timeconfirmed2;
 
             $user1cells = $this->fill_result_in_cells($result);
-            $user2cells = $this->fill_result_in_cells($result2);
+            $user2cells = $this->fill_result_in_cells($user2result);
+
             if (!is_enrolled($this->context, $result->userid)) {
                 $cells = array_merge($user2cells, $user1cells);
             } else {
                 $cells = array_merge($user1cells, $user2cells);
             }
 
-            $skiplists[] = $result->pair;
-
             $cells[] = $configs[$result->config]->filepatterns;
-
             $table->data[] = new html_table_row($cells);
         }
 
