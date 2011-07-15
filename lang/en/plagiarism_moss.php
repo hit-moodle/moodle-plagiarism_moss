@@ -58,12 +58,10 @@ $string['matchedlines'] = 'Matched lines';
 $string['matchedusers'] = 'Matched users';
 $string['messageprovider:moss_updates'] = 'Moss anti-plagiarism notifications';
 $string['messagesubject'] = 'Moss anti-plagiarism notification';
-$string['messageconfirmedhtml'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as <em>plagiarism</em>. <br />
-Visit <a href="{$a->link}">{$a->link}</a> for details.';
+$string['messageconfirmedhtml'] = '<p>Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as <em>plagiarism</em>. </p><p>Visit <a href="{$a->link}">{$a->link}</a> for details.</p>';
 $string['messageconfirmedtext'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as PLAGIARISM.
 Visit {$a->link} for details.';
-$string['messageunconfirmedhtml'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as <em>not</em> plagiarism. <br />
-Visit <a href="{$a->link}">{$a->link}</a> for details.';
+$string['messageunconfirmedhtml'] = '<p>Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as <em>not</em> plagiarism. </p><p>Visit <a href="{$a->link}">{$a->link}</a> for details.</p>';
 $string['messageunconfirmedtext'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as NOT plagiarism.
 Visit {$a->link} for details.';
 $string['moss'] = 'Moss anti-plagiarism';
