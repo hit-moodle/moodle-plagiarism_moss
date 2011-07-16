@@ -183,7 +183,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
                 $subheader = get_string('configoptional', 'plagiarism_moss', $index+1);
             }
             $subheader = html_writer::tag('strong', $subheader);
-            $mform->addElement('static', 'subheader', $subheader);
+            $mform->addElement('static', 'subheader'.$index, $subheader);
 
             $mform->addElement('text', 'filepatterns'.$index, get_string('filepatterns', 'plagiarism_moss'));
             $mform->addHelpButton('filepatterns'.$index, 'filepatterns', 'plagiarism_moss');
@@ -198,6 +198,13 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $mform->addElement('filemanager', 'basefile'.$index, get_string('basefile', 'plagiarism_moss'), null, array('subdirs' => 0));
             $mform->addHelpButton('basefile'.$index, 'basefile', 'plagiarism_moss');
             $mform->disabledIf('basefile'.$index, 'enabled');
+
+            if ($index != 0) {
+                $mform->setAdvanced('subheader'.$index);
+                $mform->setAdvanced('filepatterns'.$index);
+                $mform->setAdvanced('language'.$index);
+                $mform->setAdvanced('basefile'.$index);
+            }
         }
 
         // set config values
