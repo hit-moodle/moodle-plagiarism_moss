@@ -128,9 +128,7 @@ if ($moss_use = get_config('plagiarism', 'moss_use')) {
     $settings['mossenabled'] = $moss_use;
 }
 $moss_configs = (array)get_config('plagiarism_moss');
-foreach ($moss_configs as $key => $config) {
-    $settings[$key] = $config;
-}
+$settings = array_merge($settings, $moss_configs);
 $mform->set_data($settings);
 
 echo $OUTPUT->box_start();
