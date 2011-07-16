@@ -116,7 +116,6 @@ class moss {
 	/**
 	 * this function will call moss script and save anti-plagiarism results
      *
-     * TODO: finish it
      * @return sucessful true or failed false
 	 */
     protected function call_moss() {
