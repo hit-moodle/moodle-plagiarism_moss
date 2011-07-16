@@ -64,7 +64,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 
             if ($moss->timemeasured != 0 and has_capability('plagiarism/moss:viewallresults', get_context_instance(CONTEXT_MODULE, $cmid))) {
                 $url = new moodle_url('/plagiarism/moss/view.php', array('id' => $cmid));
-                $disclosure .= html_writer::link($url, get_string('clicktoviewresults', 'plagiarism_moss'));
+                $disclosure .= ' '.html_writer::link($url, get_string('clicktoviewresults', 'plagiarism_moss'));
             }
 
             echo format_text($disclosure, FORMAT_MOODLE);
