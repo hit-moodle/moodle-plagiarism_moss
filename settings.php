@@ -109,7 +109,7 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
         set_config('moss_use', 0, 'plagiarism');
     }
 
-    notify(get_string('savedconfigsuccess', 'plagiarism_moss'), 'notifysuccess');
+    echo $OUTPUT->notification(get_string('savedconfigsuccess', 'plagiarism_moss'), 'notifysuccess');
 }
 
 $settings = array();
