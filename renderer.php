@@ -192,8 +192,8 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                           r2.userid AS userid2, r2.percentage AS percentage2, r2.linesmatched AS linesmatched2,
                           r2.confirmed AS confirmed2, r2.confirmer AS confirmer2, r2.timeconfirmed AS timeconfirmed2
                    FROM {moss_results} r1 LEFT JOIN {moss_results} r2 ON r1.pair = r2.id ';
-        $where = 'WHERE r1.moss = ? ';
-        $orderby = 'ORDER BY r1.rank, r1.userid ASC';
+        $where = 'WHERE r1.moss = ? AND r1.userid < r2.userid ';
+        $orderby = 'ORDER BY r1.rank ASC';
         if ($currentgroup) {
             if ($users = groups_get_members($currentgroup, 'u.id', 'u.id')) {
                 $users = array_keys($users);
