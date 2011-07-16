@@ -48,6 +48,7 @@ $string['confirmed'] = '已确认为抄袭';
 $string['confirmedresults'] = '{$a->fullname}在<strong>{$a->total}</strong>项活动中有已确认的抄袭记录。';
 $string['confirmmessage'] = '您确定一定以及肯定这是抄袭吗？';
 $string['cygwinpath'] = 'Cygwin的安装目录';
+$string['defaultlanguage'] = '缺省语言';
 $string['disclosurehasmeasured']  ='已于{$a->timemeasured}对所有上传的文件进行了抄袭检测。';
 $string['disclosurenevermeasured']  ='所有上传于此的文件都将被进行抄袭检测。';
 $string['err_cygwinpath']  ='错误的Cygwin路径，或Cygwin中未安装perl';

@@ -48,6 +48,7 @@ $string['confirmed'] = 'Confirmed plagiarism';
 $string['confirmedresults'] = '{$a->fullname} has confirmed plagiarism records in <strong>{$a->total}</strong> activities.';
 $string['confirmmessage'] = 'Are you sure this is plagiarism?';
 $string['cygwinpath'] = 'Path to Cygwin installation';
+$string['defaultlanguage'] = 'Default language';
 $string['disclosurehasmeasured']  ='All files submitted here has been measured by a plagiarism detection service at {$a->timemeasured}.';
 $string['disclosurenevermeasured']  ='All files submitted here will be measured by a plagiarism detection service.';
 $string['err_cygwinpath']  ='Bad Cygwin path or perl for Cygwin is not installed';

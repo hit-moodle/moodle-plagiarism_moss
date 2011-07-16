@@ -121,7 +121,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $config = new stdClass();
             $config->moss = $data->mossid;
             $member = 'language'.$index;
-            $config->language = isset($data->$member) ? $data->$member : 'c';
+            $config->language = isset($data->$member) ? $data->$member : get_config('plagiarism_moss', 'defaultlanguage');
 
             $member = 'filepatterns'.$index;
             $config->filepatterns = str_replace('\\', '_', str_replace('/', '_', $data->$member)); // filter out path chars
@@ -204,6 +204,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
                              'vhdl'    => 'VHDL',             'vb'         => 'Visual Basic');
             $mform->addElement('select', 'language'.$index, get_string('language', 'plagiarism_moss'), $choices);
             $mform->disabledIf('language'.$index, 'enabled');
+            $mform->setDefault('language'.$index, get_config('plagiarism_moss', 'defaultlanguage'));
 
             $mform->addElement('filemanager', 'basefile'.$index, get_string('basefile', 'plagiarism_moss'), null, array('subdirs' => 0));
             $mform->addHelpButton('basefile'.$index, 'basefile', 'plagiarism_moss');
@@ -238,8 +239,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         } else { // new config
             $mform->setDefault('enabled', 0);
             $mform->setDefault('tag', '');
-            $mform->setDefault('filepatterns0', '*.c');
-            $mform->setDefault('language0', 'c');
+            $mform->setDefault('filepatterns0', '*');
             // leave other subconfig empty
         }
     }

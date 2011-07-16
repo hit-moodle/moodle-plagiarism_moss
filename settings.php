@@ -54,6 +54,21 @@ class moss_global_settings_form extends moodleform {
         $mform->setDefault('mossuserid', '');
         $mform->disabledIf('mossuserid', 'mossenabled');
 
+        $choices = array('ada'     => 'Ada',              'ascii'      => 'Plain text',
+            'a8086'   => 'a8086 assembly',   'c'          => 'C',
+            'cc'      => 'C++',              'csharp'     => 'C#',
+            'fortran' => 'FORTRAN',          'haskell'    => 'Haskell',
+            'java'    => 'Java',             'javascript' => 'Javascript',
+            'lisp'    => 'Lisp',             'matlab'     => 'Matlab',
+            'mips'    => 'MIPS assembly',    'ml'         => 'ML',
+            'modula2' => 'Modula2',          'pascal'     => 'Pascal',
+            'perl'    => 'Perl',             'plsql'      => 'PLSQL',
+            'prolog'  => 'Prolog',           'python'     => 'Python',
+            'scheme'  => 'Scheme',           'spice'      => 'Spice',
+            'vhdl'    => 'VHDL',             'vb'         => 'Visual Basic');
+        $mform->addElement('select', 'defaultlanguage', get_string('defaultlanguage', 'plagiarism_moss'), $choices);
+        $mform->disabledIf('defaultlanguage', 'mossenabled');
+
         if ($CFG->ostype == 'WINDOWS') {
             $mform->addElement('text', 'cygwinpath', get_string('cygwinpath', 'plagiarism_moss'));
             $mform->setDefault('cygwinpath', 'C:\cygwin');
@@ -97,6 +112,7 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
     if (!empty($data->mossenabled)) {
         set_config('moss_use', $data->mossenabled, 'plagiarism');
         set_config('mossuserid', $data->mossuserid, 'plagiarism_moss');
+        set_config('defaultlanguage', $data->defaultlanguage, 'plagiarism_moss');
         if ($CFG->ostype == 'WINDOWS') {
             set_config('cygwinpath', $data->cygwinpath, 'plagiarism_moss');
         }
