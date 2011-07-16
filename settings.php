@@ -33,7 +33,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->libdir.'/adminlib.php');
-require_once($CFG->libdir.'/plagiarismlib.php');
+require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
 
 class moss_global_settings_form extends moodleform {
@@ -54,18 +54,7 @@ class moss_global_settings_form extends moodleform {
         $mform->setDefault('mossuserid', '');
         $mform->disabledIf('mossuserid', 'mossenabled');
 
-        $choices = array('ada'     => 'Ada',              'ascii'      => 'Plain text',
-            'a8086'   => 'a8086 assembly',   'c'          => 'C',
-            'cc'      => 'C++',              'csharp'     => 'C#',
-            'fortran' => 'FORTRAN',          'haskell'    => 'Haskell',
-            'java'    => 'Java',             'javascript' => 'Javascript',
-            'lisp'    => 'Lisp',             'matlab'     => 'Matlab',
-            'mips'    => 'MIPS assembly',    'ml'         => 'ML',
-            'modula2' => 'Modula2',          'pascal'     => 'Pascal',
-            'perl'    => 'Perl',             'plsql'      => 'PLSQL',
-            'prolog'  => 'Prolog',           'python'     => 'Python',
-            'scheme'  => 'Scheme',           'spice'      => 'Spice',
-            'vhdl'    => 'VHDL',             'vb'         => 'Visual Basic');
+        $choices = moss_get_supported_languages();
         $mform->addElement('select', 'defaultlanguage', get_string('defaultlanguage', 'plagiarism_moss'), $choices);
         $mform->disabledIf('defaultlanguage', 'mossenabled');
 

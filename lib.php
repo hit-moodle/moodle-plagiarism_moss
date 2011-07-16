@@ -190,18 +190,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $mform->setType('filepatterns'.$index, PARAM_TEXT);
             $mform->disabledIf('filepatterns'.$index, 'enabled');
 
-            $choices = array('ada'     => 'Ada',              'ascii'      => 'Plain text',
-                             'a8086'   => 'a8086 assembly',   'c'          => 'C',
-                             'cc'      => 'C++',              'csharp'     => 'C#',
-                             'fortran' => 'FORTRAN',          'haskell'    => 'Haskell',
-                             'java'    => 'Java',             'javascript' => 'Javascript',
-                             'lisp'    => 'Lisp',             'matlab'     => 'Matlab',
-                             'mips'    => 'MIPS assembly',    'ml'         => 'ML',
-                             'modula2' => 'Modula2',          'pascal'     => 'Pascal',
-                             'perl'    => 'Perl',             'plsql'      => 'PLSQL',
-                             'prolog'  => 'Prolog',           'python'     => 'Python',
-                             'scheme'  => 'Scheme',           'spice'      => 'Spice',
-                             'vhdl'    => 'VHDL',             'vb'         => 'Visual Basic');
+            $choices = moss_get_supported_languages();
             $mform->addElement('select', 'language'.$index, get_string('language', 'plagiarism_moss'), $choices);
             $mform->disabledIf('language'.$index, 'enabled');
             $mform->setDefault('language'.$index, get_config('plagiarism_moss', 'defaultlanguage'));

@@ -211,3 +211,32 @@ function moss_message_send($result) {
 
     message_send($eventdata);
 }
+
+function moss_get_supported_languages() {
+    return array(
+        'ada'     => 'Ada',
+        'a8086'   => 'a8086 assembly',
+        'c'       => 'C',
+        'cc'      => 'C++',
+        'csharp'  => 'C#',
+        'fortran' => 'FORTRAN',
+        'haskell' => 'Haskell',
+        'java'    => 'Java',
+        'javascript' => 'Javascript',
+        'lisp'    => 'Lisp',
+        'matlab'  => 'Matlab',
+        'mips'    => 'MIPS assembly',
+        'ml'      => 'ML',
+        'modula2' => 'Modula2',
+        'pascal'  => 'Pascal',
+        'perl'    => 'Perl',
+        'ascii'   => 'Plain text',
+        'plsql'   => 'PLSQL',
+        'prolog'  => 'Prolog',
+        'python'  => 'Python',
+        'scheme'  => 'Scheme',
+        'spice'   => 'Spice',
+        'vhdl'    => 'VHDL',
+        'vb'      => 'Visual Basic');
+}
+
