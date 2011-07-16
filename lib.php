@@ -79,13 +79,13 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     public function save_form_elements($data) {
         global $DB;
 
-        if (!moss_enabled()) {
+        if (!moss_enabled() or !isset($data->enabled)) {
             return;
         }
 
         $moss = new stdClass();
         $moss->enabled = empty($data->enabled) ? 0 : 1;
-        $moss->timetomeasure = $data->timetomeasure; //TODO: activity due date
+        $moss->timetomeasure = $data->timetomeasure;
         $moss->cmid = $data->coursemodule;
         $moss->sensitivity = $data->sensitivity;
         $moss->modulename = $data->name;
