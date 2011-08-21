@@ -65,7 +65,9 @@ $string['messageunconfirmedhtml'] = '<p>您在“{$a->coursename}”中的“{$a
 $string['messageunconfirmedtext'] = '您在课程“{$a->coursename}”中的活动“{$a->modulename}”里提交的文件被确认为“不是”抄袭。
 访问 {$a->link} 了解更多细节。';
 $string['moss'] = 'Moss反抄袭';
-$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个自动检测源代码等纯文本文件的相似度的系统。';
+$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个自动检测源代码等纯文本文件的相似度的系统。
+
+注意，只有在moss启用时提交的文件才会被检测。';
 $string['moss:confirm'] = '确认抄袭行为';
 $string['moss:viewallresults'] = '查看所有人的结果';
 $string['moss:viewdiff'] = '查看成对比较视图';

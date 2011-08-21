@@ -66,7 +66,9 @@ $string['messageunconfirmedhtml'] = '<p>Your submissions of {$a->modulename} in 
 $string['messageunconfirmedtext'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as NOT plagiarism.
 Visit {$a->link} for details.';
 $string['moss'] = 'Moss anti-plagiarism';
-$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs and other plain text files.';
+$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs and other plain text files.
+
+Notice: only the files submitted when moss is enabled will be checked.';
 $string['moss:confirm'] = 'Confirm plagiarism';
 $string['moss:viewallresults'] = 'View results of everyone';
 $string['moss:viewdiff'] = 'View pair compare';
