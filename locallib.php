@@ -240,3 +240,35 @@ function moss_get_supported_languages() {
         'vb'      => 'Visual Basic');
 }
 
+/**
+ * Clean up all data related with cmid
+ *
+ * @param int $cmid
+ * @return true or false
+ */
+function moss_clean_cm($cmid) {
+    global $DB;
+
+    if ($moss = $DB->get_record('moss', array('cmid' => $cmid))) {
+        // clean up configs
+        $DB->delete_records('moss_configs', array('moss' => $moss->id));
+
+        // clean up results
+        $results = $DB->get_records('moss_results', array('moss' => $moss->id));
+        foreach ($results as $result) {
+            $DB->delete_records('moss_matched_files', array('result' => $result->id));
+        }
+        $DB->delete_records('moss_results', array('moss' => $moss->id));
+
+        // clean up files
+        // if no tag setted, no need to keep the files for further detection
+        if ($moss->tag == 0) {
+            $fs = get_file_storage();
+            $fs->delete_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $cmid);
+        }
+
+        $DB->delete_records('moss', array('cmid' => $cmid));
+    }
+
+    return true;
+}

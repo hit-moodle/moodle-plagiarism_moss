@@ -341,3 +341,9 @@ function moss_event_file_uploaded($eventdata) {
     return moss_save_files_from_event($eventdata);
 }
 
+/**
+ * A module has been deleted
+ */
+function moss_event_mod_deleted($eventdata) {
+    return moss_clean_cm($eventdata->cmid);
+}

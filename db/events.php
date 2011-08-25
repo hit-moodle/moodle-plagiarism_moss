@@ -8,6 +8,11 @@ $handlers = array (
     'assessable_file_uploaded' => array (
         'handlerfile'      => '/plagiarism/moss/lib.php',
         'handlerfunction'  => 'moss_event_file_uploaded',
-        'schedule'         => 'cron'
+        'schedule'         => 'instant'
+    ),
+    'mod_deleted' => array (
+        'handlerfile'      => '/plagiarism/moss/lib.php',
+        'handlerfunction'  => 'moss_event_mod_deleted',
+        'schedule'         => 'instant'
     ),
 );
