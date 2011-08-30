@@ -123,7 +123,7 @@ class moss {
 
         $commands = $this->get_commands();
         if(empty($commands)) {
-            mtrace('No valid config to run');
+            mtrace("\tNo valid config to run");
             return false;
         }
 
@@ -139,7 +139,7 @@ class moss {
             );
             $proc = proc_open($cmd, $descriptorspec, $pipes);
             if (!is_resource($proc)) {
-                mtrace('Call moss failed.');
+                mtrace("\tCall moss failed.");
                 return false;
             }
 
@@ -212,7 +212,7 @@ class moss {
                 $cmd .= ' '.str_replace(' ', '\\ ', $this->tempdir.'/*/'.$filepattern);
             }
             if (debugging('', DEBUG_DEVELOPER)) {
-                mtrace($cmd);
+                mtrace("\t".$cmd);
             }
             $cmds[$setting->id] = $cmd;
         }
@@ -230,10 +230,10 @@ class moss {
     protected function save_results($url, $configid) {
         global $DB, $UNITTEST;
 
-        mtrace("Processing $url");
+        mtrace("\tProcessing $url");
 
         if (!$result_page = download_file_content($url)) {
-            mtrace("can not read $url");
+            mtrace("\tcan not read $url");
             return false;
         }
 
@@ -245,7 +245,7 @@ class moss {
         );
 
         if (empty($matches)) {
-            mtrace("can not parse $url");
+            mtrace("\tcan not parse $url");
             return false;
         }
 
@@ -302,7 +302,7 @@ class moss {
             $rank++;
         }
 
-        mtrace("Got $rank pairs");
+        mtrace("\tGot $rank pairs");
 
         return true;
     }

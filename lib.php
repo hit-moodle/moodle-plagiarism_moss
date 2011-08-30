@@ -316,15 +316,17 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
                 }
                 if (!empty($duedate)) {
                     if ($moss->timemeasured < $duedate and $duedate < time()) {
-                        // measure it
+                        // it should be measured
                         $mosses[] = $moss;
                     }
                 }
             }
         }
 
+        mtrace("\tFound ".count($mosses)." moss instances to measure");
+
         foreach ($mosses as $moss) {
-            mtrace("Measure $moss->modulename ($moss->cmid) in $moss->coursename");
+            mtrace("\tMeasure $moss->modulename ($moss->cmid) in $moss->coursename");
             $moss_obj = new moss($moss->cmid);
             $moss_obj->measure();
         }
