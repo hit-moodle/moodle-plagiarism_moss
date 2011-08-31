@@ -3,7 +3,7 @@
 Introduction
 ============
 
-A plagiarism plugin for Moodle 2.x. The anti-plagiarism engine is [Moss](http://theory.stanford.edu/~aiken/moss/) which can detect plagiarism in source code and plain text files. Supports C, C++, Java, C#, Python, Visual Basic, Javascript, FORTRAN, ML, Haskell, Lisp, Scheme, Pascal, Modula2, Ada, Perl, TCL, Matlab, VHDL, Verilog, Spice, MIPS assembly, a8086 assembly, a8086 assembly, MIPS assembly and HCL2.
+A plagiarism plugin for Moodle 2.x. The underlying anti-plagiarism engine is [Moss](http://theory.stanford.edu/~aiken/moss/) which can detect plagiarism in source code and plain text files. Supports C, C++, Java, C#, Python, Visual Basic, Javascript, FORTRAN, ML, Haskell, Lisp, Scheme, Pascal, Modula2, Ada, Perl, TCL, Matlab, VHDL, Verilog, Spice, MIPS assembly, a8086 assembly, a8086 assembly, MIPS assembly and HCL2.
 
 
 Prerequisite
