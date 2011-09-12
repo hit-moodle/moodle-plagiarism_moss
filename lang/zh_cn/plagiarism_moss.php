@@ -102,4 +102,5 @@ $string['timetomeasure_help']  ='设置检测抄袭的时间。如果不设置�
 检测只在设定的时间，针对当时已提交的文件，执行一次。如果想再次检测，请重新设置此时间。';
 $string['unconfirmed'] = '未确认';
 $string['unsupportedmodule']  ='Moss不支持此模块。';
+$string['updating'] = '更新中...';
 

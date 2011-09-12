@@ -103,4 +103,5 @@ The measure will be executed only once against all existing submissions. If you 
 
 $string['unconfirmed'] = 'Unconfirmed';
 $string['unsupportedmodule']  ='Moss does not support this module.';
+$string['updating'] = 'Updating...';
 

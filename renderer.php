@@ -54,7 +54,8 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
         $this->confirm_htmls = array (
             $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss')),
-            $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'))
+            $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss')),
+            $this->pix_icon('i/loading_small', get_string('updating', 'plagiarism_moss'), 'moodle', array('id' => 'TO_BE_FILLED')) // id will be filled by js
         );
     }
 
