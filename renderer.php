@@ -283,7 +283,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         global $DB, $PAGE;
 
         if (!is_object($result)) { // $result is id
-            $result = $DB->get_record('moss_results', array('id' => $result));
+            $result = $DB->get_record('moss_results', array('id' => $result), '*', MUST_EXIST);
         }
 
         if (!is_enrolled($this->context, $result->userid)) { // show nothing for unenrolled users
