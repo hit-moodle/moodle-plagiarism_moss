@@ -311,7 +311,6 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                     'offset' => 99999999  // HACK: Use a big offset to hide the next buttons
                 )
             );
-            $icon = $this->pix_icon('i/grades', get_string('grade'));
 
             // get grade
             $grading_info = grade_get_grades($this->cm->course, 'mod', 'assignment', $this->cm->instance, $result->userid);
@@ -326,7 +325,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 $grade = '-';
             }
 
-            $output .= html_writer::link($url, $icon.'('.$grade.')', array('target' => '_blank', 'title' => get_string('grade')));
+            $output .= html_writer::link($url, ' ('.$grade.')', array('target' => '_blank', 'title' => get_string('grade')));
         }
             
         return $output;
