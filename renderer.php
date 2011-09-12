@@ -316,7 +316,12 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             // get grade
             $grading_info = grade_get_grades($this->cm->course, 'mod', 'assignment', $this->cm->instance, $result->userid);
             if (!empty($grading_info->items[0]->grades)) {
-                $grade = round(reset($grading_info->items[0]->grades)->grade);
+                $grade = reset($grading_info->items[0]->grades)->grade;
+                if (empty($grade)) {
+                    $grade = '-';
+                } else {
+                    $grade = round($grade);
+                }
             } else {
                 $grade = '-';
             }
