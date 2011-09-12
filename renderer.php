@@ -51,6 +51,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $this->can_viewdiff = has_capability('plagiarism/moss:viewdiff', $this->context);
         $this->can_viewunconfirmed = has_capability('plagiarism/moss:viewunconfirmed', $this->context);
         $this->can_confirm = has_capability('plagiarism/moss:confirm', $this->context);
+        $this->can_grade  = has_capability('mod/assignment:grade', $this->context);
 
         $this->confirm_htmls = array (
             $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss')),
@@ -274,6 +275,9 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         return html_writer::link($url, fullname($user));
     }
 
+    /**
+     * return html of confirm/unconfirm button and grade button
+     */
     protected function confirm_button($result) {
         global $DB, $PAGE;
 
@@ -285,8 +289,8 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             return '';
         }
 
+        // Confirm/unconfirm button
         $output = $this->confirm_htmls[$result->confirmed];
-
         if ($this->can_confirm) {
             $url = $PAGE->url;
             $url->param('sesskey', sesskey());
@@ -295,6 +299,21 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             $output = html_writer::link($url, $output, array('class' => 'confirmbutton', 'id' => "user$result->userid-config$result->config"));
         }
 
+        // Grade button
+        if ($this->can_grade) {
+            $url = new moodle_url('/mod/assignment/submissions.php',
+                array(
+                    'id' => $this->moss->cmid,
+                    'userid' => $result->userid,
+                    'mode' => 'single',
+                    'filter' => 0,
+                    'offset' =>0
+                )
+            );
+            $icon = $this->pix_icon('i/grades', get_string('grade'));
+            $output .= html_writer::link($url, $icon);
+        }
+            
         return $output;
     }
 
