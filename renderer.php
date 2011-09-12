@@ -189,7 +189,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $configs = $DB->get_records('moss_configs', array('moss' => $this->moss->id));
 
         $select = 'SELECT r1.*,
-                          r2.userid AS userid2, r2.percentage AS percentage2, r2.linesmatched AS linesmatched2,
+                          r2.id AS id2, r2.userid AS userid2, r2.percentage AS percentage2, r2.linesmatched AS linesmatched2,
                           r2.confirmed AS confirmed2, r2.confirmer AS confirmer2, r2.timeconfirmed AS timeconfirmed2
                    FROM {moss_results} r1 LEFT JOIN {moss_results} r2 ON r1.pair = r2.id ';
         $where = 'WHERE r1.moss = ? AND r1.userid < r2.userid ';
@@ -208,6 +208,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
         foreach ($results as $result) {
             $user2result = clone($result);
+            $user2result->id = $result->id2;
             $user2result->userid = $result->userid2;
             $user2result->percentage = $result->percentage2;
             $user2result->linesmatched = $result->linesmatched2;
