@@ -130,6 +130,7 @@ $PAGE->requires->js_init_call('M.plagiarism_moss.init', $output->get_confirm_htm
 echo $output->header();
 
 $output->moss = $moss;
+$output->cm = $cm;
 
 if ($userid) {
     $user = $DB->get_record('user', array('id' => $userid));

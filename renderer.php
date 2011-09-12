@@ -32,6 +32,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir.'/gradelib.php');
 
 /**
  * moss result page renderer class
@@ -43,6 +44,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     protected $context;
     protected $confirm_htmls;
     var $moss = null;
+    var $cm = null;
 
     public function __construct(moodle_page $page, $target) {
         parent::__construct($page, $target);
@@ -170,10 +172,9 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $output = '';
 
         /// find out current groups mode
-        $cm = get_coursemodule_from_id('', $this->moss->cmid);
-        $groupmode = groups_get_activity_groupmode($cm);
-        $currentgroup = groups_get_activity_group($cm, true);
-        $output .= groups_print_activity_menu($cm, $CFG->wwwroot . '/plagiarism/moss/view.php?id=' . $cm->id, true);
+        $groupmode = groups_get_activity_groupmode($this->cm);
+        $currentgroup = groups_get_activity_group($this->cm, true);
+        $output .= groups_print_activity_menu($this->cm, $CFG->wwwroot . '/plagiarism/moss/view.php?id=' . $this->cm->id, true);
 
         $table = new html_table();
         $table->head = array(
@@ -303,15 +304,24 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         if ($this->can_grade) {
             $url = new moodle_url('/mod/assignment/submissions.php',
                 array(
-                    'id' => $this->moss->cmid,
+                    'id' => $this->cm->id,
                     'userid' => $result->userid,
                     'mode' => 'single',
                     'filter' => 0,
-                    'offset' =>0
+                    'offset' => 99999999  // HACK: Use a big offset to hide the next buttons
                 )
             );
             $icon = $this->pix_icon('i/grades', get_string('grade'));
-            $output .= html_writer::link($url, $icon);
+
+            // get grade
+            $grading_info = grade_get_grades($this->cm->course, 'mod', 'assignment', $this->cm->instance, $result->userid);
+            if (!empty($grading_info->items[0]->grades)) {
+                $grade = round(reset($grading_info->items[0]->grades)->grade);
+            } else {
+                $grade = '-';
+            }
+
+            $output .= html_writer::link($url, $icon.'('.$grade.')', array('target' => '_blank', 'title' => get_string('grade')));
         }
             
         return $output;
