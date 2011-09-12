@@ -63,8 +63,7 @@ if ($cmid) {
     require_param('id', PARAM_INT);
 }
 
-$url = new moodle_url('/plagiarism/moss/view.php');
-$url->param('id', $cmid);
+$url = new moodle_url('/plagiarism/moss/view.php', array('id' => $cmid));
 if ($userid != 0) {
     $url->param('user', $userid);
 }
@@ -106,10 +105,14 @@ $PAGE->set_pagelayout('standard');
 $modname = get_string('modulename', $cm->modname);
 $activityname = $DB->get_field($cm->modname, 'name', array('id' => $cm->instance));
 $pagetitle = strip_tags(format_string($activityname, true).': '.get_string('moss', 'plagiarism_moss'));
+$heading = $course->fullname.': '.get_string('moss', 'plagiarism_moss');
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading($course->shortname);
+$PAGE->set_heading($heading);
 
-$PAGE->navbar->add(get_string('moss', 'plagiarism_moss'));
+$PAGE->navbar->add(get_string('allresults', 'plagiarism_moss'), new moodle_url('/plagiarism/moss/view.php', array('id' => $cmid)));
+if ($userid != 0) {
+    $PAGE->navbar->add(get_string('personalresults', 'plagiarism_moss'));
+}
 
 $output = $PAGE->get_renderer('plagiarism_moss');
 

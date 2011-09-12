@@ -31,6 +31,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['allresults'] = '所有结果';
 $string['basefile'] = '框架文件';
 $string['basefile_help'] = 'Moss通常会报告所有成对匹配的代码。 提供框架文件后，出现在框架文件中的代码会在匹配结果中被忽略。比如，教师为作业提供的基础代码就是一种典型的框架文件。您可以同时提供多个框架文件。框架文件能改善评判结果，但没有它，也未必不能获得有价值的信息。';
 $string['clicktoviewresults'] = '点击此处查看结果。';
@@ -88,6 +89,7 @@ $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@mos
 $string['nocmresults'] = '此活动没有抄袭记录';
 $string['nouserresults'] = '没有与{$a}有关的抄袭记录';
 $string['percentage'] = '相似率';
+$string['personalresults'] = '个人结果';
 $string['pluginname'] = 'Moss反抄袭';
 $string['resultlinktitle'] = '有至多{$a->percentage}%（{$a->linesmatched}行）的内容与其他{$a->count}名用户相似';
 $string['savedconfigsuccess'] = '配置保存成功';
