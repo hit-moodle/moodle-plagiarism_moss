@@ -73,28 +73,6 @@ require_login($course, true, $cm);
 
 $context = get_context_instance(CONTEXT_MODULE, $cmid);
 
-// confirm
-$result  = optional_param('result', 0, PARAM_INT);
-if ($result) {
-    require_sesskey();
-    require_capability('plagiarism/moss:confirm', $context);
-    $r = $DB->get_record('moss_results', array('id' => $result), 'moss, config, userid');
-    $r->confirmed = required_param('confirm', PARAM_BOOL);
-    $r->confirmer = $USER->id;
-    $r->timeconfirmed = time();
-    $results = $DB->get_records('moss_results', array('moss' => $r->moss, 'config' => $r->config, 'userid' => $r->userid), 'id');
-    foreach ($results as $o) {
-        $r->id = $o->id;
-        $DB->update_record('moss_results', $r);
-    }
-
-    moss_message_send($r);
-
-    if (optional_param('ajax', 0, PARAM_BOOL)) {
-        die;
-    }
-}
-
 if ($userid != $USER->id) {
     require_capability('plagiarism/moss:viewallresults', $context);
 }
@@ -115,6 +93,31 @@ if ($userid != 0) {
 }
 
 $output = $PAGE->get_renderer('plagiarism_moss');
+$output->moss = $moss;
+$output->cm = $cm;
+
+// confirm
+$result  = optional_param('result', 0, PARAM_INT);
+if ($result) {
+    require_sesskey();
+    require_capability('plagiarism/moss:confirm', $context);
+    $r = $DB->get_record('moss_results', array('id' => $result), 'moss, config, userid');
+    $r->confirmed = required_param('confirm', PARAM_BOOL);
+    $r->confirmer = $USER->id;
+    $r->timeconfirmed = time();
+    $results = $DB->get_records('moss_results', array('moss' => $r->moss, 'config' => $r->config, 'userid' => $r->userid), 'id');
+    foreach ($results as $o) {
+        $r->id = $o->id;
+        $DB->update_record('moss_results', $r);
+    }
+
+    moss_message_send($r);
+
+    if (optional_param('ajax', 0, PARAM_BOOL)) {
+        echo $output->confirm_button($r, true);
+        die;
+    }
+}
 
 $jsmodule = array(
     'name'     => 'plagiarism_moss',
@@ -124,13 +127,11 @@ $jsmodule = array(
         array('confirmmessage', 'plagiarism_moss')
     )
 );
-$PAGE->requires->js_init_call('M.plagiarism_moss.init', $output->get_confirm_htmls(), false, $jsmodule);
+$updating_html = $output->pix_icon('i/loading_small', get_string('updating', 'plagiarism_moss'));
+$PAGE->requires->js_init_call('M.plagiarism_moss.init', array($updating_html), false, $jsmodule);
 
 /// Output starts here
 echo $output->header();
-
-$output->moss = $moss;
-$output->cm = $cm;
 
 if ($userid) {
     $user = $DB->get_record('user', array('id' => $userid));

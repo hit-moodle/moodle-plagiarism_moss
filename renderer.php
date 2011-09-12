@@ -57,8 +57,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
         $this->confirm_htmls = array (
             $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss')),
-            $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss')),
-            $this->pix_icon('i/loading_small', get_string('updating', 'plagiarism_moss'), 'moodle', array('id' => 'TO_BE_FILLED')) // id will be filled by js
+            $this->pix_icon('i/completion-manual-y', get_string('confirmed', 'plagiarism_moss'))
         );
     }
 
@@ -279,7 +278,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     /**
      * return html of confirm/unconfirm button and grade button
      */
-    protected function confirm_button($result) {
+    function confirm_button($result, $ajax = false) {
         global $DB, $PAGE;
 
         if (!is_object($result)) { // $result is id
@@ -297,11 +296,11 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             $url->param('sesskey', sesskey());
             $url->param('result', $result->id);
             $url->param('confirm', !$result->confirmed);
-            $output = html_writer::link($url, $output, array('class' => 'confirmbutton', 'id' => "user$result->userid-config$result->config"));
+            $output = html_writer::link($url, $output, array('class' => 'confirmbutton'));
         }
 
         // Grade button
-        if ($this->can_grade) {
+        if ($result->confirmed && $this->can_grade) {
             $url = new moodle_url('/mod/assignment/submissions.php',
                 array(
                     'id' => $this->cm->id,
@@ -327,8 +326,12 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
             $output .= html_writer::link($url, ' ('.$grade.')', array('target' => '_blank', 'title' => get_string('grade')));
         }
-            
-        return $output;
+
+        if ($ajax) {
+            return $output;
+        } else {
+            return html_writer::tag('span', $output, array('id' => "user$result->userid-config$result->config"));
+        }
     }
 
     public function get_confirm_htmls() {
