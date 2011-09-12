@@ -62,6 +62,7 @@ $string['messageprovider:moss_updates'] = 'Moss反抄袭通知';
 $string['messageconfirmedhtml'] = '<p>您在“{$a->coursename}”中的“{$a->modulename}”里提交的文件被确认为“<em>抄袭</em>”。</p><p>访问<a href="{$a->link}">{$a->link}</a>了解更多细节。</p>';
 $string['messageconfirmedtext'] = '您在“{$a->coursename}”中的“{$a->modulename}”里提交的文件被确认为“抄袭”。
 访问 {$a->link} 了解更多细节。';
+$string['messagesubject'] = 'Moss反抄袭通知';
 $string['messageunconfirmedhtml'] = '<p>您在“{$a->coursename}”中的“{$a->modulename}”里提交的文件被确认为“<em>不是</em>”抄袭。</p><p>访问<a href="{$a->link}">{$a->link}</a>了解更多细节。</p>';
 $string['messageunconfirmedtext'] = '您在课程“{$a->coursename}”中的活动“{$a->modulename}”里提交的文件被确认为“不是”抄袭。
 访问 {$a->link} 了解更多细节。';
