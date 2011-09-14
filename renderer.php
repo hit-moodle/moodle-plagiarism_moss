@@ -43,6 +43,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     protected $can_viewunconfirmed;
     protected $context;
     protected $confirm_htmls;
+    protected $showidnumber;
     var $moss = null;
     var $cm = null;
 
@@ -54,6 +55,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $this->can_viewunconfirmed = has_capability('plagiarism/moss:viewunconfirmed', $this->context);
         $this->can_confirm = has_capability('plagiarism/moss:confirm', $this->context);
         $this->can_grade  = has_capability('mod/assignment:grade', $this->context);
+        $this->showidnumber = get_config('plagiarism_moss', 'showidnumber');
 
         $this->confirm_htmls = array (
             $this->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss')),
@@ -86,9 +88,12 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss'),
             get_string('percentage', 'plagiarism_moss'),
             get_string('matchedlines', 'plagiarism_moss'),
-            get_string('matchedusers', 'plagiarism_moss'),
-            get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss')
+            get_string('matchedusers', 'plagiarism_moss')
         );
+        if ($this->showidnumber) {
+            $table->head[] = get_string('idnumber');
+        }
+        $table->head[] = get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss');
 
         $configs = $DB->get_records('moss_configs', array('moss' => $this->moss->id));
         foreach ($configs as $config) {
@@ -126,6 +131,9 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 // other user
                 $other = $DB->get_record('user', array('id' => $match->other));
                 $cells[] = new html_table_cell($this->user($other));
+                if ($this->showidnumber) {
+                    $cells[] = new html_table_cell($other->idnumber);
+                }
                 $cells[] = new html_table_cell($this->confirm_button($match->pair));
 
                 if ($first_match) { // first row of the filepatterns
@@ -142,7 +150,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 }
 
                 if (empty($table->data)) { //first row
-                    $user_text = $this->user_picture($user).html_writer::empty_tag('br').fullname($user);
+                    $user_text = $this->user_picture($user).html_writer::empty_tag('br').fullname($user).html_writer::empty_tag('br').$user->idnumber;
                     $cell = new html_table_cell($user_text);
                     $rowcount = &$cell->rowspan; // assign it later
                     $rowcount = 0;
@@ -175,18 +183,25 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $currentgroup = groups_get_activity_group($this->cm, true);
         $output .= groups_print_activity_menu($this->cm, $CFG->wwwroot . '/plagiarism/moss/view.php?id=' . $this->cm->id, true);
 
+        /// Table header
+        $head = array();
+        $head[] = get_string('user').'1';
+        if ($this->showidnumber) {
+            $head[] = get_string('idnumber').'1';
+        }
+        $head[] = get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss');
+        $head[] = get_string('percentage', 'plagiarism_moss');
+        $head[] = get_string('matchedlines', 'plagiarism_moss');
+        $head[] = get_string('user').'2';
+        if ($this->showidnumber) {
+            $head[] = get_string('idnumber').'2';
+        }
+        $head[] = get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss');
+        $head[] = get_string('percentage', 'plagiarism_moss');
+        $head[] = get_string('matchedlines', 'plagiarism_moss');
+        $head[] = get_string('filepatterns', 'plagiarism_moss');
         $table = new html_table();
-        $table->head = array(
-            get_string('user').'1',
-            get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss'),
-            get_string('percentage', 'plagiarism_moss'),
-            get_string('matchedlines', 'plagiarism_moss'),
-            get_string('user').'2',
-            get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss'),
-            get_string('percentage', 'plagiarism_moss'),
-            get_string('matchedlines', 'plagiarism_moss'),
-            get_string('filepatterns', 'plagiarism_moss')
-        );
+        $table->head = $head;
 
         $configs = $DB->get_records('moss_configs', array('moss' => $this->moss->id));
 
@@ -345,6 +360,9 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         // user name
         $user = $DB->get_record('user', array('id' => $result->userid), 'id, firstname, lastname, idnumber');
         $cells[] = new html_table_cell($this->user($user));
+        if ($this->showidnumber) {
+            $cells[] = new html_table_cell($user->idnumber);
+        }
         $cells[] = new html_table_cell($this->confirm_button($result));
 
         // percentage and linesmatched

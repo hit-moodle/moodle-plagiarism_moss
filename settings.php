@@ -58,6 +58,10 @@ class moss_global_settings_form extends moodleform {
         $mform->addElement('select', 'defaultlanguage', get_string('defaultlanguage', 'plagiarism_moss'), $choices);
         $mform->disabledIf('defaultlanguage', 'mossenabled');
 
+        $mform->addElement('checkbox', 'showidnumber', get_string('showidnumber', 'plagiarism_moss'));
+        $mform->setDefault('showidnumber', false);
+        $mform->disabledIf('showidnumber', 'mossenabled');
+
         if ($CFG->ostype == 'WINDOWS') {
             $mform->addElement('text', 'cygwinpath', get_string('cygwinpath', 'plagiarism_moss'));
             $mform->setDefault('cygwinpath', 'C:\cygwin');
@@ -102,6 +106,7 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
         set_config('moss_use', $data->mossenabled, 'plagiarism');
         set_config('mossuserid', $data->mossuserid, 'plagiarism_moss');
         set_config('defaultlanguage', $data->defaultlanguage, 'plagiarism_moss');
+        set_config('showidnumber', $data->showidnumber, 'plagiarism_moss');
         if ($CFG->ostype == 'WINDOWS') {
             set_config('cygwinpath', $data->cygwinpath, 'plagiarism_moss');
         }
