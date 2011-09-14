@@ -300,7 +300,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         }
 
         // Grade button
-        if ($result->confirmed && $this->can_grade) {
+        if ($this->can_grade) {
             $url = new moodle_url('/mod/assignment/submissions.php',
                 array(
                     'id' => $this->cm->id,
