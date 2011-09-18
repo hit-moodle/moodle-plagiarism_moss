@@ -213,9 +213,9 @@ function moss_message_send($result) {
 }
 
 function moss_get_supported_languages() {
-    return array(
+    $langs = array(
         'ada'     => 'Ada',
-        'a8086'   => 'a8086 assembly',
+        'a8086'   => get_string('langa8086', 'plagiarism_moss'),
         'c'       => 'C',
         'cc'      => 'C++',
         'csharp'  => 'C#',
@@ -225,12 +225,12 @@ function moss_get_supported_languages() {
         'javascript' => 'Javascript',
         'lisp'    => 'Lisp',
         'matlab'  => 'Matlab',
-        'mips'    => 'MIPS assembly',
+        'mips'    => get_string('langmips', 'plagiarism_moss'),
         'ml'      => 'ML',
         'modula2' => 'Modula2',
         'pascal'  => 'Pascal',
         'perl'    => 'Perl',
-        'ascii'   => 'Plain text',
+        'ascii'   => get_string('langascii', 'plagiarism_moss'),
         'plsql'   => 'PLSQL',
         'prolog'  => 'Prolog',
         'python'  => 'Python',
@@ -238,6 +238,9 @@ function moss_get_supported_languages() {
         'spice'   => 'Spice',
         'vhdl'    => 'VHDL',
         'vb'      => 'Visual Basic');
+
+    textlib_get_instance()->asort($langs);
+    return $langs;
 }
 
 /**
