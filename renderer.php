@@ -200,6 +200,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $head[] = get_string('percentage', 'plagiarism_moss');
         $head[] = get_string('matchedlines', 'plagiarism_moss');
         $head[] = get_string('filepatterns', 'plagiarism_moss');
+        $head[] = get_string('deltatime', 'plagiarism_moss').$this->help_icon('deltatime', 'plagiarism_moss');
         $table = new html_table();
         $table->head = $head;
 
@@ -233,16 +234,21 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             $user2result->confirmer = $result->confirmer2;
             $user2result->timeconfirmed = $result->timeconfirmed2;
 
-            $user1cells = $this->fill_result_in_cells($result);
-            $user2cells = $this->fill_result_in_cells($user2result);
-
-            if (!is_enrolled($this->context, $result->userid)) {
-                $cells = array_merge($user2cells, $user1cells);
+            // The persons who submitted later are displayed in the left column
+            // since they are more likely to be copiers.
+            $delta = moss_get_submit_time($this->moss->cmid, $result->userid) - moss_get_submit_time($this->moss->cmid, $user2result->userid);
+            if ($delta >= 0) {
+                $user1cells = $this->fill_result_in_cells($result);
+                $user2cells = $this->fill_result_in_cells($user2result);
             } else {
-                $cells = array_merge($user1cells, $user2cells);
+                $delta = -$delta;
+                $user2cells = $this->fill_result_in_cells($result);
+                $user1cells = $this->fill_result_in_cells($user2result);
             }
 
+            $cells = array_merge($user1cells, $user2cells);
             $cells[] = $configs[$result->config]->filepatterns;
+            $cells[] = $delta != 0 ? format_time($delta) : get_string('numseconds', '', 0);
             $table->data[] = new html_table_row($cells);
         }
 

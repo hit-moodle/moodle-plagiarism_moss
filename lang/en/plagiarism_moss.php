@@ -49,6 +49,10 @@ $string['confirmed'] = 'Confirmed plagiarism';
 $string['confirmedresults'] = '{$a->fullname} has confirmed plagiarism records in <strong>{$a->total}</strong> activities.';
 $string['confirmmessage'] = 'Are you sure this is plagiarism?';
 $string['cygwinpath'] = 'Path to Cygwin installation';
+$string['deltatime'] = 'Delta time';
+$string['deltatime_help'] = 'How long the user 1 submitted later than the user 2.
+
+The user 1 is always the later one. In common, the person who submitted later is the copier and another person is the copiee. However, it is not always true.';
 $string['defaultlanguage'] = 'Default language';
 $string['disclosurehasmeasured']  ='All files submitted here has been measured by a plagiarism detection service at {$a->timemeasured}.';
 $string['disclosurenevermeasured']  ='All files submitted here will be measured by a plagiarism detection service.';

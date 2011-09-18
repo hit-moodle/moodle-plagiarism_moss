@@ -278,3 +278,28 @@ function moss_clean_cm($cmid) {
 
     return true;
 }
+
+/**
+ * Return the submit time
+ */
+function moss_get_submit_time($cmid, $userid) {
+    global $DB;
+
+    $fs = get_file_storage();
+    $context = get_system_context();
+    if ($userdir = $fs->get_file($context->id, 'plagiarism_moss', 'files', $cmid, "/$userid/", '.')) {
+        return $userdir->get_timemodified();
+    } else {
+        // lookup in cm with the same tag
+        $moss = $DB->get_record('moss', array('cmid' => $cmid), '*', MUST_EXIST);
+        $mosses = $DB->get_records_select('moss', 'tag = ? AND tag != 0', array($moss->tag));
+        foreach ($mosses as $moss) {
+            if ($userdir = $fs->get_file($context->id, 'plagiarism_moss', 'files', $moss->cmid, "/$userid/", '.')) {
+                return $userdir->get_timemodified();
+            }
+        }
+    }
+
+    // No records found.
+    return 0;
+}
