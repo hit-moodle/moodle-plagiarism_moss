@@ -131,7 +131,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 $cells[] = new html_table_cell($linesmatched);
 
                 // time submitted
-                $delta = moss_get_submit_time($this->moss->cmid, $match->other) - $user_timesubmitted;
+                $delta = $user_timesubmitted - moss_get_submit_time($this->moss->cmid, $match->other);
                 if ($delta > 0) {
                     $delta_text = get_string('late', 'assignment', format_time($delta));
                 } else if ($delta <0) {
