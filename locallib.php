@@ -264,13 +264,16 @@ function moss_clean_cm($cmid) {
         $DB->delete_records('moss_results', array('moss' => $moss->id));
 
         // clean up files
-        // if no tag setted, no need to keep the files for further detection
         if ($moss->tag == 0) {
+            // if no tag setted, no need to keep the files and moss record for further detection
             $fs = get_file_storage();
             $fs->delete_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $cmid);
+            $DB->delete_records('moss', array('cmid' => $cmid));
+        } else {
+            // Mark moss record related with a deleted cm as disabled
+            $moss->enabled = 0;
+            $DB->update_record('moss', $moss);
         }
-
-        $DB->delete_records('moss', array('cmid' => $cmid));
     }
 
     return true;
