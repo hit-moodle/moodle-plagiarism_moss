@@ -241,7 +241,6 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 $user1cells = $this->fill_result_in_cells($result);
                 $user2cells = $this->fill_result_in_cells($user2result);
             } else {
-                $delta = -$delta;
                 $user2cells = $this->fill_result_in_cells($result);
                 $user1cells = $this->fill_result_in_cells($user2result);
             }
