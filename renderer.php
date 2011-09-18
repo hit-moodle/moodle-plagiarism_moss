@@ -79,6 +79,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         global $DB;
 
         $output = $this->user_stats($user);
+        $user_timesubmitted = moss_get_submit_time($this->moss->cmid, $user->id);
 
         $table = new html_table();
 
@@ -88,6 +89,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss'),
             get_string('percentage', 'plagiarism_moss'),
             get_string('matchedlines', 'plagiarism_moss'),
+            get_string('timesubmitted', 'plagiarism_moss'),
             get_string('matchedusers', 'plagiarism_moss')
         );
         if ($this->showidnumber) {
@@ -127,6 +129,17 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 }
                 $cells[] = new html_table_cell($percentage);
                 $cells[] = new html_table_cell($linesmatched);
+
+                // time submitted
+                $delta = moss_get_submit_time($this->moss->cmid, $match->other) - $user_timesubmitted;
+                if ($delta > 0) {
+                    $delta_text = get_string('late', 'assignment', format_time($delta));
+                } else if ($delta <0) {
+                    $delta_text = get_string('early', 'assignment', format_time($delta));
+                } else {
+                    $delta_text = get_string('early', 'assignment', get_string('numseconds', '', 0));
+                }
+                $cells[] = new html_table_cell($delta_text);
 
                 // other user
                 $other = $DB->get_record('user', array('id' => $match->other));
