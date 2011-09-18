@@ -287,19 +287,33 @@ function moss_get_submit_time($cmid, $userid) {
 
     $fs = get_file_storage();
     $context = get_system_context();
-    if ($userdir = $fs->get_file($context->id, 'plagiarism_moss', 'files', $cmid, "/$userid/", '.')) {
-        return $userdir->get_timemodified();
+    $time = 0;
+    if ($files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'files', $cmid, "/$userid/")) {
+        // search for the latest submitted file
+        foreach ($files as $file) {
+            if ($file->get_timemodified() > $time) {
+                $time = $file->get_timemodified();
+            }
+        }
     } else {
         // lookup in cm with the same tag
         $moss = $DB->get_record('moss', array('cmid' => $cmid), '*', MUST_EXIST);
         $mosses = $DB->get_records_select('moss', 'tag = ? AND tag != 0', array($moss->tag));
         foreach ($mosses as $moss) {
-            if ($userdir = $fs->get_file($context->id, 'plagiarism_moss', 'files', $moss->cmid, "/$userid/", '.')) {
-                return $userdir->get_timemodified();
+            if ($files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'files', $moss->cmid, "/$userid/")) {
+                // search for the latest submitted file
+                foreach ($files as $file) {
+                    if ($file->get_timemodified() > $time) {
+                        $time = $file->get_timemodified();
+                    }
+                }
+            }
+            // Do not lookup other mosses any more if got one matched
+            if ($time > 0) {
+                break;
             }
         }
     }
 
-    // No records found.
-    return 0;
+    return $time;
 }
