@@ -31,6 +31,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['activityconfirmedresults'] = '本次活动共有{$a}人被确认为抄袭。';
 $string['allresults'] = '所有结果';
 $string['basefile'] = '框架文件';
 $string['basefile_help'] = 'Moss通常会报告所有成对匹配的代码。 提供框架文件后，出现在框架文件中的代码会在匹配结果中被忽略。比如，教师为作业提供的基础代码就是一种典型的框架文件。您可以同时提供多个框架文件。框架文件能改善评判结果，但没有它，也未必不能获得有价值的信息。';

@@ -31,6 +31,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['activityconfirmedresults'] = 'There are {$a} users are confirmed as plagiarim.';
 $string['allresults'] = 'All results';
 $string['basefile'] = 'Base file';
 $string['basefile_help'] = 'Moss normally reports all code that matches in pairs of files. When a base file is supplied, program code that also appears in the base file is not counted in matches. A typical base file will include, for example, the instructor-supplied code for an assignment. You can provide multiple base files here. Base files improve results, but are not usually necessary for obtaining useful information.';

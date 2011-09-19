@@ -75,6 +75,17 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         return $this->container(get_string('confirmedresults', 'plagiarism_moss', $a));
     }
 
+    function cm_stats() {
+        global $DB;
+
+        $sql = 'SELECT COUNT(DISTINCT userid)
+                FROM {moss_results}
+                WHERE moss = ? AND confirmed = 1';
+        $total = $DB->count_records_sql($sql, array($this->moss->id));
+
+        return $this->container(get_string('activityconfirmedresults', 'plagiarism_moss', $total));
+    }
+
     function user_result($user) {
         global $DB;
 
@@ -189,7 +200,8 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
      */
     function cm_result($from=0, $num=30) {
         global $DB, $CFG, $PAGE;
-        $output = '';
+
+        $output = $this->cm_stats();
 
         /// find out current groups mode
         $groupmode = groups_get_activity_groupmode($this->cm);
