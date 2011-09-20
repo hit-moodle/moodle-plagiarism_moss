@@ -153,6 +153,8 @@ class moss {
                 return false;
             }
 
+            mtrace(substr_count($out, 'done').' files are uploaded.');
+
             $url_p = '/http:\/\/moss\.stanford\.edu\/results\/\d+/';
             if (!preg_match($url_p, $out, $match)) {
                 mtrace($out);
