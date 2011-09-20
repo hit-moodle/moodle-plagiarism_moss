@@ -160,7 +160,9 @@ class moss {
                 return false;
             }
 
-            if (!$this->save_results($match[0], $configid)) {
+            $url = $match[0].'/'; // Some curl do not process 301. Add a tailing / to prevent 301 from moss
+
+            if (!$this->save_results($url, $configid)) {
                 return false;
             }
         }
