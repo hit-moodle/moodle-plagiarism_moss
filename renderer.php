@@ -98,7 +98,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             get_string('user'),
             get_string('filepatterns', 'plagiarism_moss'),
             get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss'),
-            get_string('timesubmitted', 'plagiarism_moss'),
+            get_string('deltatime', 'plagiarism_moss'),
             get_string('percentage', 'plagiarism_moss'),
             get_string('matchedlines', 'plagiarism_moss'),
             get_string('matchedusers', 'plagiarism_moss')
@@ -136,7 +136,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                 } else if ($delta <0) {
                     $delta_text = get_string('early', 'assignment', format_time($delta));
                 } else {
-                    $delta_text = get_string('early', 'assignment', get_string('numseconds', '', 0));
+                    $delta_text = get_string('numseconds', '', 0);
                 }
                 $cells[] = new html_table_cell($delta_text);
 
