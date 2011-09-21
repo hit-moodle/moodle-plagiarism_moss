@@ -261,22 +261,52 @@ function moss_clean_cm($cmid) {
         foreach ($results as $result) {
             $DB->delete_records('moss_matched_files', array('result' => $result->id));
         }
-        $DB->delete_records('moss_results', array('moss' => $moss->id));
 
-        // clean up files
+        // clean up files and results
         if ($moss->tag == 0) {
             // if no tag setted, no need to keep the files and moss record for further detection
             $fs = get_file_storage();
             $fs->delete_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $cmid);
             $DB->delete_records('moss', array('cmid' => $cmid));
+
+            // Clean results
+            $DB->delete_records('moss_results', array('moss' => $moss->id));
         } else {
-            // Mark moss record related with a deleted cm as disabled
+            moss_clean_noise($moss);
+
+            // Disable moss record related with a deleted cm
             $moss->enabled = 0;
             $DB->update_record('moss', $moss);
+
+            // Clean results
+            $DB->delete_records('moss_results', array('moss' => $moss->id));
         }
     }
 
     return true;
+}
+
+/**
+ * Remove confirmed files. They may be noise in further detection
+ */
+function moss_clean_noise($moss) {
+    global $DB;
+
+    $sql = 'SELECT DISTINCT userid
+            from {moss_results}
+            where moss = ? and confirmed = 1';
+    $confirmed_results = $DB->get_records_sql($sql, array($moss->id));
+    $fs = get_file_storage();
+    $context = get_system_context();
+    foreach ($confirmed_results as $result) {
+        $old_files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'files', $moss->cmid, "/$result->userid/", true, true);
+        foreach($old_files as $oldfile) {
+            $oldfile->delete();
+        }
+        if ($userdir = $fs->get_file($context->id, 'plagiarism_moss', 'files', $moss->cmid, "/$result->userid/", '.')) {
+            $userdir->delete();
+        }
+    }
 }
 
 /**
