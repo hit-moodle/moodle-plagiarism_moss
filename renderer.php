@@ -239,7 +239,6 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $head[] = get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss');
         $head[] = get_string('percentage', 'plagiarism_moss');
         $head[] = get_string('matchedlines', 'plagiarism_moss');
-        $head[] = get_string('filepatterns', 'plagiarism_moss');
         $head[] = get_string('deltatime', 'plagiarism_moss').$this->help_icon('deltatime', 'plagiarism_moss');
         $table = new html_table();
         $table->head = $head;
@@ -284,7 +283,6 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             }
 
             $cells = array_merge($user1cells, $user2cells);
-            $cells[] = $configs[$result->config]->filepatterns;
             $cells[] = $delta != 0 ? format_time($delta) : get_string('numseconds', '', 0);
             $table->data[] = new html_table_row($cells);
         }
