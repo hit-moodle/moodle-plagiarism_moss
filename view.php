@@ -38,6 +38,9 @@ require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
 $cmid = optional_param('id', 0, PARAM_INT);  // Course Module ID
 $mossid = optional_param('moss', 0, PARAM_INT);  // Moss ID
 $userid  = optional_param('user', 0, PARAM_INT);   // User ID
+$config = optional_param('config', 0, PARAM_INT);
+$from = optional_param('from', 0, PARAM_INT);
+$num = optional_param('num', 30, PARAM_INT);
 
 if ($cmid) {
     if (! $cm = get_coursemodule_from_id('', $cmid)) {
@@ -63,7 +66,7 @@ if ($cmid) {
     require_param('id', PARAM_INT);
 }
 
-$url = new moodle_url('/plagiarism/moss/view.php', array('id' => $cmid));
+$url = new moodle_url('/plagiarism/moss/view.php', array('id' => $cmid, 'config' => $config, 'from' => $from, 'num' => $num));
 if ($userid != 0) {
     $url->param('user', $userid);
 }
@@ -137,9 +140,6 @@ if ($userid) {
     $user = $DB->get_record('user', array('id' => $userid));
     echo $output->user_result($user);
 } else {
-    $config = optional_param('config', 0, PARAM_INT);
-    $from = optional_param('from', 0, PARAM_INT);
-    $num = optional_param('num', 30, PARAM_INT);
     echo $output->cm_result($config, $from, $num);
 }
 

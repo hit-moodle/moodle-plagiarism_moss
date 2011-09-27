@@ -221,7 +221,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         /// find out current groups mode
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm, true);
-        $output .= groups_print_activity_menu($this->cm, $PAGE->url, true);
+        $output .= groups_print_activity_menu($this->cm, clone($PAGE->url), true);
 
         /// Table header
         $head = array();
@@ -316,12 +316,11 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     }
 
     protected function user($user) {
-        global $PAGE, $COURSE, $USER;
+        global $COURSE, $USER;
 
         if (is_enrolled($this->context, $user)) {
             if ($user->id == $USER->id or has_capability('plagiarism/moss:viewallresults', $this->context)) {
-                $url = $PAGE->url;
-                $url->param('user', $user->id);
+                $url = new moodle_url('/plagiarism/moss/view.php', array('id' => $this->cm->id, 'user' => $user->id));
             } else {
                 $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $COURSE->id));
             }
