@@ -221,7 +221,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         /// find out current groups mode
         $groupmode = groups_get_activity_groupmode($this->cm);
         $currentgroup = groups_get_activity_group($this->cm, true);
-        $output .= groups_print_activity_menu($this->cm, $CFG->wwwroot . '/plagiarism/moss/view.php?id=' . $this->cm->id, true);
+        $output .= groups_print_activity_menu($this->cm, $PAGE->url, true);
 
         /// Table header
         $head = array();
