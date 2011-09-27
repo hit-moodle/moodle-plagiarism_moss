@@ -95,7 +95,7 @@ $string['mossuserid_help'] ='向<a href="mailto:moss@moss.stanford.edu">moss@mos
     $userid=1234567890;
 
 其中的数字就是您能的Moss账号。';
-$string['nocmresults'] = '此活动没有抄袭记录';
+$string['nocmresults'] = '没有抄袭记录';
 $string['nouserresults'] = '没有与{$a}有关的抄袭记录';
 $string['percentage'] = '相似率';
 $string['personalresults'] = '个人结果';

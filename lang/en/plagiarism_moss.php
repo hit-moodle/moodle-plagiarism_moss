@@ -95,7 +95,7 @@ After registration, you will get a reply mail which contains a perl script with 
     $userid=1234567890;
 
 The number is exactly your moss account.';
-$string['nocmresults'] = 'No plagiarism records in this activity';
+$string['nocmresults'] = 'No plagiarism records';
 $string['nouserresults'] = 'No plagiarism records related with {$a}';
 $string['percentage'] = 'Similarity';
 $string['personalresults'] = 'Personal results';

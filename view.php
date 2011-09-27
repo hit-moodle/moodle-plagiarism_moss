@@ -137,9 +137,10 @@ if ($userid) {
     $user = $DB->get_record('user', array('id' => $userid));
     echo $output->user_result($user);
 } else {
+    $config = optional_param('config', 0, PARAM_INT);
     $from = optional_param('from', 0, PARAM_INT);
     $num = optional_param('num', 30, PARAM_INT);
-    echo $output->cm_result($from, $num);
+    echo $output->cm_result($config, $from, $num);
 }
 
 echo $output->footer();
