@@ -203,6 +203,12 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
         $output = $this->cm_stats();
 
+        /// find out current groups mode
+        $groupmode = groups_get_activity_groupmode($this->cm);
+        $currentgroup = groups_get_activity_group($this->cm, true);
+        $output .= groups_print_activity_menu($this->cm, clone($PAGE->url), true);
+
+        /// Tabs
         $select = 'moss = ? AND filepatterns != \'\'';
         $configs = $DB->get_records_select('moss_configs', $select, array($this->moss->id));
         $current_config = reset($configs)->id;
@@ -217,11 +223,6 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
             }
             $output .= print_tabs(array($row), $current_config, NULL, NULL, true);
         }
-
-        /// find out current groups mode
-        $groupmode = groups_get_activity_groupmode($this->cm);
-        $currentgroup = groups_get_activity_group($this->cm, true);
-        $output .= groups_print_activity_menu($this->cm, clone($PAGE->url), true);
 
         /// Table header
         $head = array();
