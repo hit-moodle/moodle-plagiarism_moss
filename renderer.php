@@ -198,7 +198,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
     /**
      * List all results in a course module
      */
-    function cm_result($configid=0, $from=0, $num=30) {
+    function cm_result($tabid=0, $from=0, $num=30) {
         global $DB, $CFG, $PAGE;
 
         $output = $this->cm_stats();
@@ -211,18 +211,18 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         /// Tabs
         $select = 'moss = ? AND filepatterns != \'\'';
         $configs = $DB->get_records_select('moss_configs', $select, array($this->moss->id));
-        $current_config = reset($configs)->id;
-        if (count($configs) > 1) {
-            $row = array();
-            foreach ($configs as $conf) {
-                $link = new moodle_url('/plagiarism/moss/view.php', array('id' => $this->cm->id, 'config' => $conf->id));
-                $row[] = new tabobject($conf->id, $link, $conf->filepatterns, get_string('filepatterns', 'plagiarism_moss').' '.$conf->filepatterns);
-                if ($configid == $conf->id) {
-                    $current_config = $conf->id;
-                }
+        $current_config = $tabid == -1 ? $tabid : reset($configs)->id;  // -1 means confirmed only
+        $row = array();
+        foreach ($configs as $conf) {
+            $link = new moodle_url('/plagiarism/moss/view.php', array('id' => $this->cm->id, 'tab' => $conf->id));
+            $row[] = new tabobject($conf->id, $link, $conf->filepatterns, get_string('filepatterns', 'plagiarism_moss').' '.$conf->filepatterns);
+            if ($tabid == $conf->id) {
+                $current_config = $conf->id;
             }
-            $output .= print_tabs(array($row), $current_config, NULL, NULL, true);
         }
+        $link = new moodle_url('/plagiarism/moss/view.php', array('id' => $this->cm->id, 'tab' => -1));
+        $row[] = new tabobject(-1, $link, get_string('confirmed', 'plagiarism_moss'));
+        $output .= print_tabs(array($row), $current_config, NULL, NULL, true);
 
         /// Table header
         $head = array();
@@ -248,7 +248,11 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
                           r2.id AS id2, r2.userid AS userid2, r2.percentage AS percentage2, r2.linesmatched AS linesmatched2,
                           r2.confirmed AS confirmed2, r2.confirmer AS confirmer2, r2.timeconfirmed AS timeconfirmed2
                    FROM {moss_results} r1 LEFT JOIN {moss_results} r2 ON r1.pair = r2.id ';
-        $where = 'WHERE r1.moss = ? AND r1.userid < r2.userid AND r1.config = ?';
+        if ($tabid == -1) {
+            $where = 'WHERE r1.moss = ? AND r1.userid < r2.userid AND ( r1.confirmed = 1 or r2.confirmed = 1 )';
+        } else {
+            $where = 'WHERE r1.moss = ? AND r1.userid < r2.userid AND r1.config = ?';
+        }
         $orderby = 'ORDER BY r1.rank ASC';
         if ($currentgroup) {
             if ($users = groups_get_members($currentgroup, 'u.id', 'u.id')) {
