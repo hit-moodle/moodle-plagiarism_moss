@@ -248,11 +248,6 @@ class moss {
             PREG_SET_ORDER
         );
 
-        if (empty($matches)) {
-            mtrace("\tcan not parse $url");
-            return false;
-        }
-
         if (!isset($UNITTEST)) { // testcase can not construct course structure
             $context = get_context_instance(CONTEXT_COURSE, $this->moss->course);
         }
@@ -260,8 +255,10 @@ class moss {
         $filepatterns = $DB->get_field('moss_configs', 'filepatterns', array('id' => $configid));
         $filepatterns = explode(' ', $filepatterns);
         $fs = get_file_storage();
-        $rank = 1;
+        $rank = 0;
         foreach ($matches as $result) {
+            $rank++;
+
             $result['moss'] = $this->moss->id;
             $result['config'] = $configid;
             $result['rank'] = $rank + 1;
@@ -302,8 +299,6 @@ class moss {
                     }
                 }
             }
-
-            $rank++;
         }
 
         mtrace("\tGot $rank pairs");
