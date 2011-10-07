@@ -62,6 +62,12 @@ class moss_global_settings_form extends moodleform {
         $mform->setDefault('showidnumber', false);
         $mform->disabledIf('showidnumber', 'mossenabled');
 
+        $mform->addElement('text', 'maxfilesize', get_string('maxfilesize', 'plagiarism_moss'));
+        $mform->addHelpButton('maxfilesize', 'maxfilesize', 'plagiarism_moss');
+        $mform->setDefault('maxfilesize', MOSS_DEFAULT_MAXFILESIZE);
+        $mform->setType('maxfilesize', PARAM_INT);
+        $mform->disabledIf('maxfilesize', 'mossenabled');
+
         if ($CFG->ostype == 'WINDOWS') {
             $mform->addElement('text', 'cygwinpath', get_string('cygwinpath', 'plagiarism_moss'));
             $mform->setDefault('cygwinpath', 'C:\cygwin');
@@ -107,6 +113,7 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
         set_config('mossuserid', $data->mossuserid, 'plagiarism_moss');
         set_config('defaultlanguage', $data->defaultlanguage, 'plagiarism_moss');
         set_config('showidnumber', $data->showidnumber, 'plagiarism_moss');
+        set_config('maxfilesize', $data->maxfilesize, 'plagiarism_moss');
         if ($CFG->ostype == 'WINDOWS') {
             set_config('cygwinpath', $data->cygwinpath, 'plagiarism_moss');
         }

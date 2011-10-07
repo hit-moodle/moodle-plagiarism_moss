@@ -60,6 +60,14 @@ class moss {
         }
     }
 
+    protected function get_config($name) {
+        $value = get_config('plagiarism_moss', $name);
+        if ($value === false) {
+            mtrace("\t!!! WARNING !!! - global settings of moss may not proper.");
+        }
+        return $value;
+    }
+
     /**
      * Measure the current course module
      *
@@ -99,9 +107,13 @@ class moss {
             $moss = $this->moss;
         }
 
+        $sizelimit = $this->get_config('maxfilesize');
         $fs = get_file_storage();
         $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
         foreach ($files as $file) {
+            if ($file->get_filesize() > $sizelimit) {
+                continue;
+            }
             $path = $this->tempdir.$file->get_filepath();
             $fullpath = $path.$file->get_filename();
             if (!check_dir_exists($path)) {
@@ -190,7 +202,7 @@ class moss {
             }
 
             if ($CFG->ostype == 'WINDOWS') {
-                $cygwin = get_config('plagiarism_moss', 'cygwinpath');
+                $cygwin = $this->get_config('cygwinpath');
                 $perl = $cygwin.'\\bin\\perl.exe';
                 $mossscrpit = $CFG->dirroot.'\\plagiarism\\moss\\moss';
                 $cmd = str_replace(' ', '\\ ', $CFG->dirroot.'\\plagiarism\\moss\\moss.bat');
@@ -199,7 +211,7 @@ class moss {
                 $cmd = '"'.$CFG->dirroot.'/plagiarism/moss/moss'.'"';
             }
             $cmd .= ' -d';
-            $cmd .= ' -u '.get_config('plagiarism_moss', 'mossuserid');;
+            $cmd .= ' -u '.$this->get_config('mossuserid');;
             $cmd .= ' -l '.$setting->language;
             if (!empty($this->moss->sensitivity)) {
                 $cmd .= ' -m '.$this->moss->sensitivity;

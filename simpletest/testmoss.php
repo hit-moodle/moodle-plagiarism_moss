@@ -64,6 +64,7 @@ class plagiarism_moss_test extends UnitTestCase {
         $DB->get_manager()->install_one_table_from_xmldb_file($CFG->dirroot . '/lib/db/install.xml', 'config_plugins');
 
         set_config('mossuserid', 580031178, 'plagiarism_moss');
+        set_config('maxfilesize', MOSS_DEFAULT_MAXFILESIZE, 'plagiarism_moss');
         set_config('cygwinpath', 'C:\\cygwin', 'plagiarism_moss');
         set_config('moss_use', 1, 'plagiarism');
 

@@ -35,6 +35,8 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once($CFG->dirroot.'/plagiarism/moss/moss.php');
 
+define('MOSS_DEFAULT_MAXFILESIZE', 64 * 1024 * 1024);   // default max size of files to be submitted. I think 64K is big enough
+
 /**
  * Whether moss is enabled
  *

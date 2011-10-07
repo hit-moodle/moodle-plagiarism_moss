@@ -66,6 +66,8 @@ $string['langascii'] = '纯文本';
 $string['langmips'] = 'MIPS汇编';
 $string['matchedlines'] = '相似行数';
 $string['matchedusers'] = '相似用户';
+$string['maxfilesize'] = '文件大小上限(字节)';
+$string['maxfilesize_help'] = '所有大于此限制的文件都会被跳过检查。请设置一个合理的值来保护免费的Moss服务。';
 $string['messageprovider:moss_updates'] = 'Moss反抄袭通知';
 $string['messageconfirmedhtml'] = '<p>您在“{$a->coursename}”中的“{$a->modulename}”里提交的文件被确认为“<em>抄袭</em>”。</p><p>访问<a href="{$a->link}">{$a->link}</a>了解更多细节。</p>';
 $string['messageconfirmedtext'] = '您在“{$a->coursename}”中的“{$a->modulename}”里提交的文件被确认为“抄袭”。

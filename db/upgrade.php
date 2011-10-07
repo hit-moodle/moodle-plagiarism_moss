@@ -61,5 +61,11 @@ function xmldb_plagiarism_moss_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011071500, 'plagiarism', 'moss');
     }
 
+    if ($oldversion < 2011100700) {
+        set_config('maxfilesize', 64 * 1024 * 1024, 'plagiarism_moss');
+        // moss savepoint reached
+        upgrade_plugin_savepoint(true, 2011100700, 'plagiarism', 'moss');
+    }
+
     return true;
 }

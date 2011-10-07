@@ -66,6 +66,8 @@ $string['langascii'] = 'Plain text';
 $string['langmips'] = 'MIPS assembly';
 $string['matchedlines'] = 'Matched lines';
 $string['matchedusers'] = 'Matched users';
+$string['maxfilesize'] = 'File size limit in bytes';
+$string['maxfilesize_help'] = 'All files bigger than the limit will be skipped. Please keep it reasonable to protect the free moss service.';
 $string['messageprovider:moss_updates'] = 'Moss anti-plagiarism notifications';
 $string['messagesubject'] = 'Moss anti-plagiarism notification';
 $string['messageconfirmedhtml'] = '<p>Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as <em>plagiarism</em>. </p><p>Visit <a href="{$a->link}">{$a->link}</a> for details.</p>';
