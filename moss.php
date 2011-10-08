@@ -48,6 +48,7 @@ class moss {
             $this->moss->course = $DB->get_field('course_modules', 'course', array('id' => $this->moss->cmid));
         }
         $this->tempdir = $CFG->dataroot.'/temp/moss/'.$this->moss->id;
+        remove_dir($this->tempdir); // Perhaps it is not cleaned in previous run
         if ($CFG->ostype == 'WINDOWS') {
             // the tempdir will be passed to cygwin which require '/' path spliter
             $this->tempdir = str_replace('\\', '/', $this->tempdir);
