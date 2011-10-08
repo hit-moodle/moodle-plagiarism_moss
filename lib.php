@@ -79,12 +79,20 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     public function save_form_elements($data) {
         global $DB;
 
-        if (!moss_enabled() or !isset($data->enabled)) {
+        if (!moss_enabled()) {
             return;
         }
 
         $moss = new stdClass();
         $moss->enabled = empty($data->enabled) ? 0 : 1;
+        if (!$moss->enabled) {
+            if (isset($data->mossid)) { // disable it
+                $DB->set_field('moss', 'enabled', 0, array('id' => $data->mossid));
+            }
+            // disabled mosses keep old configs
+            return;
+        }
+
         $moss->timetomeasure = $data->timetomeasure;
         $moss->cmid = $data->coursemodule;
         $moss->sensitivity = $data->sensitivity;
@@ -109,11 +117,6 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $DB->update_record('moss', $moss);
         } else {
             $data->mossid = $DB->insert_record('moss', $moss);
-        }
-
-        if (!$moss->enabled) {
-            // disabled mosses keep old configs
-            return;
         }
 
         // sub configs
