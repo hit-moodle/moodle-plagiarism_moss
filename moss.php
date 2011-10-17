@@ -93,14 +93,12 @@ class moss {
 
         $this->extract_files();
 
-        if (!$this->call_moss()) {
-            return false;
-        }
+        $result = $this->call_moss();
 
         $this->moss->timemeasured = time();
         $DB->update_record('moss', $this->moss);
 
-        return true;
+        return $result;
     }
 
     protected function extract_files($moss = null) {
