@@ -280,6 +280,7 @@ while($i < $bindex)
 #   die "Base file $opt_b is not a text file. $noreq\n" unless -T "$opt_b[$i]";
    $i++;
 }
+$uploadable_file_count = 0;
 foreach $file (@ARGV)
 {
 # change 'die' to 'print' by sunner to skip some glob format filenames
@@ -287,10 +288,14 @@ foreach $file (@ARGV)
    print "File $file is not readable. $noreq\n" unless -r "$file";
 # comment out by sunner to allow non-ascii words
 #   die "File $file is not a text file. $noreq\n" unless -T "$file";
+   $uploadable_file_count++ if -r "$file";
 }
 
 if ("@ARGV" eq '') {
    die "No files submitted.\n $usage";
+}
+if ($uploadable_file_count eq 0) {
+   die "No files can be submitted.";
 }
 print "OK\n";
 
