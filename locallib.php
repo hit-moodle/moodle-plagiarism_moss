@@ -51,7 +51,7 @@ function moss_enabled($cmid = 0) {
     } else if ($cmid == 0) {
         return true;
     } else {
-        return $DB->get_field('moss', 'enabled', array('cmid' => $cmid));
+        return $DB->get_field('plagiarism_moss', 'enabled', array('cmid' => $cmid));
     }
 }
 
@@ -180,7 +180,7 @@ function moss_message_send($result) {
 
     $subject = get_string('messagesubject', 'plagiarism_moss');
 
-    $moss = $DB->get_record('moss', array('id' => $result->moss));
+    $moss = $DB->get_record('plagiarism_moss', array('id' => $result->moss));
     $moss->link = $CFG->wwwroot."/plagiarism/moss/view.php?id=$moss->cmid&user=$result->userid";
     $html = '';
     if ($result->confirmed) {
@@ -254,14 +254,14 @@ function moss_get_supported_languages() {
 function moss_clean_cm($cmid) {
     global $DB;
 
-    if ($moss = $DB->get_record('moss', array('cmid' => $cmid))) {
+    if ($moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid))) {
         // clean up configs
-        $DB->delete_records('moss_configs', array('moss' => $moss->id));
+        $DB->delete_records('plagiarism_moss_configs', array('moss' => $moss->id));
 
         // clean up results
-        $results = $DB->get_records('moss_results', array('moss' => $moss->id));
+        $results = $DB->get_records('plagiarism_moss_results', array('moss' => $moss->id));
         foreach ($results as $result) {
-            $DB->delete_records('moss_matched_files', array('result' => $result->id));
+            $DB->delete_records('plagiarism_moss_matchedfiles', array('result' => $result->id));
         }
 
         // clean up files and results
@@ -269,19 +269,19 @@ function moss_clean_cm($cmid) {
             // if no tag setted, no need to keep the files and moss record for further detection
             $fs = get_file_storage();
             $fs->delete_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $cmid);
-            $DB->delete_records('moss', array('cmid' => $cmid));
+            $DB->delete_records('plagiarism_moss', array('cmid' => $cmid));
 
             // Clean results
-            $DB->delete_records('moss_results', array('moss' => $moss->id));
+            $DB->delete_records('plagiarism_moss_results', array('moss' => $moss->id));
         } else {
             moss_clean_noise($moss);
 
             // Disable moss record related with a deleted cm
             $moss->enabled = 0;
-            $DB->update_record('moss', $moss);
+            $DB->update_record('plagiarism_moss', $moss);
 
             // Clean results
-            $DB->delete_records('moss_results', array('moss' => $moss->id));
+            $DB->delete_records('plagiarism_moss_results', array('moss' => $moss->id));
         }
     }
 
@@ -295,7 +295,7 @@ function moss_clean_noise($moss) {
     global $DB;
 
     $sql = 'SELECT DISTINCT userid
-            from {moss_results}
+            from {plagiarism_moss_results}
             where moss = ? and confirmed = 1';
     $confirmed_results = $DB->get_records_sql($sql, array($moss->id));
     $fs = get_file_storage();
@@ -329,8 +329,8 @@ function moss_get_submit_time($cmid, $userid) {
         }
     } else {
         // lookup in cm with the same tag
-        $moss = $DB->get_record('moss', array('cmid' => $cmid), '*', MUST_EXIST);
-        $mosses = $DB->get_records_select('moss', 'tag = ? AND tag != 0', array($moss->tag));
+        $moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid), '*', MUST_EXIST);
+        $mosses = $DB->get_records_select('plagiarism_moss', 'tag = ? AND tag != 0', array($moss->tag));
         foreach ($mosses as $moss) {
             if ($files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'files', $moss->cmid, "/$userid/")) {
                 // search for the latest submitted file

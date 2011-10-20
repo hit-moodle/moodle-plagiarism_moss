@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="plagiarism/moss/db" VERSION="20110715" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
+<XMLDB PATH="plagiarism/moss/db" VERSION="20111020" COMMENT="XMLDB file for Moodle plagiarism/moss plugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="moss" COMMENT="MOSS instances" NEXT="moss_configs">
+    <TABLE NAME="plagiarism_moss" COMMENT="MOSS instances" NEXT="plagiarism_moss_configs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="cmid"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="timetomeasure"/>
@@ -19,10 +19,10 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="cmid"/>
         <KEY NAME="cmid" TYPE="foreign-unique" FIELDS="cmid" REFTABLE="course_modules" REFFIELDS="id" PREVIOUS="primary" NEXT="tag"/>
-        <KEY NAME="tag" TYPE="foreign" FIELDS="tag" REFTABLE="moss_tags" REFFIELDS="id" PREVIOUS="cmid"/>
+        <KEY NAME="tag" TYPE="foreign" FIELDS="tag" REFTABLE="plagiarism_moss_tags" REFFIELDS="id" PREVIOUS="cmid"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="moss_configs" COMMENT="configs for different filename patterns" PREVIOUS="moss" NEXT="moss_tags">
+    <TABLE NAME="plagiarism_moss_configs" COMMENT="configs for different filename patterns" PREVIOUS="plagiarism_moss" NEXT="plagiarism_moss_tags">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="moss"/>
         <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="filepatterns"/>
@@ -31,10 +31,10 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="moss"/>
-        <KEY NAME="moss" TYPE="foreign" FIELDS="moss" REFTABLE="moss" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="moss" TYPE="foreign" FIELDS="moss" REFTABLE="plagiarism_moss" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="moss_tags" COMMENT="tags to identify assignments with same task" PREVIOUS="moss_configs" NEXT="moss_results">
+    <TABLE NAME="plagiarism_moss_tags" COMMENT="tags to identify assignments with same task" PREVIOUS="plagiarism_moss_configs" NEXT="plagiarism_moss_results">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="id"/>
@@ -44,7 +44,7 @@
         <KEY NAME="name" TYPE="unique" FIELDS="name" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="moss_results" COMMENT="place to store moss result" PREVIOUS="moss_tags" NEXT="moss_matched_files">
+    <TABLE NAME="plagiarism_moss_results" COMMENT="place to store moss result" PREVIOUS="plagiarism_moss_tags" NEXT="plagiarism_moss_matchedfiles">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="moss"/>
         <FIELD NAME="moss" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="config"/>
@@ -61,8 +61,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="moss"/>
-        <KEY NAME="moss" TYPE="foreign" FIELDS="moss" REFTABLE="moss" REFFIELDS="id" PREVIOUS="primary" NEXT="config"/>
-        <KEY NAME="config" TYPE="foreign" FIELDS="config" REFTABLE="moss_configs" REFFIELDS="id" PREVIOUS="moss" NEXT="userid"/>
+        <KEY NAME="moss" TYPE="foreign" FIELDS="moss" REFTABLE="plagiarism_moss" REFFIELDS="id" PREVIOUS="primary" NEXT="config"/>
+        <KEY NAME="config" TYPE="foreign" FIELDS="config" REFTABLE="plagiarism_moss_configs" REFFIELDS="id" PREVIOUS="moss" NEXT="userid"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="config" NEXT="confirmer"/>
         <KEY NAME="confirmer" TYPE="foreign" FIELDS="confirmer" REFTABLE="user" REFFIELDS="id" PREVIOUS="userid" NEXT="pair"/>
         <KEY NAME="pair" TYPE="unique" FIELDS="pair" PREVIOUS="confirmer"/>
@@ -71,7 +71,7 @@
         <INDEX NAME="rank" UNIQUE="false" FIELDS="rank"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="moss_matched_files" COMMENT="Files matched" PREVIOUS="moss_results">
+    <TABLE NAME="plagiarism_moss_matchedfiles" COMMENT="Files matched" PREVIOUS="plagiarism_moss_results">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="result"/>
         <FIELD NAME="result" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="contenthash"/>
@@ -79,7 +79,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="result"/>
-        <KEY NAME="result" TYPE="foreign" FIELDS="result" REFTABLE="moss_results" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="result" TYPE="foreign" FIELDS="result" REFTABLE="plagiarism_moss_results" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="contenthash" UNIQUE="false" FIELDS="contenthash"/>

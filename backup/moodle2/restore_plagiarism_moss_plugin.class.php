@@ -32,10 +32,10 @@ class restore_plagiarism_moss_plugin extends restore_plagiarism_plugin {
         global $DB;
         $data = (object)$data;
 
-        if ($existingtag = $DB->get_record('moss_tags', array('name' => $data->name))) {
+        if ($existingtag = $DB->get_record('plagiarism_moss_tags', array('name' => $data->name))) {
             $newid = $existingtag->id;
         } else {
-            $newid = $DB->insert_record('moss_tags', $data);
+            $newid = $DB->insert_record('plagiarism_moss_tags', $data);
         }
         $this->set_mapping('moss_tags', $data->id, $newid);
     }
@@ -50,7 +50,7 @@ class restore_plagiarism_moss_plugin extends restore_plagiarism_plugin {
         if ($data->tag != 0) {
             $data->tag = $this->get_mappingid('moss_tags', $data->tag);
         }
-        $newid = $DB->insert_record('moss', $data);
+        $newid = $DB->insert_record('plagiarism_moss', $data);
         $this->set_mapping('moss_moss', $data->id, $newid);
     }
 
@@ -59,7 +59,7 @@ class restore_plagiarism_moss_plugin extends restore_plagiarism_plugin {
         $data = (object)$data;
 
         $data->moss = $this->get_mappingid('moss_moss', $data->moss);
-        $DB->insert_record('moss_configs', $data);
+        $DB->insert_record('plagiarism_moss_configs', $data);
 
         $this->add_related_files('plagiarism_moss', 'basefiles', 'moss_configs', get_system_context()->id, $data->id);
     }

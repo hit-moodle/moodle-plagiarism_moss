@@ -54,7 +54,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         if (moss_enabled($cmid)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
 
-            $moss = $DB->get_record('moss', array('cmid' => $cmid), 'timetomeasure, timemeasured');
+            $moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid), 'timetomeasure, timemeasured');
             $a->timemeasured = userdate($moss->timemeasured);
             if ($moss->timemeasured == 0) {
                 $disclosure = get_string('disclosurenevermeasured', 'plagiarism_moss', $a);
@@ -87,7 +87,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $moss->enabled = empty($data->enabled) ? 0 : 1;
         if (!$moss->enabled) {
             if (isset($data->mossid)) { // disable it
-                $DB->set_field('moss', 'enabled', 0, array('id' => $data->mossid));
+                $DB->set_field('plagiarism_moss', 'enabled', 0, array('id' => $data->mossid));
             }
             // disabled mosses keep old configs
             return;
@@ -103,20 +103,20 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         if (empty($data->tag)) {
             $moss->tag = 0;
         } else {
-            if ($tagid = $DB->get_field('moss_tags', 'id', array('name' => $data->tag))) {
+            if ($tagid = $DB->get_field('plagiarism_moss_tags', 'id', array('name' => $data->tag))) {
                 $moss->tag = $tagid;
             } else {
                 $tag = new stdClass();
                 $tag->name = $data->tag;
-                $moss->tag = $DB->insert_record('moss_tags', $tag);
+                $moss->tag = $DB->insert_record('plagiarism_moss_tags', $tag);
             }
         }
 
         if (isset($data->mossid)) {
             $moss->id = $data->mossid;
-            $DB->update_record('moss', $moss);
+            $DB->update_record('plagiarism_moss', $moss);
         } else {
-            $data->mossid = $DB->insert_record('moss', $moss);
+            $data->mossid = $DB->insert_record('plagiarism_moss', $moss);
         }
 
         // sub configs
@@ -135,9 +135,9 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $member= 'configid'.$index;
             if (isset($data->$member)) {
                 $config->id = $data->$member;
-                $DB->update_record('moss_configs', $config);
+                $DB->update_record('plagiarism_moss_configs', $config);
             } else {
-                $config->id = $DB->insert_record('moss_configs', $config);
+                $config->id = $DB->insert_record('plagiarism_moss_configs', $config);
             }
 
             $context = get_system_context();
@@ -212,16 +212,16 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 
         // set config values
         $cmid = optional_param('update', 0, PARAM_INT); //there doesn't seem to be a way to obtain the current cm a better way - $this->_cm is not available here.
-        if ($cmid != 0 and $moss = $DB->get_record('moss', array('cmid'=>$cmid))) { // configed
+        if ($cmid != 0 and $moss = $DB->get_record('plagiarism_moss', array('cmid'=>$cmid))) { // configed
             $mform->setDefault('enabled', $moss->enabled);
             $mform->setDefault('timetomeasure', $moss->timetomeasure);
-            $mform->setDefault('tag', $DB->get_field('moss_tags', 'name', array('id' => $moss->tag)));
+            $mform->setDefault('tag', $DB->get_field('plagiarism_moss_tags', 'name', array('id' => $moss->tag)));
             if (!empty($moss->sensitivity)) {
                 $mform->setDefault('sensitivity', $moss->sensitivity);
             }
             $mform->addElement('hidden', 'mossid', $moss->id);
 
-            $subconfigs = $DB->get_records('moss_configs', array('moss'=>$moss->id));
+            $subconfigs = $DB->get_records('plagiarism_moss_configs', array('moss'=>$moss->id));
             $index = 0;
             foreach ($subconfigs as $subconfig) {
                 $mform->setDefault('filepatterns'.$index, $subconfig->filepatterns);
@@ -258,8 +258,8 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         }
 
         $sql = 'SELECT r.*
-                FROM {moss_results} r
-                LEFT JOIN {moss_matched_files} f ON r.id = f.result
+                FROM {plagiarism_moss_results} r
+                LEFT JOIN {plagiarism_moss_matchedfiles} f ON r.id = f.result
                 WHERE f.contenthash = :contenthash AND r.userid = :userid AND r.moss = :mossid ';
         if (!has_capability('plagiarism/moss:viewunconfirmed', get_context_instance(CONTEXT_MODULE, $linkarray['cmid']))) {
             $sql .= 'AND r.confirmed = 1 ';
@@ -268,7 +268,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $params = array(
             'userid'      => $linkarray['userid'],
             'contenthash' => $linkarray['file']->get_contenthash(),
-            'mossid'      => $DB->get_field('moss', 'id', array('cmid' => $linkarray['cmid']))
+            'mossid'      => $DB->get_field('plagiarism_moss', 'id', array('cmid' => $linkarray['cmid']))
         );
 
         $results = $DB->get_records_sql($sql, $params);
@@ -307,10 +307,10 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 
         // get mosses measure on specified time
         $select  = 'timetomeasure < ? AND timetomeasure > timemeasured AND enabled = 1 AND timetomeasure != 0';
-        $mosses = $DB->get_records_select('moss', $select, array(time()));
+        $mosses = $DB->get_records_select('plagiarism_moss', $select, array(time()));
 
         // get mosses measure on activity due date
-        $duemosses = $DB->get_records('moss', array('enabled' => 1, 'timetomeasure' => 0));
+        $duemosses = $DB->get_records('plagiarism_moss', array('enabled' => 1, 'timetomeasure' => 0));
         foreach ($duemosses as $moss) {
             if ($cm = get_coursemodule_from_id('', $moss->cmid)) {
                 switch ($cm->modname) {

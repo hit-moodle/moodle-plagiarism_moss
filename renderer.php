@@ -67,7 +67,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         global $DB;
 
         $sql = 'SELECT COUNT(DISTINCT moss)
-                FROM {moss_results}
+                FROM {plagiarism_moss_results}
                 WHERE userid = ? AND confirmed = 1';
         $a->total = $DB->count_records_sql($sql, array($user->id));
         $a->fullname = fullname($user);
@@ -79,7 +79,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         global $DB;
 
         $sql = 'SELECT COUNT(DISTINCT userid)
-                FROM {moss_results}
+                FROM {plagiarism_moss_results}
                 WHERE moss = ? AND confirmed = 1';
         $total = $DB->count_records_sql($sql, array($this->moss->id));
 
@@ -108,15 +108,15 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         }
         $table->head[] = get_string('confirm', 'plagiarism_moss').$this->help_icon('confirm', 'plagiarism_moss');
 
-        $configs = $DB->get_records('moss_configs', array('moss' => $this->moss->id));
+        $configs = $DB->get_records('plagiarism_moss_configs', array('moss' => $this->moss->id));
         foreach ($configs as $config) {
             if (empty($config->filepatterns)) {
                 continue;
             }
 
             $sql = 'SELECT r1.*, r2.userid AS other
-                FROM {moss_results} r1
-                LEFT JOIN {moss_results} r2 ON r1.pair = r2.id
+                FROM {plagiarism_moss_results} r1
+                LEFT JOIN {plagiarism_moss_results} r2 ON r1.pair = r2.id
                 WHERE r1.userid = ? AND r1.moss = ? AND r1.config = ? ';
             if (!$this->can_viewunconfirmed) {
                 $sql .= 'AND r1.confirmed = 1 ';
@@ -210,7 +210,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
 
         /// Tabs
         $select = 'moss = ? AND filepatterns != \'\'';
-        $configs = $DB->get_records_select('moss_configs', $select, array($this->moss->id));
+        $configs = $DB->get_records_select('plagiarism_moss_configs', $select, array($this->moss->id));
         $current_config = $tabid == -1 ? $tabid : reset($configs)->id;  // -1 means confirmed only
         $row = array();
         foreach ($configs as $conf) {
@@ -247,7 +247,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         $select = 'SELECT r1.*,
                           r2.id AS id2, r2.userid AS userid2, r2.percentage AS percentage2, r2.linesmatched AS linesmatched2,
                           r2.confirmed AS confirmed2, r2.confirmer AS confirmer2, r2.timeconfirmed AS timeconfirmed2
-                   FROM {moss_results} r1 LEFT JOIN {moss_results} r2 ON r1.pair = r2.id ';
+                   FROM {plagiarism_moss_results} r1 LEFT JOIN {plagiarism_moss_results} r2 ON r1.pair = r2.id ';
         if ($tabid == -1) {
             $where = 'WHERE r1.moss = ? AND r1.userid < r2.userid AND ( r1.confirmed = 1 or r2.confirmed = 1 )';
         } else {
@@ -342,7 +342,7 @@ class plagiarism_moss_renderer extends plugin_renderer_base {
         global $DB, $PAGE;
 
         if (!is_object($result)) { // $result is id
-            $result = $DB->get_record('moss_results', array('id' => $result), '*', MUST_EXIST);
+            $result = $DB->get_record('plagiarism_moss_results', array('id' => $result), '*', MUST_EXIST);
         }
 
         if (!is_enrolled($this->context, $result->userid)) { // show nothing for unenrolled users

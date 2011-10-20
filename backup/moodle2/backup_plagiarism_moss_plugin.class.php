@@ -24,7 +24,7 @@ class backup_plagiarism_moss_plugin extends backup_plagiarism_plugin {
         $pluginwrapper->add_child($tags);
         $tags->add_child($tag);
         $sql = 'SELECT t.*
-                FROM {moss_tags} t
+                FROM {plagiarism_moss_tags} t
                 LEFT JOIN {moss} m 
                     ON m.tag = t.id
                 WHERE m.cmid = ?
@@ -35,13 +35,13 @@ class backup_plagiarism_moss_plugin extends backup_plagiarism_plugin {
         $moss = new backup_nested_element('moss', array('id'), array('cmid', 'timetomeasure', 'timemeasured', 'tag', 'sensitivity', 'enabled', 'coursename', 'modulename'));
         $pluginwrapper->add_child($mosses);
         $mosses->add_child($moss);
-        $moss->set_source_table('moss', array('cmid' => backup::VAR_PARENTID));
+        $moss->set_source_table('plagiarism_moss', array('cmid' => backup::VAR_PARENTID));
 
         $configs = new backup_nested_element('configs');
         $config = new backup_nested_element('config', array('id'), array('moss', 'filepatterns', 'language'));
         $moss->add_child($configs);
         $configs->add_child($config);
-        $config->set_source_table('moss_configs', array('moss' => backup::VAR_PARENTID));
+        $config->set_source_table('plagiarism_moss_configs', array('moss' => backup::VAR_PARENTID));
 
         $config->annotate_files('plagiarism_moss', 'basefiles', 'id');
 

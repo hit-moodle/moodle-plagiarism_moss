@@ -49,7 +49,7 @@ class plagiarism_moss_test extends UnitTestCase {
         $DB = new $dbclass();
         $DB->connect($CFG->dbhost, $CFG->dbuser, $CFG->dbpass, $CFG->dbname, $CFG->unittestprefix);
 
-        if ($DB->get_manager()->table_exists('moss')) {
+        if ($DB->get_manager()->table_exists('plagiarism_moss')) {
             $DB->get_manager()->delete_tables_from_xmldb_file($CFG->dirroot . '/plagiarism/moss/db/install.xml');
         }
         $DB->get_manager()->install_from_xmldb_file($CFG->dirroot . '/plagiarism/moss/db/install.xml');
@@ -81,10 +81,10 @@ class plagiarism_moss_test extends UnitTestCase {
             array('name' => 'test4')
         );
         foreach ($tags as $tag) {
-            $DB->insert_record('moss_tags', $tag);
+            $DB->insert_record('plagiarism_moss_tags', $tag);
         }
         foreach ($mosses as $moss) {
-            $DB->insert_record('moss', $moss);
+            $DB->insert_record('plagiarism_moss', $moss);
         }
     }
 
@@ -162,7 +162,7 @@ class plagiarism_moss_test extends UnitTestCase {
         global $DB;
         $moss = $cmid; // Yes, they should be same
         $DB->insert_record(
-            'moss_configs',
+            'plagiarism_moss_configs',
             array(
                 'moss' => $moss,
                 'filepatterns' => $filepatterns,
@@ -174,7 +174,7 @@ class plagiarism_moss_test extends UnitTestCase {
     function trigger($cmid, $events) {
         global $DB;
 
-        $DB->set_field('moss', 'enabled', 1, array('cmid' => $cmid));
+        $DB->set_field('plagiarism_moss', 'enabled', 1, array('cmid' => $cmid));
         foreach ($events as $event) {
             moss_event_file_uploaded($event);
         }

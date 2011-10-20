@@ -67,5 +67,36 @@ function xmldb_plagiarism_moss_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2011100700, 'plagiarism', 'moss');
     }
 
+    if ($oldversion < 2011102000) {
+
+        // Define table moss to be renamed to plagiarism_moss
+        $table = new xmldb_table('moss');
+        // Launch rename table for moss
+        $dbman->rename_table($table, 'plagiarism_moss');
+
+        // Define table moss_configs to be renamed to plagiarism_moss_configs
+        $table = new xmldb_table('moss_configs');
+        // Launch rename table for moss_configs
+        $dbman->rename_table($table, 'plagiarism_moss_configs');
+
+        // Define table moss_tags to be renamed to plagiarism_moss_tags
+        $table = new xmldb_table('moss_tags');
+        // Launch rename table for moss_tags
+        $dbman->rename_table($table, 'plagiarism_moss_tags');
+
+        // Define table moss_results to be renamed to plagiarism_moss_results
+        $table = new xmldb_table('moss_results');
+        // Launch rename table for moss_results
+        $dbman->rename_table($table, 'plagiarism_moss_results');
+
+        // Define table plagiarism_moss_matchedfiles to be renamed to plagiarism_moss_matchedfiles
+        $table = new xmldb_table('moss_matched_files');
+        // Launch rename table for moss_matched_files
+        $dbman->rename_table($table, 'plagiarism_moss_matchedfiles');
+
+        // moss savepoint reached
+        upgrade_plugin_savepoint(true, 2011102000, 'plagiarism', 'moss');
+    }
+
     return true;
 }

@@ -46,14 +46,14 @@ if ($cmid) {
     if (! $cm = get_coursemodule_from_id('', $cmid)) {
         print_error('invalidcoursemodule');
     }
-    if (! $moss = $DB->get_record("moss", array('cmid'=>$cmid))) {
+    if (! $moss = $DB->get_record("plagiarism_moss", array('cmid'=>$cmid))) {
         print_error('unsupportedmodule', 'plagiarism_moss');
     }
     if (! $course = $DB->get_record("course", array("id"=>$cm->course))) {
         print_error('coursemisconf', 'assignment');
     }
 } else if ($moss) {
-    if (! $moss = $DB->get_record("moss", array('cmid'=>$cmid))) {
+    if (! $moss = $DB->get_record("plagiarism_moss", array('cmid'=>$cmid))) {
         print_error('unsupportedmodule', 'plagiarism_moss');
     }
     if (! $cm = get_coursemodule_from_id('', $moss->cmid)) {
@@ -104,14 +104,14 @@ $result  = optional_param('result', 0, PARAM_INT);
 if ($result) {
     require_sesskey();
     require_capability('plagiarism/moss:confirm', $context);
-    $r = $DB->get_record('moss_results', array('id' => $result), 'moss, config, userid');
+    $r = $DB->get_record('plagiarism_moss_results', array('id' => $result), 'moss, config, userid');
     $r->confirmed = required_param('confirm', PARAM_BOOL);
     $r->confirmer = $USER->id;
     $r->timeconfirmed = time();
-    $results = $DB->get_records('moss_results', array('moss' => $r->moss, 'config' => $r->config, 'userid' => $r->userid), 'id');
+    $results = $DB->get_records('plagiarism_moss_results', array('moss' => $r->moss, 'config' => $r->config, 'userid' => $r->userid), 'id');
     foreach ($results as $o) {
         $r->id = $o->id;
-        $DB->update_record('moss_results', $r);
+        $DB->update_record('plagiarism_moss_results', $r);
     }
 
     moss_message_send($r);

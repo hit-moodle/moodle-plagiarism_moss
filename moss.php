@@ -43,7 +43,7 @@ class moss {
 
     public function __construct($cmid) {
         global $CFG, $DB, $UNITTEST;
-        $this->moss = $DB->get_record('moss', array('cmid' => $cmid));
+        $this->moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid));
         if (!isset($UNITTEST)) { // testcase can not construct course structure
             $this->moss->course = $DB->get_field('course_modules', 'course', array('id' => $this->moss->cmid));
         }
@@ -81,7 +81,7 @@ class moss {
             return false;
         }
 
-        $mosses = $DB->get_records_select('moss', 'tag = ? AND tag != 0', array($this->moss->tag));
+        $mosses = $DB->get_records_select('plagiarism_moss', 'tag = ? AND tag != 0', array($this->moss->tag));
         foreach ($mosses as $moss) {
             if ($moss->cmid == $this->moss->cmid) {
                 // current moss must be extracted lastly
@@ -96,7 +96,7 @@ class moss {
         $result = $this->call_moss();
 
         $this->moss->timemeasured = time();
-        $DB->update_record('moss', $this->moss);
+        $DB->update_record('plagiarism_moss', $this->moss);
 
         return $result;
     }
@@ -190,7 +190,7 @@ class moss {
     protected function get_commands() {
         global $CFG, $DB;
 
-        $settings = $DB->get_records('moss_configs', array('moss' => $this->moss->id));
+        $settings = $DB->get_records('plagiarism_moss_configs', array('moss' => $this->moss->id));
         $fs = get_file_storage();
         $context = get_system_context();
         $cmds = array();
@@ -263,7 +263,7 @@ class moss {
             $context = get_context_instance(CONTEXT_COURSE, $this->moss->course);
         }
 
-        $filepatterns = $DB->get_field('moss_configs', 'filepatterns', array('id' => $configid));
+        $filepatterns = $DB->get_field('plagiarism_moss_configs', 'filepatterns', array('id' => $configid));
         $filepatterns = explode(' ', $filepatterns);
         $fs = get_file_storage();
         $rank = 0;
@@ -287,13 +287,13 @@ class moss {
                 }
             }
 
-            $result1->id = $DB->insert_record('moss_results', $result1);
+            $result1->id = $DB->insert_record('plagiarism_moss_results', $result1);
             $result2->pair = $result1->id;
-            $result2->id = $DB->insert_record('moss_results', $result2);
+            $result2->id = $DB->insert_record('plagiarism_moss_results', $result2);
             $result1->pair = $result2->id;
-            $DB->update_record('moss_results', $result1);
+            $DB->update_record('plagiarism_moss_results', $result1);
 
-            // update moss_matched_files db
+            // update moss_matchedfiles db
             for ($i=1; $i<=2; $i++) {
                 $userid = eval('return $result'.$i.'->userid;');
                 $resultid = eval('return $result'.$i.'->id;');
@@ -305,7 +305,7 @@ class moss {
                             $obj = new stdClass();
                             $obj->result = $resultid;
                             $obj->contenthash = $file->get_contenthash();
-                            $DB->insert_record('moss_matched_files', $obj);
+                            $DB->insert_record('plagiarism_moss_matchedfiles', $obj);
                         }
                     }
                 }
@@ -323,13 +323,13 @@ class moss {
     protected function clean_results() {
         global $DB;
 
-        $sql = 'DELETE FROM {moss_matched_files}
+        $sql = 'DELETE FROM {plagiarism_moss_matchedfiles}
                 WHERE result in (
-                    SELECT id FROM {moss_results}
+                    SELECT id FROM {plagiarism_moss_results}
                     WHERE moss = ?
                 )';
         $DB->execute($sql, array($this->moss->id));
-        $DB->delete_records('moss_results', array('moss' => $this->moss->id));
+        $DB->delete_records('plagiarism_moss_results', array('moss' => $this->moss->id));
         //TODO: remove cached pages
     }
 }
