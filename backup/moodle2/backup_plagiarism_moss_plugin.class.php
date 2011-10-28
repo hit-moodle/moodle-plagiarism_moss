@@ -25,7 +25,7 @@ class backup_plagiarism_moss_plugin extends backup_plagiarism_plugin {
         $tags->add_child($tag);
         $sql = 'SELECT t.*
                 FROM {plagiarism_moss_tags} t
-                LEFT JOIN {moss} m 
+                LEFT JOIN {plagiarism_moss} m
                     ON m.tag = t.id
                 WHERE m.cmid = ?
         ';
