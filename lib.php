@@ -37,6 +37,7 @@ require_once($CFG->dirroot.'/plagiarism/lib.php');
 require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
 
 define('MOSS_MAX_PATTERNS', 3);
+define('MOSS_DEFAULT_SENSITIVITY', 50);
 
 /**
  * plagiarism_plugin_moss inherit from plagiarism_plugin class, this is the most important class in plagiarism plugin,
@@ -239,6 +240,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $mform->setDefault('enabled', 0);
             $mform->setDefault('tag', '');
             $mform->setDefault('filepatterns0', '*');
+            $mform->setDefault('sensitivity', MOSS_DEFAULT_SENSITIVITY);
             // leave other subconfig empty
         }
     }
