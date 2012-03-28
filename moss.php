@@ -107,19 +107,32 @@ class moss {
         }
 
         $sizelimit = $this->get_config('maxfilesize');
+        $localewincharset = get_string('localewincharset', 'langconfig');
+
         $fs = get_file_storage();
         $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
         foreach ($files as $file) {
             if ($file->get_filesize() > $sizelimit) {
                 continue;
             }
+
+            $content = $file->get_content();
+            if (!mb_check_encoding($content, 'UTF-8')) {
+                if (mb_check_encoding($content, $localewincharset)) {
+                    // Convert content charset to UTF-8
+                    $content = textlib_get_instance()->convert($content, $localewincharset);
+                } else {
+                    // Unknown charset, possible binary file. Skip it
+                    mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
+                    continue;
+                }
+            }
+
             $path = $this->tempdir.$file->get_filepath();
             $fullpath = $path.$file->get_filename();
             if (!check_dir_exists($path)) {
                 throw new moodle_exception('errorcreatingdirectory', '', '', $path);
             }
-            // Convert content charset to UTF-8 if necessary
-            $content = mb_convert_encoding($file->get_content(), 'UTF-8', 'UTF-8, '.get_string('localewincharset', 'langconfig'));
             file_put_contents($fullpath, $content);
         }
     }
