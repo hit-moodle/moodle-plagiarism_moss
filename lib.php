@@ -305,6 +305,15 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 
         mtrace('---Moss begins---');
 
+        $this->measure_all();
+
+        mtrace('---Moss done---');
+    }
+
+    /**
+     * Measure all moss instances that should be measured
+     */
+    protected function measure_all() {
         // get mosses measure on specified time
         $select  = 'timetomeasure < ? AND timetomeasure > timemeasured AND enabled = 1 AND timetomeasure != 0';
         $mosses = $DB->get_records_select('plagiarism_moss', $select, array(time()));
@@ -333,7 +342,6 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $moss_obj = new moss($moss->cmid);
             $moss_obj->measure();
         }
-        mtrace('---Moss done---');
     }
 }
 
