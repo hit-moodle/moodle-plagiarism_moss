@@ -277,6 +277,8 @@ function moss_clean_cm($cmid) {
             moss_clean_noise($moss);
 
             // Disable moss record related with a deleted cm
+            // The record will be reserved for further reference by other mosses
+            // with the same tags
             $moss->enabled = 0;
             $DB->update_record('plagiarism_moss', $moss);
 
