@@ -119,10 +119,7 @@ class moss {
 			
 			$filen = $file->get_filename();
 			$file_type = substr($filen,strlen($filen)-4,4);
-			
-			$path = $this->tempdir.$file->get_filepath();
-            $fullpath = $path.$file->get_filename();
-			
+		
 			$temp_file = $this->tempdir.'A.tmp';
 			
 			file_put_contents($temp_file,$file->get_content());
