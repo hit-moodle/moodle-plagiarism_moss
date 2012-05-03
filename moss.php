@@ -33,6 +33,7 @@
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
+require_once($CFG->dirroot.'/plagiarism/moss/textlib.php');
 
 /**
  * moss script interface
@@ -111,29 +112,61 @@ class moss {
 
         $fs = get_file_storage();
         $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
-        foreach ($files as $file) {
-            if ($file->get_filesize() > $sizelimit) {
+        foreach ($files as $file) 
+		{
+            if ($file->get_filesize() > $sizelimit) 
+			{
                 continue;
             }
-
-            $content = $file->get_content();
-            if (!mb_check_encoding($content, 'UTF-8')) {
-                if (mb_check_encoding($content, $localewincharset)) {
-                    // Convert content charset to UTF-8
-                    $content = textlib_get_instance()->convert($content, $localewincharset);
-                } else {
-                    // Unknown charset, possible binary file. Skip it
-                    mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
-                    continue;
-                }
-            }
-
+			
+			$filen = $file->get_filename();
+			$file_type = substr($filen,strlen($filen)-4,4);
+			
+			$path = $this->tempdir.$file->get_filepath();
+            $fullpath = $path.$file->get_filename();
+			
+			echo $filt_type;
+			
+			if (strcasecmp($file_type,'.pdf') == 0)
+			{
+				$content = pdf2text_content($file->get_content());
+			}
+			else if (strcasecmp($file_type,'.doc') == 0)
+			{
+				$content = doc2text_content($file->get_content());
+			}
+			else if (strcasecmp($file_type,'docx') == 0)
+			{
+				$content = getTextFromZippedXML($fullpath,'./word/document.xml');
+			}
+			else
+			{
+				$content = $file->get_content();
+				if (!mb_check_encoding($content, 'UTF-8')) 
+				{
+					if (mb_check_encoding($content, $localewincharset)) 
+					{
+						// Convert content charset to UTF-8
+						$content = textlib_get_instance()->convert($content, $localewincharset);
+					} 
+					else 
+					{
+						// Unknown charset, possible binary file. Skip it
+						mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
+						continue;
+					}
+				}
+			}
+			
             $path = $this->tempdir.$file->get_filepath();
             $fullpath = $path.$file->get_filename();
-            if (!check_dir_exists($path)) {
+            
+			if (!check_dir_exists($path)) 
+			{
                 throw new moodle_exception('errorcreatingdirectory', '', '', $path);
             }
-            file_put_contents($fullpath, $content);
+            
+			file_put_contents($fullpath, $content);
         }
     }
 
@@ -180,6 +213,9 @@ class moss {
             mtrace(substr_count($out, 'done').' files are uploaded.');
 
             $url_p = '/http:\/\/moss\.stanford\.edu\/results\/\d+/';
+			
+			echo $url_p;
+			
             if (!preg_match($url_p, $out, $match)) {
                 mtrace($out);
                 mtrace($err);

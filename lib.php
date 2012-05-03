@@ -301,14 +301,40 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
      * Hook for cron
      */
     public function cron() {
+        global $DB;
+
         mtrace('---Moss begins---');
 
-        moss_clean_noise();
-        moss_measure_all();
+        // get mosses measure on specified time
+        $select  = 'timetomeasure < ? AND timetomeasure > timemeasured AND enabled = 1 AND timetomeasure != 0';
+        $mosses = $DB->get_records_select('plagiarism_moss', $select, array(time()));
 
+        // get mosses measure on activity due date
+        $duemosses = $DB->get_records('plagiarism_moss', array('enabled' => 1, 'timetomeasure' => 0));
+        foreach ($duemosses as $moss) {
+            if ($cm = get_coursemodule_from_id('', $moss->cmid)) {
+                switch ($cm->modname) {
+                case 'assignment':
+                    $duedate = $DB->get_field('assignment', 'timedue', array('id' => $cm->instance));
+                }
+                if (!empty($duedate)) {
+                    if ($moss->timemeasured < $duedate and $duedate < time()) {
+                        // it should be measured
+                        $mosses[] = $moss;
+                    }
+                }
+            }
+        }
+
+        mtrace("\tFound ".count($mosses)." moss instances to measure");
+
+        foreach ($mosses as $moss) {
+            mtrace("\tMeasure $moss->modulename ($moss->cmid) in $moss->coursename");
+            $moss_obj = new moss($moss->cmid);
+            $moss_obj->measure();
+        }
         mtrace('---Moss done---');
     }
-
 }
 
 /**

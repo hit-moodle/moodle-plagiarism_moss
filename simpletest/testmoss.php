@@ -38,12 +38,13 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 
 // Make sure the code being tested is accessible.
 require_once($CFG->dirroot . '/plagiarism/moss/lib.php');
+require_once($CFG->dirroot . '/plagiarism/moss/textlib.php');
 
 /** This class contains the test cases for the functions in judegelib.php. */
 class plagiarism_moss_test extends UnitTestCase {
 	function setUp() {
         global $DB, $CFG;
-
+		
         $this->realDB = $DB;
         $dbclass = get_class($this->realDB);
         $DB = new $dbclass();
@@ -89,11 +90,13 @@ class plagiarism_moss_test extends UnitTestCase {
     }
 
 	function tearDown() {
+		
 		global $DB, $CFG;
         $DB = $this->realDB;
 	}
 
 	function test_onefile() {
+		
         $events = array(
             array('userid' => 1, 'cmid' => 1),
             array('userid' => 2, 'cmid' => 1),
@@ -173,7 +176,7 @@ class plagiarism_moss_test extends UnitTestCase {
 
     function trigger($cmid, $events) {
         global $DB;
-
+		
         $DB->set_field('plagiarism_moss', 'enabled', 1, array('cmid' => $cmid));
         foreach ($events as $event) {
             moss_event_file_uploaded($event);
