@@ -277,8 +277,6 @@ function moss_clean_cm($cmid) {
             moss_clean_noise($moss);
 
             // Disable moss record related with a deleted cm
-            // The record will be reserved for further reference by other mosses
-            // with the same tags
             $moss->enabled = 0;
             $DB->update_record('plagiarism_moss', $moss);
 
@@ -291,45 +289,24 @@ function moss_clean_cm($cmid) {
 }
 
 /**
- * Remove noise files.
- *
- * Noise files were uploaded by unenrolled users and confirmed as plagiarism.
- * They may be noise in further detection
- *
- * @param object $moss  null means all moss instance
+ * Remove confirmed files. They may be noise in further detection
  */
-function moss_clean_noise($moss = null) {
+function moss_clean_noise($moss) {
     global $DB;
 
-    $mosses = array();
-    if (empty($moss)) {
-        $mosses = $DB->get_records('plagiarism_moss');
-    } else {
-        $mosses[] = $moss;
-    }
-
-    foreach ($mosses as $moss) {
-        $sql = 'SELECT DISTINCT userid
+    $sql = 'SELECT DISTINCT userid
             from {plagiarism_moss_results}
             where moss = ? and confirmed = 1';
-        if (! $confirmed_results = $DB->get_records_sql($sql, array($moss->id))) {
-            continue;
+    $confirmed_results = $DB->get_records_sql($sql, array($moss->id));
+    $fs = get_file_storage();
+    $context = get_system_context();
+    foreach ($confirmed_results as $result) {
+        $old_files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'files', $moss->cmid, "/$result->userid/", true, true);
+        foreach($old_files as $oldfile) {
+            $oldfile->delete();
         }
-
-        $fs = get_file_storage();
-        $systemcontext = get_system_context();
-        $cmcontext = get_context_instance(CONTEXT_MODULE, $moss->cmid);
-
-        foreach ($confirmed_results as $result) {
-            if (!is_enrolled($cmcontext, $result->userid)) {
-                $old_files = $fs->get_directory_files($systemcontext->id, 'plagiarism_moss', 'files', $moss->cmid, "/$result->userid/", true, true);
-                foreach($old_files as $oldfile) {
-                    $oldfile->delete();
-                }
-                if ($userdir = $fs->get_file($systemcontext->id, 'plagiarism_moss', 'files', $moss->cmid, "/$result->userid/", '.')) {
-                    $userdir->delete();
-                }
-            }
+        if ($userdir = $fs->get_file($context->id, 'plagiarism_moss', 'files', $moss->cmid, "/$result->userid/", '.')) {
+            $userdir->delete();
         }
     }
 }
@@ -372,40 +349,3 @@ function moss_get_submit_time($cmid, $userid) {
 
     return $time;
 }
-
-/**
- * Measure all moss instances that should be measured
- */
-function moss_measure_all() {
-    global $DB;
-
-    // get mosses measure on specified time
-    $select  = 'timetomeasure < ? AND timetomeasure > timemeasured AND enabled = 1 AND timetomeasure != 0';
-    $mosses = $DB->get_records_select('plagiarism_moss', $select, array(time()));
-
-    // get mosses measure on activity due date
-    $duemosses = $DB->get_records('plagiarism_moss', array('enabled' => 1, 'timetomeasure' => 0));
-    foreach ($duemosses as $moss) {
-        if ($cm = get_coursemodule_from_id('', $moss->cmid)) {
-            switch ($cm->modname) {
-            case 'assignment':
-                $duedate = $DB->get_field('assignment', 'timedue', array('id' => $cm->instance));
-            }
-            if (!empty($duedate)) {
-                if ($moss->timemeasured < $duedate and $duedate < time()) {
-                    // it should be measured
-                    $mosses[] = $moss;
-                }
-            }
-        }
-    }
-
-    mtrace("\tFound ".count($mosses)." moss instances to measure");
-
-    foreach ($mosses as $moss) {
-        mtrace("\tMeasure $moss->modulename ($moss->cmid) in $moss->coursename");
-        $moss_obj = new moss($moss->cmid);
-        $moss_obj->measure();
-    }
-}
-
