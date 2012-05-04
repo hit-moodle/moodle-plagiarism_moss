@@ -33,6 +33,7 @@
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
+require_once($CFG->dirroot.'/plagiarism/moss/textlib.php');
 
 /**
  * moss script interface
@@ -112,11 +113,37 @@ class moss {
         $fs = get_file_storage();
         $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
         foreach ($files as $file) {
+
             if ($file->get_filesize() > $sizelimit) {
                 continue;
             }
-
-            $content = $file->get_content();
+            
+            $filen = $file->get_filename();
+            $file_type = substr($filen, strlen($filen)-4, 4);
+                    
+            $file_type = strtolower($file_type);
+            
+            if (strcmp($file_type, '.pdf') == 0){
+                $content = pdf2text_content($file->get_content());
+            }else if (strcmp($file_type, '.rtf') == 0){
+                $temp_file = $this->tempdir.'A.tmp';
+                file_put_contents($temp_file, $file->get_content());
+                $content = rtf2text($temp_file);
+            }else if (strcmp($file_type, '.odt') == 0){
+                $temp_file = $this->tempdir.'A.tmp';
+                file_put_contents($temp_file, $file->get_content());
+                $content = odt2text($temp_file);
+            }else if (strcmp($file_type, '.doc') == 0){
+                $content = doc2text_content($file->get_content());
+                html_entity_decode($content,null,'UTF-8');
+            }else if (strcmp($file_type, 'docx') == 0){
+                 $temp_file = $this->tempdir.'A.tmp';
+                file_put_contents($temp_file, $file->get_content());
+                $content = docx2text($temp_file);
+            }else{
+                $content = $file->get_content();
+            }
+            
             if (!mb_check_encoding($content, 'UTF-8')) {
                 if (mb_check_encoding($content, $localewincharset)) {
                     // Convert content charset to UTF-8
@@ -130,18 +157,20 @@ class moss {
 
             $path = $this->tempdir.$file->get_filepath();
             $fullpath = $path.$file->get_filename();
+            
             if (!check_dir_exists($path)) {
                 throw new moodle_exception('errorcreatingdirectory', '', '', $path);
             }
+            
             file_put_contents($fullpath, $content);
         }
     }
 
-	/**
-	 * this function will call moss script and save anti-plagiarism results
+    /**
+     * this function will call moss script and save anti-plagiarism results
      *
      * @return sucessful true or failed false
-	 */
+     */
     protected function call_moss() {
         global $CFG, $DB;
 
