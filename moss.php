@@ -108,10 +108,10 @@ class moss {
         }
 
         $sizelimit = $this->get_config('maxfilesize');
-        $localewincharset = get_string('localewincharset',  'langconfig');
+        $localewincharset = get_string('localewincharset', 'langconfig');
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files(get_system_context()->id,  'plagiarism_moss',  'files',  $moss->cmid,  'sortorder',  false);
+        $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
         foreach ($files as $file) {
 
             if ($file->get_filesize() > $sizelimit) {
@@ -149,12 +149,12 @@ class moss {
                     // Convert content charset to UTF-8
                     $content = textlib_get_instance()->convert($content, $localewincharset);
                 } else {
-                    // Unknown charset,  possible binary file. Skip it
+                    // Unknown charset, possible binary file. Skip it
                     mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
                     continue;
                 }
             }
-                
+
             $path = $this->tempdir.$file->get_filepath();
             $fullpath = $path.$file->get_filename();
             
