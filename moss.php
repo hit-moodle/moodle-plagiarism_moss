@@ -144,12 +144,11 @@ class moss {
                 $content = $file->get_content();
             }
             
-            if (!mb_check_encoding($content,  'UTF-8')) {
-                if (mb_check_encoding($content,  $localewincharset)) {
+            if (!mb_check_encoding($content, 'UTF-8')) {
+                if (mb_check_encoding($content, $localewincharset)) {
                     // Convert content charset to UTF-8
-                    $content = textlib_get_instance()->convert($content,  $localewincharset);
-                } 
-                else {
+                    $content = textlib_get_instance()->convert($content, $localewincharset);
+                } else {
                     // Unknown charset,  possible binary file. Skip it
                     mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
                     continue;
@@ -160,10 +159,10 @@ class moss {
             $fullpath = $path.$file->get_filename();
             
             if (!check_dir_exists($path)) {
-                throw new moodle_exception('errorcreatingdirectory',  '',  '',  $path);
+                throw new moodle_exception('errorcreatingdirectory', '', '', $path);
             }
             
-            file_put_contents($fullpath,  $content);
+            file_put_contents($fullpath, $content);
         }
     }
 
