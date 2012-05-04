@@ -582,6 +582,59 @@ function pdf2text($filename) {
     return getTextUsingTransformations($texts, $transformations);
 }
 
+function pdf2text_content($filename) 
+{
+    // Read from the pdf file into string keeping in mind that file may contain binary streams
+    $infile = $filename;
+	
+    if (empty($infile))
+        return "";
+
+    // First iteration. We need to get all the text data from file.
+    // We'll get only "raw" data after the firs iteration. These data will include positioning, 
+    // hex entries, etc.
+    $transformations = array();
+    $texts = array();
+
+    // Get list of all files from pdf file.
+    preg_match_all("#obj(.*)endobj#ismU", $infile, $objects);
+    $objects = @$objects[1];
+
+    // Let start the crawling. Apart fromthe text we can meet some other stuff including fonts.
+    for ($i = 0; $i < count($objects); $i++) {
+        $currentObject = $objects[$i];
+
+        // Check if there is data stream in the current object. 
+        // Almost all the time it will be compressed with gzip.
+        if (preg_match("#stream(.*)endstream#ismU", $currentObject, $stream)) {
+            $stream = ltrim($stream[1]);
+
+            // Read the attributes of this object. We are looking only 
+            // for text, so we have to do minimal cuts to improve the speed
+            $options = getObjectOptions($currentObject);
+            if (!(empty($options["Length1"]) && empty($options["Type"]) && empty($options["Subtype"])))
+                continue;
+
+            // So, we "may" have text in from of us. Lets decode it from binary file to get the plain text.
+            $data = getDecodedStream($stream, $options); 
+            if (strlen($data)) {
+                // We need to find text container in the current stream. 
+                // If we will be able to get it the raw text we found will be added to the previous findings. 
+                if (preg_match_all("#BT(.*)ET#ismU", $data, $textContainers)) {
+                    $textContainers = @$textContainers[1];
+                    getDirtyTexts($texts, $textContainers);
+                // Otherwise we'll try to use symbol transformations that we gonna use on the 2nd step.
+                } else
+                    getCharTransformations($transformations, $data);
+            }
+        }
+    }
+
+    // After the preliminary parsing of  pdf-document we need to parse 
+    // the text blocks we got in the context of simbolic transformations. Return the result after we done.
+    return getTextUsingTransformations($texts, $transformations);
+}
+
 // Reading WCBFF
 // Version 0.2
 // Author: 均抖快抗扼快抄 妓快技忌我扮 a.k.a Ramon
@@ -1155,6 +1208,12 @@ class doc extends cfb {
 function doc2text($filename) {
     $doc = new doc;
     $doc->read($filename);
+    return $doc->parse();
+}
+
+function doc2text_content($filename) {
+    $doc = new doc;
+    $doc->read_content($filename);
     return $doc->parse();
 }
 
