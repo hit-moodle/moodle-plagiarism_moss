@@ -33,6 +33,7 @@
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
 require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
+require_once($CFG->dirroot.'/plagiarism/moss/textlib.php');
 
 /**
  * moss script interface
@@ -116,7 +117,27 @@ class moss {
                 continue;
             }
 
-            $content = $file->get_content();
+            $temp_file = $this->tempdir.'/tmp.tmp';
+
+            $filen = $file->get_filename();
+            $file_type = strtolower(substr($filen, strlen($filen)-4, 4));
+            $file->copy_content_to($temp_file);
+
+            if (strcmp($file_type, '.pdf') == 0) {
+                $content = pdf2text($temp_file);
+            } else if (strcmp($file_type, '.rtf') == 0) {
+                $content = rtf2text($temp_file);
+            } else if (strcmp($file_type, '.odt') == 0) {
+                $content =  getTextFromZippedXML($temp_file,'content.xml');
+            } else if (strcmp($file_type, '.doc') == 0) {
+                $content = doc2text($temp_file);
+                html_entity_decode($content,null,'UTF-8');
+            } else if (strcmp($file_type, 'docx') == 0) {
+                $content = getTextFromZippedXML($temp_file,'word/document.xml');
+            } else {
+                $content = $file->get_content();
+            }
+            
             if (!mb_check_encoding($content, 'UTF-8')) {
                 if (mb_check_encoding($content, $localewincharset)) {
                     // Convert content charset to UTF-8
