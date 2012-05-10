@@ -56,6 +56,7 @@ class moss_global_settings_form extends moodleform {
 
         $choices = moss_get_supported_languages();
         $mform->addElement('select', 'defaultlanguage', get_string('defaultlanguage', 'plagiarism_moss'), $choices);
+        $mform->setDefault('defaultlanguage', 'ascii');
         $mform->disabledIf('defaultlanguage', 'mossenabled');
 
         $mform->addElement('checkbox', 'showidnumber', get_string('showidnumber', 'plagiarism_moss'));
