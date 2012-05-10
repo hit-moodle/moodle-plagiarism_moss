@@ -54,15 +54,15 @@ $string['deltatime'] = 'Delta time';
 $string['deltatime_help'] = 'How long the user 1 submitted later than the user 2.
 
 The user 1 is always the later one. In common, the person who submitted later is the copier and another person is the copiee. However, it is not always true.';
-$string['defaultlanguage'] = 'Default language';
+$string['defaultlanguage'] = 'Default content type';
 $string['disclosurehasmeasured']  ='All files submitted here has been measured by a plagiarism detection service at {$a->timemeasured}.';
 $string['disclosurenevermeasured']  ='All files submitted here will be measured by a plagiarism detection service.';
 $string['err_cygwinpath']  ='Bad Cygwin path or perl for Cygwin is not installed';
 $string['filepatterns'] = 'Filename patterns';
 $string['filepatterns_help'] = 'Glob format. E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
-$string['language'] = 'Programming language';
+$string['language'] = 'Submission content type';
 $string['langa8086'] = 'a8086 assembly';
-$string['langascii'] = 'Plain text';
+$string['langascii'] = 'Text';
 $string['langmips'] = 'MIPS assembly';
 $string['matchedlines'] = 'Matched lines';
 $string['matchedusers'] = 'Matched users';
@@ -77,7 +77,7 @@ $string['messageunconfirmedhtml'] = '<p>Your submissions of {$a->modulename} in 
 $string['messageunconfirmedtext'] = 'Your submissions of {$a->modulename} in {$a->coursename} have been confirmed as NOT plagiarism.
 Visit {$a->link} for details.';
 $string['moss'] = 'Moss anti-plagiarism';
-$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of programs and other plain text files.
+$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (for a Measure Of Software Similarity) is an automatic system for determining the similarity of source code and plain text. It supports all kinds of source code files as well as pdf, doc, docx, rtf and odt documents.
 
 Notice: only the files submitted when moss is enabled will be checked.';
 $string['moss:confirm'] = 'Confirm plagiarism';

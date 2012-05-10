@@ -54,15 +54,15 @@ $string['deltatime'] = '时间差';
 $string['deltatime_help'] = '用户1比用户2晚提交多长时间。
 
 用户1永远是晚提交的用户。通常情况，晚提交的是抄袭者，而先提交的是被抄袭者。当然，这不是绝对的。';
-$string['defaultlanguage'] = '缺省语言';
+$string['defaultlanguage'] = '缺省文件内容种类';
 $string['disclosurehasmeasured']  ='已于{$a->timemeasured}对所有上传的文件进行了抄袭检测。';
 $string['disclosurenevermeasured']  ='所有上传于此的文件都将被进行抄袭检测。';
 $string['err_cygwinpath']  ='错误的Cygwin路径，或Cygwin中未安装perl';
 $string['filepatterns'] = '文件名通配符';
 $string['filepatterns_help'] = 'Glob格式。例如：\*.c，hello.\*，a?c.java。用空格分隔多个通配符。留空表示禁用此条配置。';
-$string['language'] = '编程语言';
+$string['language'] = '文件内容种类';
 $string['langa8086'] = 'a8086汇编';
-$string['langascii'] = '纯文本';
+$string['langascii'] = '文字';
 $string['langmips'] = 'MIPS汇编';
 $string['matchedlines'] = '相似行数';
 $string['matchedusers'] = '相似用户';
@@ -77,7 +77,7 @@ $string['messageunconfirmedhtml'] = '<p>您在“{$a->coursename}”中的“{$a
 $string['messageunconfirmedtext'] = '您在课程“{$a->coursename}”中的活动“{$a->modulename}”里提交的文件被确认为“不是”抄袭。
 访问 {$a->link} 了解更多细节。';
 $string['moss'] = 'Moss反抄袭';
-$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个自动检测源代码等纯文本文件的相似度的系统。
+$string['moss_help'] = '<a href="http://theory.stanford.edu/~aiken/moss/">Moss</a> (Measure Of Software Similarity) 是一个自动检测源代码等纯文本的相似度的系统。支持各种源代码文件和 pdf、doc、docx、rtf 和 odt 文档。
 
 注意，只有在moss启用时提交的文件才会被检测。';
 $string['moss:confirm'] = '确认抄袭行为';
