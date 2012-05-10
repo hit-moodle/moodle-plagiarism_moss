@@ -179,8 +179,8 @@ function rtf2text($filename) {
 }// end rtf2text
 
 // Reading text from PDF
-// ß£ß÷ß‚ß„ß⁄ßÒ 0.3
-// Author: ß°ß›ß÷ß‹ß„ß÷ß€ ß≤ß÷ßﬁß“ß⁄ßÍ a.k.a Ramon
+// –í–µ—Ä—Å–∏—è 0.3
+// Author: –ê–ª–µ–∫—Å–µ–π –†–µ–º–±–∏—à a.k.a Ramon
 // E-mail: alex@rembish.ru
 // Copyright 2009
 // Partial translation by Sergey
@@ -389,7 +389,7 @@ function getCharTransformations(&$transformations, $stream) {
     // OR
     // - <0000> <0002> [<abcd> <01234567> <8900>] -> here it works in a bit different way. We need to look how
     //   many elemants are located between  <0000> and <0002> (its actually three including 0001). After it we assign to each element 
-    //   a corresponding value from [ ]: 0000 -> abcd, 0001 -> 0123 4567, ß— 0002 -> 8900.
+    //   a corresponding value from [ ]: 0000 -> abcd, 0001 -> 0123 4567, –∞ 0002 -> 8900.
     for ($j = 0; $j < count($ranges); $j++) {
         // We need to cross check the number of elements for transofrmation.
         $count = $ranges[$j][1];
@@ -575,12 +575,12 @@ function pdf2text($filename) {
 
 // Reading WCBFF
 // Version 0.2
-// Author: ß°ß›ß÷ß‹ß„ß÷ß€ ß≤ß÷ßﬁß“ß⁄ßÍ a.k.a Ramon
+// Author: –ê–ª–µ–∫—Å–µ–π –†–µ–º–±–∏—à a.k.a Ramon
 // E-mail: alex@rembish.ru
 // Copyright 2009
 
 // so my little firends, below you can see class that works with WCBFF (Windows Compound Binary File Format). 
-// Why do we need it? This format serves as a basement for such "delicious" formats as .doc, .xls ß⁄ .ppt. 
+// Why do we need it? This format serves as a basement for such "delicious" formats as .doc, .xls –∏ .ppt. 
 // Lets see how it looks like
 class cfb {
     // We gonna read the content of the file we need to decode into this variable.
@@ -611,7 +611,7 @@ class cfb {
     // The number of FAT sectors in the file
     private $cFAT = 0;
 
-    // The number of miniFAT-sectors and position of sequences of miniFAT-ß„sectors in the file
+    // The number of miniFAT-sectors and position of sequences of miniFAT-—Åsectors in the file
     private $cMiniFAT = 0;
     private $fMiniFAT = 0;
 
@@ -657,7 +657,7 @@ class cfb {
         // Remove the unnecessary link to DIFAT-sectors, we have "stolen" complete FAT sequences instead of them.
         unset($this->DIFAT);
 
-        // After all this we should be able to work with any of the "upper" formats from Microsoft such as doc, xls ß⁄ß›ß⁄ ppt.
+        // After all this we should be able to work with any of the "upper" formats from Microsoft such as doc, xls –∏–ª–∏ ppt.
     }
 
     // Function that looks for stream number in the directory structure by its name. 
@@ -925,8 +925,8 @@ class cfb {
                     $skip = true; 
                 else { 
                     continue; 
-                    // ß£ ß·ß‚ß‡ß‰ß⁄ß”ßﬂß‡ßﬁ ß„ß›ßÂßÈß—ß÷ ß·ß‚ß‡ß”ß÷ß‚ßÒß÷ßﬁ ß„ß⁄ßﬁß”ß‡ß›ßÌ ßﬂß— ß”ßﬂß÷ß’ß‚ß◊ßﬂßﬂßÌß÷ ß‹ß‡ßﬁß—ßﬂß’ßÌ (ß„ß·ß⁄ß„ß‡ß‹ ßﬁß‡ßÿßﬂß‡ 
-                    // ß’ß‡ß·ß‡ß›ßﬂß⁄ß‰ßÓ ß⁄ ß·ß‡ß·ß‡ß›ßﬂß⁄ß‰ßÓ). 
+                    // –í –ø—Ä–æ—Ç–∏–≤–Ω–æ–º —Å–ª—É—á–∞–µ –ø—Ä–æ–≤–µ—Ä—è–µ–º —Å–∏–º–≤–æ–ª—ã –Ω–∞ –≤–Ω–µ–¥—Ä—ë–Ω–Ω—ã–µ –∫–æ–º–∞–Ω–¥—ã (—Å–ø–∏—Å–æ–∫ –º–æ–∂–Ω–æ 
+                    // –¥–æ–ø–æ–ª–Ω–∏—Ç—å –∏ –ø–æ–ø–æ–ª–Ω–∏—Ç—å). 
                     switch (ord($cd[0])) { 
                         case 0x0D: case 0x07: $out .= "\n"; break; 
                         case 0x08: case 0x01: $out .= ""; break; 
@@ -936,7 +936,7 @@ class cfb {
                         default: $out .= " "; break; 
                     } 
                 } 
-            } else { // ß™ßﬂß—ßÈß÷ ß·ß‚ß÷ß‡ß“ß‚ß—ßŸß‡ß”ßÌß”ß—ß÷ßﬁ ß” HTML entity 
+            } else { // –ò–Ω–∞—á–µ –ø—Ä–µ–æ–±—Ä–∞–∑–æ–≤—ã–≤–∞–µ–º –≤ HTML entity 
                 if (ord($cd[1]) == 0x13) { 
                     echo "@"; 
                     $skip = true; 
@@ -976,8 +976,8 @@ class cfb {
     }
 } 
 // Reading text from DOC
-// ß£ß÷ß‚ß„ß⁄ßÒ 0.4
-// Author: ß°ß›ß÷ß‹ß„ß÷ß€ ß≤ß÷ßﬁß“ß⁄ßÍ a.k.a Ramon
+// –í–µ—Ä—Å–∏—è 0.4
+// Author: –ê–ª–µ–∫—Å–µ–π –†–µ–º–±–∏—à a.k.a Ramon
 // E-mail: 				
 // Copyright 2009
 // Comments translated by Sergey Butakov
@@ -1033,7 +1033,7 @@ class doc extends cfb {
 
         // And read the stream to a variable
         $tStream = $this->getStreamById($tStreamID);
-        // ß±ß‡ß‰ß‡ßﬁ ßﬂß—ßÁß‡ß’ß⁄ßﬁ ß” ß·ß‡ß‰ß‡ß‹ß÷ CLX
+        // –ü–æ—Ç–æ–º –Ω–∞—Ö–æ–¥–∏–º –≤ –ø–æ—Ç–æ–∫–µ CLX
         $clx = substr($tStream, $fcClx, $lcbClx);
 
         // Now we need to go through  CLX (yes... its complex) looking for piece with offsets and sizes of text pieces
@@ -1042,12 +1042,12 @@ class doc extends cfb {
 
         // Well... this is the most exciting part. There is not too much of documentation on the web site about  
         // what can be found before  pieceTable in the  CLX. So we will do the total search looking 
-        // for the possible beginning of pieceTable (it must start with  0ßÁ02), and read the following 4 bytes
+        // for the possible beginning of pieceTable (it must start with  0—Ö02), and read the following 4 bytes
         // - size of pieceTable. If the actual size equial to size writtent in the offset then Bingo! we found pieceTable. 
         // If not continue the search.
 
         $from = 0;
-        // Looking for  0ßÁ02 in CLX starting from the current offset
+        // Looking for  0—Ö02 in CLX starting from the current offset
         while (($i = strpos($clx, chr(0x02), $from)) !== false) {
             // Get the pieceTable size
             $lcbPieceTable = $this->getLong($i + 1, $clx);
@@ -1146,7 +1146,7 @@ function doc2text($filename) {
 
 // Reading text from PPT
 // Version 0.3
-// Auhtor: ß°ß›ß÷ß‹ß„ß÷ß€ ß≤ß÷ßﬁß“ß⁄ßÍ a.k.a Ramon
+// Auhtor: –ê–ª–µ–∫—Å–µ–π –†–µ–º–±–∏—à a.k.a Ramon
 // E-mail: alex@rembish.ru
 // Copyright 2009
 // Comments translated by Sergey
