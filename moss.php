@@ -44,12 +44,18 @@ class moss {
 
     public function __construct($cmid) {
         global $CFG, $DB, $UNITTEST;
+
         $this->moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid));
         if (!isset($UNITTEST)) { // testcase can not construct course structure
             $this->moss->course = $DB->get_field('course_modules', 'course', array('id' => $this->moss->cmid));
         }
+
         $this->tempdir = $CFG->dataroot.'/temp/moss/'.$this->moss->id;
         remove_dir($this->tempdir); // Perhaps it is not cleaned in previous run
+        if (!check_dir_exists($this->tempdir)) {
+            throw new moodle_exception('errorcreatingdirectory', '', '', $this->tempdir);
+        }
+
         if ($CFG->ostype == 'WINDOWS') {
             // the tempdir will be passed to cygwin which require '/' path spliter
             $this->tempdir = str_replace('\\', '/', $this->tempdir);
@@ -108,7 +114,6 @@ class moss {
         }
 
         $sizelimit = $this->get_config('maxfilesize');
-        $localewincharset = get_string('localewincharset', 'langconfig');
 
         $fs = get_file_storage();
         $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
@@ -117,45 +122,9 @@ class moss {
                 continue;
             }
 
-            $temp_file = $this->tempdir.'/tmp.tmp';
-
-            $filen = $file->get_filename();
-            $file_type = strtolower(substr($filen, strlen($filen)-4, 4));
-
-            if (strcmp($file_type, '.pdf') == 0) {
-                $file->copy_content_to($temp_file);
-                $content = pdf2text($temp_file);
-                unlink($temp_file);
-            } else if (strcmp($file_type, '.rtf') == 0) {
-                $file->copy_content_to($temp_file);
-                $content = rtf2text($temp_file);
-                unlink($temp_file);
-            } else if (strcmp($file_type, '.odt') == 0) {
-                $file->copy_content_to($temp_file);
-                $content =  getTextFromZippedXML($temp_file,'content.xml');
-                unlink($temp_file);
-            } else if (strcmp($file_type, '.doc') == 0) {
-                $file->copy_content_to($temp_file);
-                $content = doc2text($temp_file);
-                html_entity_decode($content,null,'UTF-8');
-                unlink($temp_file);
-            } else if (strcmp($file_type, 'docx') == 0) {
-                $file->copy_content_to($temp_file);
-                $content = getTextFromZippedXML($temp_file,'word/document.xml');
-                unlink($temp_file);
-            } else {
-                $content = $file->get_content();
-            }
-
-            if (!mb_check_encoding($content, 'UTF-8')) {
-                if (mb_check_encoding($content, $localewincharset)) {
-                    // Convert content charset to UTF-8
-                    $content = textlib_get_instance()->convert($content, $localewincharset);
-                } else {
-                    // Unknown charset, possible binary file. Skip it
-                    mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
-                    continue;
-                }
+            $content = $this->get_clear_utf8_content($file);
+            if (empty($content)) {
+                continue;
             }
 
             $path = $this->tempdir.$file->get_filepath();
@@ -165,6 +134,64 @@ class moss {
             }
             file_put_contents($fullpath, $content);
         }
+    }
+
+    /**
+     * Convert binary files to text and ensure the charset is UTF8
+     *
+     * @param object $file moodle storedfile
+     * @return content or false
+     */
+    protected function get_clear_utf8_content($file) {
+        $temp_file = $this->tempdir.'/tmp.tmp';
+        $localewincharset = get_string('localewincharset', 'langconfig');
+
+        $filen = $file->get_filename();
+        $file_type = strtolower(substr($filen, strlen($filen)-4, 4));
+
+        switch ($file_type) {
+        case '.pdf':
+            $file->copy_content_to($temp_file);
+            $content = pdf2text($temp_file);
+            unlink($temp_file);
+            return $content;
+        case '.rtf':
+            $file->copy_content_to($temp_file);
+            $content = html_entity_decode(rtf2text($temp_file), ENT_QUOTES, 'UTF-8');
+            unlink($temp_file);
+            return $content;
+        case '.odt':
+            $file->copy_content_to($temp_file);
+            $content =  getTextFromZippedXML($temp_file,'content.xml');
+            unlink($temp_file);
+            return $content;
+        case '.doc':
+            $file->copy_content_to($temp_file);
+            $content = html_entity_decode(doc2text($temp_file), ENT_QUOTES, 'UTF-8');
+            unlink($temp_file);
+            return $content;
+        case 'docx':
+            $file->copy_content_to($temp_file);
+            $content = getTextFromZippedXML($temp_file,'word/document.xml');
+            unlink($temp_file);
+            return $content;
+        }
+
+        // Files no need to covert format go here
+        $content = $file->get_content();
+
+        if (!mb_check_encoding($content, 'UTF-8')) {
+            if (mb_check_encoding($content, $localewincharset)) {
+                // Convert content charset to UTF-8
+                $content = textlib_get_instance()->convert($content, $localewincharset);
+            } else {
+                // Unknown charset, possible binary file. Skip it
+                mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
+                return false;
+            }
+        }
+
+        return $content;
     }
 
 	/**
