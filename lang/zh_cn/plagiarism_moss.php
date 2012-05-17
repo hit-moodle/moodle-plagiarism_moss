@@ -33,6 +33,12 @@
 
 $string['activityconfirmedresults'] = '本次活动共有{$a}人被确认为抄袭。';
 $string['allresults'] = '所有结果';
+$string['antiwordpath'] = 'antiword 的路径';
+$string['antiwordpath_help'] = 'antiword 可执行文件的路径
+
+建议设置，这样 moss 就会使用 antiword 来解析 .doc 文件中的文本内容。如果留空，moss 会使用比较不稳定的内部函数做同样的事情。
+
+您可以在 <a href="http://www.winfield.demon.nl/">http://www.winfield.demon.nl/</a> 下载 antiword。';
 $string['basefile'] = '框架文件';
 $string['basefile_help'] = 'Moss通常会报告所有成对匹配的代码。 提供框架文件后，出现在框架文件中的代码会在匹配结果中被忽略。比如，教师为作业提供的基础代码就是一种典型的框架文件。您可以同时提供多个框架文件。框架文件能改善评判结果，但没有它，也未必不能获得有价值的信息。';
 $string['clicktoviewresults'] = '点击此处查看结果。';

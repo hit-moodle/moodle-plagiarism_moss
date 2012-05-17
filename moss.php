@@ -167,7 +167,12 @@ class moss {
             return $content;
         case '.doc':
             $file->copy_content_to($temp_file);
-            $content = html_entity_decode(doc2text($temp_file), ENT_QUOTES, 'UTF-8');
+            $antiwordpath = $this->get_config('antiwordpath');
+            if (empty($antiwordpath) || !is_executable($antiwordpath)) {
+                $content = html_entity_decode(doc2text($temp_file), ENT_QUOTES, 'UTF-8');
+            } else {
+                $content = shell_exec($antiwordpath.' -f -w 0 '.$temp_file);
+            }
             unlink($temp_file);
             return $content;
         case 'docx':

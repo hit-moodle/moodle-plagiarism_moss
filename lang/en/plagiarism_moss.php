@@ -33,6 +33,12 @@
 
 $string['activityconfirmedresults'] = 'There are {$a} users are confirmed as plagiarim.';
 $string['allresults'] = 'All results';
+$string['antiwordpath'] = 'Path of antiword';
+$string['antiwordpath_help'] = 'Path of antiword executable binary file
+
+If set (recommended), moss will use antiword to extract text from .doc files. If leave blank, moss will do it through a less stable internal function.
+
+You can download antiword from <a href="http://www.winfield.demon.nl/">http://www.winfield.demon.nl/</a>.';
 $string['basefile'] = 'Base file';
 $string['basefile_help'] = 'Moss normally reports all code that matches in pairs of files. When a base file is supplied, program code that also appears in the base file is not counted in matches. A typical base file will include, for example, the instructor-supplied code for an assignment. You can provide multiple base files here. Base files improve results, but are not usually necessary for obtaining useful information.';
 $string['clicktoviewresults'] = 'Click here to view results.';

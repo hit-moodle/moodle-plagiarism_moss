@@ -69,6 +69,12 @@ class moss_global_settings_form extends moodleform {
         $mform->setType('maxfilesize', PARAM_INT);
         $mform->disabledIf('maxfilesize', 'mossenabled');
 
+        $mform->addElement('text', 'antiwordpath', get_string('antiwordpath', 'plagiarism_moss'));
+        $mform->addHelpButton('antiwordpath', 'antiwordpath', 'plagiarism_moss');
+        $mform->setDefault('antiwordpath', '');
+        $mform->setType('antiwordpath', PARAM_RAW);
+        $mform->disabledIf('antiwordpath', 'mossenabled');
+
         if ($CFG->ostype == 'WINDOWS') {
             $mform->addElement('text', 'cygwinpath', get_string('cygwinpath', 'plagiarism_moss'));
             $mform->setDefault('cygwinpath', 'C:\cygwin');
@@ -115,6 +121,7 @@ if (($data = $mform->get_data()) && confirm_sesskey()) {
         set_config('defaultlanguage', $data->defaultlanguage, 'plagiarism_moss');
         set_config('showidnumber', $data->showidnumber, 'plagiarism_moss');
         set_config('maxfilesize', $data->maxfilesize, 'plagiarism_moss');
+        set_config('antiwordpath', $data->antiwordpath, 'plagiarism_moss');
         if ($CFG->ostype == 'WINDOWS') {
             set_config('cygwinpath', $data->cygwinpath, 'plagiarism_moss');
         }
