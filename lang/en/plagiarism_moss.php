@@ -61,9 +61,9 @@ $string['deltatime_help'] = 'How long the user 1 submitted later than the user 2
 
 The user 1 is always the later one. In common, the person who submitted later is the copier and another person is the copiee. However, it is not always true.';
 $string['defaultlanguage'] = 'Default content type';
-$string['disclosurehasmeasured']  ='All files submitted here has been measured by a plagiarism detection service at {$a->timemeasured}.';
-$string['disclosurenevermeasured']  ='All files submitted here will be measured by a plagiarism detection service.';
-$string['err_cygwinpath']  ='Bad Cygwin path or perl for Cygwin is not installed';
+$string['disclosurehasmeasured'] ='All files submitted here has been measured by a plagiarism detection service at {$a->timemeasured}.';
+$string['disclosurenevermeasured'] ='All files submitted here will be measured by a plagiarism detection service.';
+$string['err_cygwinpath'] ='Bad Cygwin path or perl for Cygwin is not installed';
 $string['filepatterns'] = 'Filename patterns';
 $string['filepatterns_help'] = 'Glob format. E.g. \*.c, hello.\*, a?c.java. Use blank space to seperate multi patterns. Leave blank to disable the config.';
 $string['language'] = 'Submission content type';
@@ -93,7 +93,7 @@ $string['moss:viewunconfirmed'] = 'View unconfirmed results';
 $string['mossexplain'] = '<a href="https://github.com/hit-moodle/moodle-plagiarism_moss">Moss Anti-Plagiarism Plugin</a> is developped by <a href="http://www.hit.edu.cn/">Harbin Institute of Technology</a>. The plagiarism engine is <a href="http://theory.stanford.edu/~aiken/moss/">Moss</a>.';
 $string['mossenabled'] ='Enable moss';
 $string['mossuserid'] ='Moss account';
-$string['mossuserid_help'] ='To obtain a Moss account, send a  mail message to <a href="mailto:moss@moss.stanford.edu">moss@moss.stanford.edu</a>. The body of the message should be in <strong>PLAIN TEXT</strong>(without any HTML tags) format and appear exactly as follows:
+$string['mossuserid_help'] ='To obtain a Moss account, send a mail message to <a href="mailto:moss@moss.stanford.edu">moss@moss.stanford.edu</a>. The body of the message should be in <strong>PLAIN TEXT</strong>(without any HTML tags) format and appear exactly as follows:
 
     registeruser
     mail username@domain
@@ -111,17 +111,17 @@ $string['pluginname'] = 'Moss anti-plagiarism';
 $string['resultlinktitle'] = 'Up to {$a->percentage}% ({$a->linesmatched} lines) is similar with other {$a->count} user(s)';
 $string['savedconfigsuccess'] = 'Moss anti-plagiarism settings saved';
 $string['sensitivity'] = 'Sensitivity';
-$string['sensitivity_help'] = 'The sensitivity option sets the maximum number of times a given passage may appear before it is ignored. A passage of code that appears in many programs is probably legitimate sharing and not the result of plagiarism.  With sensitivity N, any passage appearing in more than N programs is treated as if it appeared in a base file (i.e., it is never reported). With sensitivity 2, moss reports only passages that appear in exactly two programs.  If one expects many very similar solutions (e.g., the short first assignments typical of introductory programming courses) then using 3 or 4 is a good way to eliminate all but truly unusual matches between programs while still being able to detect 3-way or 4-way plagiarism. With 1000000 (or any very large number), moss reports all matches, no matter how often they appear. The setting is most useful for large assignments where one also a base file expected to hold all legitimately shared code.';
+$string['sensitivity_help'] = 'The sensitivity option sets the maximum number of times a given passage may appear before it is ignored. A passage of code that appears in many programs is probably legitimate sharing and not the result of plagiarism. With sensitivity N, any passage appearing in more than N programs is treated as if it appeared in a base file (i.e., it is never reported). With sensitivity 2, moss reports only passages that appear in exactly two programs. If one expects many very similar solutions (e.g., the short first assignments typical of introductory programming courses) then using 3 or 4 is a good way to eliminate all but truly unusual matches between programs while still being able to detect 3-way or 4-way plagiarism. With 1000000 (or any very large number), moss reports all matches, no matter how often they appear. The setting is most useful for large assignments where one also a base file expected to hold all legitimately shared code.';
 $string['showidnumber'] = 'Show idnumbers in results';
 $string['tag'] = 'Tag';
 $string['tag_help'] = 'Different activities using the same tag will be measured together. Tag is helpful to prevent plagiarism among courses.';
-$string['timesubmitted']  ='Time submitted';
-$string['timetomeasure']  ='Time to measure';
-$string['timetomeasure_help']  ='Set the time to measure all submissions to detect plagiarism. If not set, the measure will occur after the activity\'s due time.
+$string['timesubmitted'] ='Time submitted';
+$string['timetomeasure'] ='Time to measure';
+$string['timetomeasure_help'] ='Set the time to measure all submissions to detect plagiarism. If not set, the measure will occur after the activity\'s due time.
 
 The measure will be executed only once against all existing submissions. If you want to measure again, reset the time.';
 
 $string['unconfirmed'] = 'Unconfirmed';
-$string['unsupportedmodule']  ='Moss does not support this module.';
+$string['unsupportedmodule'] ='Moss does not support this module.';
 $string['updating'] = 'Updating...';
 
