@@ -157,7 +157,7 @@ class moss {
             return $content;
         case '.rtf':
             $file->copy_content_to($temp_file);
-            $content = html_entity_decode(rtf2text($temp_file), ENT_QUOTES, 'UTF-8');
+            $content = textlib_get_instance()->entities_to_utf8(rtf2text($temp_file));
             unlink($temp_file);
             return $content;
         case '.odt':
@@ -169,7 +169,7 @@ class moss {
             $file->copy_content_to($temp_file);
             $antiwordpath = $this->get_config('antiwordpath');
             if (empty($antiwordpath) || !is_executable($antiwordpath)) {
-                $content = html_entity_decode(doc2text($temp_file), ENT_QUOTES, 'UTF-8');
+                $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
             } else {
                 $content = shell_exec($antiwordpath.' -f -w 0 '.$temp_file);
             }
