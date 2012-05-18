@@ -170,7 +170,7 @@ class moss {
                 } else if (empty($antiwordpath) || !is_executable($antiwordpath)) {
                     $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
                 } else {
-                    $content = shell_exec($antiwordpath.' -f -w 0 "'.$temp_file.'"');
+                    $content = shell_exec($antiwordpath.' -f -w 0 '.escapeshellarg($temp_file));
                     if ($content === NULL) { // antiword can not recognize this file
                         $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
                     }
@@ -313,17 +313,17 @@ class moss {
                 $cmd = '"'.$CFG->dirroot.'/plagiarism/moss/moss'.'"';
             }
             $cmd .= ' -d';
-            $cmd .= ' -u '.$this->get_config('mossuserid');;
-            $cmd .= ' -l '.$setting->language;
+            $cmd .= ' -u '.escapeshellarg($this->get_config('mossuserid'));
+            $cmd .= ' -l '.escapeshellarg($setting->language);
             if (!empty($this->moss->sensitivity)) {
-                $cmd .= ' -m '.$this->moss->sensitivity;
+                $cmd .= ' -m '.escapeshellarg($this->moss->sensitivity);
             }
 
             $basefiles = $fs->get_area_files($context->id, 'plagiarism_moss', 'basefiles', $setting->id, 'filename', false);
             foreach ($basefiles as $basefile) {
                 $realpath = $this->tempdir.'/'.$setting->id.'_'.$basefile->get_filename();
                 $basefile->copy_content_to($realpath);
-                $cmd .= ' -b "'.$realpath.'"';
+                $cmd .= ' -b '.escapeshellarg($realpath);
             }
             $filepatterns = explode(' ', $setting->filepatterns);
             foreach ($filepatterns as $filepattern) {
