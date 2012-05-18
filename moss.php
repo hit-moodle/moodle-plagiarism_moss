@@ -163,7 +163,11 @@ class moss {
                 break;
             case '.doc':
                 $antiwordpath = $this->get_config('antiwordpath');
-                if (empty($antiwordpath) || !is_executable($antiwordpath)) {
+                $magic = file_get_contents($temp_file, NULL, NULL, -1, 2);
+                if ($magic === 'PK') {
+                    // It is really a docx
+                    $content = getTextFromZippedXML($temp_file,'word/document.xml');
+                } else if (empty($antiwordpath) || !is_executable($antiwordpath)) {
                     $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
                 } else {
                     $content = shell_exec($antiwordpath.' -f -w 0 "'.$temp_file.'"');
