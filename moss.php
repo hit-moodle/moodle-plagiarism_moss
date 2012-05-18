@@ -143,43 +143,38 @@ class moss {
      * @return content or false
      */
     protected function get_clear_utf8_content($file) {
-        $temp_file = $this->tempdir.'/tmp.tmp';
         $localewincharset = get_string('localewincharset', 'langconfig');
 
         $filen = $file->get_filename();
         $file_type = strtolower(substr($filen, strlen($filen)-4, 4));
 
-        switch ($file_type) {
-        case '.pdf':
+        if (array_search($file_type, array('.pdf', '.rtf', '.odt', '.doc', 'docx'))) {
+            $temp_file = $this->tempdir."/$filen.tmp";
             $file->copy_content_to($temp_file);
-            $content = pdf2text($temp_file);
-            unlink($temp_file);
-            return $content;
-        case '.rtf':
-            $file->copy_content_to($temp_file);
-            $content = textlib_get_instance()->entities_to_utf8(rtf2text($temp_file));
-            unlink($temp_file);
-            return $content;
-        case '.odt':
-            $file->copy_content_to($temp_file);
-            $content =  getTextFromZippedXML($temp_file,'content.xml');
-            unlink($temp_file);
-            return $content;
-        case '.doc':
-            $file->copy_content_to($temp_file);
-            $antiwordpath = $this->get_config('antiwordpath');
-            if (empty($antiwordpath) || !is_executable($antiwordpath)) {
-                $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
-            } else {
-                $content = shell_exec($antiwordpath.' -f -w 0 '.$temp_file);
+            switch ($file_type) {
+            case '.pdf':
+                $content = pdf2text($temp_file);
+                break;
+            case '.rtf':
+                $content = textlib_get_instance()->entities_to_utf8(rtf2text($temp_file));
+                break;
+            case '.odt':
+                $content =  getTextFromZippedXML($temp_file,'content.xml');
+                break;
+            case '.doc':
+                $antiwordpath = $this->get_config('antiwordpath');
+                if (empty($antiwordpath) || !is_executable($antiwordpath)) {
+                    $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
+                } else {
+                    $content = shell_exec($antiwordpath.' -f -w 0 "'.$temp_file.'"');
+                }
+                break;
+            case 'docx':
+                $content = getTextFromZippedXML($temp_file,'word/document.xml');
+                break;
             }
             unlink($temp_file);
-            return $content;
-        case 'docx':
-            $file->copy_content_to($temp_file);
-            $content = getTextFromZippedXML($temp_file,'word/document.xml');
-            unlink($temp_file);
-            return $content;
+            return $this->wordwrap($content, 80);
         }
 
         // Files no need to covert format go here
@@ -197,6 +192,32 @@ class moss {
         }
 
         return $content;
+    }
+
+    /**
+     * Auto wordwarp text
+     */
+    protected function wordwrap($text, $width) {
+        $i = 0;
+        $return = '';
+        $linelen = 0;
+        $prev_ch = '';
+        while (($ch = mb_substr($text, $i, 1, 'UTF-8')) !== '') {
+            if ($linelen >= $width and (!ctype_alnum($prev_ch) or ctype_space($ch))) { // Do not break latin words
+                $return .= "\n";
+                $linelen = 0;
+            }
+            if ($linelen != 0 or !ctype_space($ch)) {   // trim heading whitespaces
+                $return .= $ch;
+                $linelen += mb_strwidth($ch, 'UTF-8');   // Multy-byte chars may twice the width
+            }
+            if ($ch === "\n") {
+                $linelen = 0;
+            }
+            $i++;
+            $prev_ch = $ch;
+        }
+        return $return;
     }
 
 	/**
