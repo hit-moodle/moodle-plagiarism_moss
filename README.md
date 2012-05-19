@@ -3,33 +3,24 @@
 Introduction
 ============
 
-A plagiarism plugin for Moodle 2.x. The underlying anti-plagiarism engine is [Moss](http://theory.stanford.edu/~aiken/moss/) which can detect plagiarism in:
+A plagiarism plugin for Moodle 2.x. The underlying anti-plagiarism engine is [Moss](http://theory.stanford.edu/~aiken/moss/). It can detect plagiarism in:
 
 * Source code of C, C++, Java, C#, Python, Visual Basic, Javascript, FORTRAN, ML, Haskell, Lisp, Scheme, Pascal, Modula2, Ada, Perl, TCL, Matlab, VHDL, Verilog, Spice, MIPS assembly, a8086 assembly, a8086 assembly, MIPS assembly and HCL2.
-* Plain text. (We add supports to pdf, doc, docx, odt and rtf files)
+* Plain text in pdf, doc, docx, odt and rtf files.
 
 Prerequisite
 ============
 
-On Linux
---------
-
 * Moodle 2.0 or above
-* perl
-
-On Windows
-----------
-
-* Moodle 2.0 or above
-* Cygwin with perl
-
+* antiword (optional)
+* perl (Linux) or Cygwin with perl (Windows)
 
 Download
 ========
 
 Download it from https://github.com/hit-moodle/moodle-plagiarism_moss/archives/master
 
-or using git:
+or use git:
 
 `git clone git://github.com/hit-moodle/moodle-plagiarism_moss.git moss`
 
