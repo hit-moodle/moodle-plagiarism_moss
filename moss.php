@@ -44,12 +44,18 @@ class moss {
 
     public function __construct($cmid) {
         global $CFG, $DB, $UNITTEST;
+
         $this->moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid));
         if (!isset($UNITTEST)) { // testcase can not construct course structure
             $this->moss->course = $DB->get_field('course_modules', 'course', array('id' => $this->moss->cmid));
         }
+
         $this->tempdir = $CFG->dataroot.'/temp/moss/'.$this->moss->id;
         remove_dir($this->tempdir); // Perhaps it is not cleaned in previous run
+        if (!check_dir_exists($this->tempdir)) {
+            throw new moodle_exception('errorcreatingdirectory', '', '', $this->tempdir);
+        }
+
         if ($CFG->ostype == 'WINDOWS') {
             // the tempdir will be passed to cygwin which require '/' path spliter
             $this->tempdir = str_replace('\\', '/', $this->tempdir);
@@ -108,7 +114,6 @@ class moss {
         }
 
         $sizelimit = $this->get_config('maxfilesize');
-        $localewincharset = get_string('localewincharset', 'langconfig');
 
         $fs = get_file_storage();
         $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
@@ -117,45 +122,9 @@ class moss {
                 continue;
             }
 
-            $temp_file = $this->tempdir.'/tmp.tmp';
-
-            $filen = $file->get_filename();
-            $file_type = strtolower(substr($filen, strlen($filen)-4, 4));
-
-            if (strcmp($file_type, '.pdf') == 0) {
-                $file->copy_content_to($temp_file);
-                $content = pdf2text($temp_file);
-                unlink($temp_file);
-            } else if (strcmp($file_type, '.rtf') == 0) {
-                $file->copy_content_to($temp_file);
-                $content = rtf2text($temp_file);
-                unlink($temp_file);
-            } else if (strcmp($file_type, '.odt') == 0) {
-                $file->copy_content_to($temp_file);
-                $content =  getTextFromZippedXML($temp_file,'content.xml');
-                unlink($temp_file);
-            } else if (strcmp($file_type, '.doc') == 0) {
-                $file->copy_content_to($temp_file);
-                $content = doc2text($temp_file);
-                html_entity_decode($content,null,'UTF-8');
-                unlink($temp_file);
-            } else if (strcmp($file_type, 'docx') == 0) {
-                $file->copy_content_to($temp_file);
-                $content = getTextFromZippedXML($temp_file,'word/document.xml');
-                unlink($temp_file);
-            } else {
-                $content = $file->get_content();
-            }
-
-            if (!mb_check_encoding($content, 'UTF-8')) {
-                if (mb_check_encoding($content, $localewincharset)) {
-                    // Convert content charset to UTF-8
-                    $content = textlib_get_instance()->convert($content, $localewincharset);
-                } else {
-                    // Unknown charset, possible binary file. Skip it
-                    mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
-                    continue;
-                }
+            $content = $this->get_clear_utf8_content($file);
+            if (empty($content)) {
+                continue;
             }
 
             $path = $this->tempdir.$file->get_filepath();
@@ -165,6 +134,97 @@ class moss {
             }
             file_put_contents($fullpath, $content);
         }
+    }
+
+    /**
+     * Convert binary files to text and ensure the charset is UTF8
+     *
+     * @param object $file moodle storedfile
+     * @return content or false
+     */
+    protected function get_clear_utf8_content($file) {
+        $localewincharset = get_string('localewincharset', 'langconfig');
+
+        $filen = $file->get_filename();
+        $file_type = strtolower(substr($filen, strlen($filen)-4, 4));
+
+        if (array_search($file_type, array('.pdf', '.rtf', '.odt', '.doc', 'docx'))) {
+            $temp_file = $this->tempdir."/$filen.tmp";
+            $file->copy_content_to($temp_file);
+            switch ($file_type) {
+            case '.pdf':
+                $content = pdf2text($temp_file);
+                break;
+            case '.rtf':
+                $content = textlib_get_instance()->entities_to_utf8(rtf2text($temp_file));
+                break;
+            case '.odt':
+                $content =  getTextFromZippedXML($temp_file,'content.xml');
+                break;
+            case '.doc':
+                $antiwordpath = $this->get_config('antiwordpath');
+                $magic = file_get_contents($temp_file, NULL, NULL, -1, 2);
+                if ($magic === 'PK') {
+                    // It is really a docx
+                    $content = getTextFromZippedXML($temp_file,'word/document.xml');
+                } else if (empty($antiwordpath) || !is_executable($antiwordpath)) {
+                    $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
+                } else {
+                    $content = shell_exec($antiwordpath.' -f -w 0 '.escapeshellarg($temp_file));
+                    if ($content === NULL) { // antiword can not recognize this file
+                        $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
+                    }
+                }
+                break;
+            case 'docx':
+                $content = getTextFromZippedXML($temp_file,'word/document.xml');
+                break;
+            }
+            unlink($temp_file);
+            return $this->wordwrap($content, 80);
+        }
+
+        // Files no need to covert format go here
+        $content = $file->get_content();
+
+        if (!mb_check_encoding($content, 'UTF-8')) {
+            if (mb_check_encoding($content, $localewincharset)) {
+                // Convert content charset to UTF-8
+                $content = textlib_get_instance()->convert($content, $localewincharset);
+            } else {
+                // Unknown charset, possible binary file. Skip it
+                mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
+                return false;
+            }
+        }
+
+        return $content;
+    }
+
+    /**
+     * Auto wordwarp text
+     */
+    protected function wordwrap($text, $width) {
+        $i = 0;
+        $return = '';
+        $linelen = 0;
+        $prev_ch = '';
+        while (($ch = mb_substr($text, $i, 1, 'UTF-8')) !== '') {
+            if ($linelen >= $width and (!ctype_alnum($prev_ch) or ctype_space($ch))) { // Do not break latin words
+                $return .= "\n";
+                $linelen = 0;
+            }
+            if ($linelen != 0 or !ctype_space($ch)) {   // trim heading whitespaces
+                $return .= $ch;
+                $linelen += mb_strwidth($ch, 'UTF-8');   // Multy-byte chars may twice the width
+            }
+            if ($ch === "\n") {
+                $linelen = 0;
+            }
+            $i++;
+            $prev_ch = $ch;
+        }
+        return $return;
     }
 
 	/**
@@ -253,17 +313,17 @@ class moss {
                 $cmd = '"'.$CFG->dirroot.'/plagiarism/moss/moss'.'"';
             }
             $cmd .= ' -d';
-            $cmd .= ' -u '.$this->get_config('mossuserid');;
-            $cmd .= ' -l '.$setting->language;
+            $cmd .= ' -u '.escapeshellarg($this->get_config('mossuserid'));
+            $cmd .= ' -l '.escapeshellarg($setting->language);
             if (!empty($this->moss->sensitivity)) {
-                $cmd .= ' -m '.$this->moss->sensitivity;
+                $cmd .= ' -m '.escapeshellarg($this->moss->sensitivity);
             }
 
             $basefiles = $fs->get_area_files($context->id, 'plagiarism_moss', 'basefiles', $setting->id, 'filename', false);
             foreach ($basefiles as $basefile) {
                 $realpath = $this->tempdir.'/'.$setting->id.'_'.$basefile->get_filename();
                 $basefile->copy_content_to($realpath);
-                $cmd .= ' -b "'.$realpath.'"';
+                $cmd .= ' -b '.escapeshellarg($realpath);
             }
             $filepatterns = explode(' ', $setting->filepatterns);
             foreach ($filepatterns as $filepattern) {
@@ -286,7 +346,7 @@ class moss {
      * @return true or false
      */
     protected function save_results($url, $configid) {
-        global $DB, $UNITTEST;
+        global $DB, $UNITTEST, $CFG;
 
         mtrace("\tProcessing $url");
 
@@ -313,6 +373,22 @@ class moss {
         foreach ($matches as $result) {
             $rank++;
 
+            $diff_obj = new StdClass();
+            
+            $link = $result['link'];
+            $resultid_prefix_length = strlen("http://moss.stanford.edu/results/");	
+            $resultid_end = stripos($link,'/match0.html',$resultid_prefix_length-1);
+            $resultid = substr($link,$resultid_prefix_length,$resultid_end - $resultid_prefix_length);
+
+            $diff_obj->resultid = $resultid;
+            $diff_obj->user_1 = $result['user1'];
+            $diff_obj->user_2 = $result['user2'];
+            $diff_obj->content_1 = file_get_contents("http://moss.stanford.edu/results/".$diff_obj->resultid."/match0-0.html");
+            $diff_obj->content_2 = file_get_contents("http://moss.stanford.edu/results/".$diff_obj->resultid."/match0-1.html");
+            $diff_obj->content_top = file_get_contents("http://moss.stanford.edu/results/".$diff_obj->resultid."/match0-top.html");
+
+            $DB->insert_record('moss_diff', $diff_obj);
+
             $result['moss'] = $this->moss->id;
             $result['config'] = $configid;
             $result['rank'] = $rank + 1;
@@ -329,6 +405,9 @@ class moss {
                     continue;
                 }
             }
+
+            $result1->link = $CFG->wwwroot.'/plagiarism/moss/diff.php?id='.$diff_obj->resultid;
+            $result2->link = $CFG->wwwroot.'/plagiarism/moss/diff.php?id='.$diff_obj->resultid;
 
             $result1->id = $DB->insert_record('plagiarism_moss_results', $result1);
             $result2->pair = $result1->id;
