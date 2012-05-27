@@ -346,7 +346,7 @@ class moss {
      * @return true or false
      */
     protected function save_results($url, $configid) {
-        global $DB, $UNITTEST;
+        global $DB, $UNITTEST, $CFG;
 
         mtrace("\tProcessing $url");
 
@@ -373,6 +373,22 @@ class moss {
         foreach ($matches as $result) {
             $rank++;
 
+            $diff_obj = new StdClass();
+            
+            $link = $result['link'];
+            $resultid_prefix_length = strlen("http://moss.stanford.edu/results/");	
+            $resultid_end = stripos($link,'/match0.html',$resultid_prefix_length-1);
+            $resultid = substr($link,$resultid_prefix_length,$resultid_end - $resultid_prefix_length);
+
+            $diff_obj->resultid = $resultid;
+            $diff_obj->user_1 = $result['user1'];
+            $diff_obj->user_2 = $result['user2'];
+            $diff_obj->content_1 = file_get_contents("http://moss.stanford.edu/results/".$diff_obj->resultid."/match0-0.html");
+            $diff_obj->content_2 = file_get_contents("http://moss.stanford.edu/results/".$diff_obj->resultid."/match0-1.html");
+            $diff_obj->content_top = file_get_contents("http://moss.stanford.edu/results/".$diff_obj->resultid."/match0-top.html");
+
+            $DB->insert_record('moss_diff', $diff_obj);
+
             $result['moss'] = $this->moss->id;
             $result['config'] = $configid;
             $result['rank'] = $rank + 1;
@@ -389,6 +405,9 @@ class moss {
                     continue;
                 }
             }
+
+            $result1->link = $CFG->wwwroot.'/plagiarism/moss/diff.php?id='.$diff_obj->resultid;
+            $result2->link = $CFG->wwwroot.'/plagiarism/moss/diff.php?id='.$diff_obj->resultid;
 
             $result1->id = $DB->insert_record('plagiarism_moss_results', $result1);
             $result2->pair = $result1->id;
