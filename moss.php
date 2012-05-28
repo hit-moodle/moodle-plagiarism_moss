@@ -171,7 +171,7 @@ class moss {
                     $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
                 } else {
                     $content = shell_exec($antiwordpath.' -f -w 0 '.escapeshellarg($temp_file));
-                    if ($content === NULL) { // antiword can not recognize this file
+                    if (empty($content)) { // antiword can not recognize this file
                         $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
                     }
                 }
