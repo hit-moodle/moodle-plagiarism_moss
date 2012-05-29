@@ -37,6 +37,33 @@ function xmldb_plagiarism_moss_upgrade($oldversion=0) {
 
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2012052700){
+        $table = new xmldb_table('moss_diff');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+                XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('resultid', XMLDB_TYPE_CHAR, '255', null,
+                null, null, null);
+        $table->add_field('user_1', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+                XMLDB_NOTNULL, null, null);
+        $table->add_field('user_2', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
+                XMLDB_NOTNULL, null, null);
+       $table->add_field('content_1', XMLDB_TYPE_TEXT, null, null,
+                null, null, null);
+       $table->add_field('content_2', XMLDB_TYPE_TEXT, null, null,
+                null, null, null);
+       $table->add_field('content_top', XMLDB_TYPE_TEXT, null, null,
+                null, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2012052700, 'plagiarism', 'moss');
+    }
+
     if ($oldversion < 2011071500) {
 
         // Define field sensitivity to be dropped from moss_configs
