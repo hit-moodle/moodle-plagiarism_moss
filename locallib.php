@@ -241,7 +241,7 @@ function moss_get_supported_languages() {
         'vhdl'    => 'VHDL',
         'vb'      => 'Visual Basic');
 
-    textlib_get_instance()->asort($langs);
+    core_collator::asort($langs);
     return $langs;
 }
 
