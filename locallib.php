@@ -98,26 +98,28 @@ function moss_save_storedfiles($storedfiles, $cmid, $userid) {
     }
 
     // store files
-    foreach($storedfiles as $file) {
-        if ($file->get_filename() === '.') {
-            continue;
-        }
-        //hacky way to check file still exists
-        $fileid = $fs->get_file_by_id($file->get_id());
-        if (empty($fileid)) {
-            mtrace("nofilefound!");
-            continue;
-        }
+    foreach($storedfiles as $fileMultiple) {
+        foreach($fileMultiple as $file) {
+            if ($file->get_filename() === '.') {
+                continue;
+            }
+            //hacky way to check file still exists
+            $fileid = $fs->get_file_by_id($file->get_id());
+            if (empty($fileid)) {
+                mtrace("nofilefound!");
+                continue;
+            }
 
-        $fileinfo = array(
-            'contextid' => $context->id,
-            'component' => 'plagiarism_moss',
-            'filearea'  => 'files',
-            'itemid'    => $cmid,
-            'filepath'  => "/$userid/",
-            // save /abc/def/ghi.c as abc_def_ghi.c
-            'filename'  => str_replace('/', '_', ltrim($file->get_filepath(), '/')).$file->get_filename());
-        $fs->create_file_from_storedfile($fileinfo, $file);
+            $fileinfo = array(
+                'contextid' => $context->id,
+                'component' => 'plagiarism_moss',
+                'filearea'  => 'files',
+                'itemid'    => $cmid,
+                'filepath'  => "/$userid/",
+                // save /abc/def/ghi.c as abc_def_ghi.c
+                'filename'  => str_replace('/', '_', ltrim($file->get_filepath(), '/')).$file->get_filename());
+            $fs->create_file_from_storedfile($fileinfo, $file);
+        }
     }
 }
 
