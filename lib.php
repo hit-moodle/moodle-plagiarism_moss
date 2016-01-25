@@ -163,7 +163,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 
         $mform->addElement('checkbox', 'enabled', get_string('mossenabled', 'plagiarism_moss'));
 
-        $mform->addElement('date_time_selector', 'timetomeasure', get_string('timetomeasure', 'plagiarism_moss'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'timetomeasure', get_string('timetomeasure', 'plagiarism_moss'));
         $mform->addHelpButton('timetomeasure', 'timetomeasure', 'plagiarism_moss');
         $mform->disabledIf('timetomeasure', 'enabled');
 

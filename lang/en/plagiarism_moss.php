@@ -117,7 +117,7 @@ $string['tag'] = 'Tag';
 $string['tag_help'] = 'Different activities using the same tag will be measured together. Tag is helpful to prevent plagiarism among courses.';
 $string['timesubmitted'] ='Time submitted';
 $string['timetomeasure'] ='Time to measure';
-$string['timetomeasure_help'] ='Set the time to measure all submissions to detect plagiarism. If not set, the measure will occur after the activity\'s due time.
+$string['timetomeasure_help'] ='Set the time to measure all submissions to detect plagiarism.
 
 The measure will be executed only once against all existing submissions. If you want to measure again, reset the time.';
 
