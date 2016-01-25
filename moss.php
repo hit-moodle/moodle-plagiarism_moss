@@ -156,7 +156,7 @@ class moss {
                 $content = pdf2text($temp_file);
                 break;
             case '.rtf':
-                $content = textlib_get_instance()->entities_to_utf8(rtf2text($temp_file));
+                $content = core_text::entities_to_utf8(rtf2text($temp_file));
                 break;
             case '.odt':
                 $content =  getTextFromZippedXML($temp_file,'content.xml');
@@ -168,11 +168,11 @@ class moss {
                     // It is really a docx
                     $content = getTextFromZippedXML($temp_file,'word/document.xml');
                 } else if (empty($antiwordpath) || !is_executable($antiwordpath)) {
-                    $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
+                    $content = core_text::entities_to_utf8(doc2text($temp_file));
                 } else {
                     $content = shell_exec($antiwordpath.' -f -w 0 '.escapeshellarg($temp_file));
                     if (empty($content)) { // antiword can not recognize this file
-                        $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
+                        $content = core_text::entities_to_utf8(doc2text($temp_file));
                     }
                 }
                 break;
@@ -190,7 +190,7 @@ class moss {
         if (!mb_check_encoding($content, 'UTF-8')) {
             if (mb_check_encoding($content, $localewincharset)) {
                 // Convert content charset to UTF-8
-                $content = textlib_get_instance()->convert($content, $localewincharset);
+                $content = core_text::convert($content, $localewincharset);
             } else {
                 // Unknown charset, possible binary file. Skip it
                 mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
