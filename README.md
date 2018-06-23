@@ -1,3 +1,6 @@
+**Plugin is under development so that it can be compatible to newer versions of Moodle.**
+
+------
 **THIS PLUGIN IS IN BETA VERSION AND NOT RECOMMANDED TO USE IN PRODUCTION SITES**
 
 Introduction
