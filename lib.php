@@ -33,8 +33,8 @@
  */
 defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 
-require_once($CFG->dirroot.'/plagiarism/lib.php');
-require_once($CFG->dirroot.'/plagiarism/moss/locallib.php');
+require_once($CFG->dirroot . '/plagiarism/lib.php');
+require_once($CFG->dirroot . '/plagiarism/moss/locallib.php');
 
 define('MOSS_MAX_PATTERNS', 3);
 
@@ -45,12 +45,12 @@ define('MOSS_MAX_PATTERNS', 3);
  *
  */
 class plagiarism_plugin_moss extends plagiarism_plugin {
-	/**
-	 * (non-PHPdoc)
-	 * @see plagiarism_plugin::print_disclosure()
-	 */
+    /**
+     * (non-PHPdoc)
+     * @see plagiarism_plugin::print_disclosure()
+     */
     public function print_disclosure($cmid) {
-    	global $OUTPUT, $DB;
+        global $OUTPUT, $DB;
         if (moss_enabled($cmid)) {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
 
@@ -64,12 +64,12 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 
             if ($moss->timemeasured != 0 and has_capability('plagiarism/moss:viewallresults', context_module::instance($cmid))) {
                 $url = new moodle_url('/plagiarism/moss/view.php', array('id' => $cmid));
-                $disclosure .= ' '.html_writer::link($url, get_string('clicktoviewresults', 'plagiarism_moss'));
+                $disclosure .= ' ' . html_writer::link($url, get_string('clicktoviewresults', 'plagiarism_moss'));
             }
 
             echo format_text($disclosure, FORMAT_MOODLE);
             echo $OUTPUT->box_end();
-    	}
+        }
     }
 
     /**
@@ -120,19 +120,19 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         }
 
         // sub configs
-        for($index = 0; $index < MOSS_MAX_PATTERNS; $index++) {
+        for ($index = 0; $index < MOSS_MAX_PATTERNS; $index++) {
             $config = new stdClass();
             $config->moss = $data->mossid;
-            $member = 'language'.$index;
+            $member = 'language' . $index;
             $config->language = isset($data->$member) ? $data->$member : get_config('plagiarism_moss', 'defaultlanguage');
 
-            $member = 'filepatterns'.$index;
+            $member = 'filepatterns' . $index;
             $config->filepatterns = str_replace('\\', '_', str_replace('/', '_', $data->$member)); // filter out path chars
             if ($index == 0 and empty($config->filepatterns)) {
                 $config->filepatterns = '*';
             }
 
-            $member= 'configid'.$index;
+            $member = 'configid' . $index;
             if (isset($data->$member)) {
                 $config->id = $data->$member;
                 $DB->update_record('plagiarism_moss_configs', $config);
@@ -141,7 +141,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             }
 
             $context = context_system::instance();
-            $member= 'basefile'.$index;
+            $member = 'basefile' . $index;
             file_save_draft_area_files($data->$member, $context->id, 'plagiarism_moss', 'basefiles', $config->id);
         }
     }
@@ -179,40 +179,40 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         $mform->disabledIf('sensitivity', 'enabled');
 
         // multi configs
-        for($index = 0; $index < MOSS_MAX_PATTERNS; $index++) {
+        for ($index = 0; $index < MOSS_MAX_PATTERNS; $index++) {
             if ($index == 0) {
-                $subheader = get_string('configrequired', 'plagiarism_moss', $index+1);
+                $subheader = get_string('configrequired', 'plagiarism_moss', $index + 1);
             } else {
-                $subheader = get_string('configoptional', 'plagiarism_moss', $index+1);
+                $subheader = get_string('configoptional', 'plagiarism_moss', $index + 1);
             }
             $subheader = html_writer::tag('strong', $subheader);
-            $mform->addElement('static', 'subheader'.$index, $subheader);
+            $mform->addElement('static', 'subheader' . $index, $subheader);
 
-            $mform->addElement('text', 'filepatterns'.$index, get_string('filepatterns', 'plagiarism_moss'));
-            $mform->addHelpButton('filepatterns'.$index, 'filepatterns', 'plagiarism_moss');
-            $mform->setType('filepatterns'.$index, PARAM_TEXT);
-            $mform->disabledIf('filepatterns'.$index, 'enabled');
+            $mform->addElement('text', 'filepatterns' . $index, get_string('filepatterns', 'plagiarism_moss'));
+            $mform->addHelpButton('filepatterns' . $index, 'filepatterns', 'plagiarism_moss');
+            $mform->setType('filepatterns' . $index, PARAM_TEXT);
+            $mform->disabledIf('filepatterns' . $index, 'enabled');
 
             $choices = moss_get_supported_languages();
-            $mform->addElement('select', 'language'.$index, get_string('language', 'plagiarism_moss'), $choices);
-            $mform->disabledIf('language'.$index, 'enabled');
-            $mform->setDefault('language'.$index, get_config('plagiarism_moss', 'defaultlanguage'));
+            $mform->addElement('select', 'language' . $index, get_string('language', 'plagiarism_moss'), $choices);
+            $mform->disabledIf('language' . $index, 'enabled');
+            $mform->setDefault('language' . $index, get_config('plagiarism_moss', 'defaultlanguage'));
 
-            $mform->addElement('filemanager', 'basefile'.$index, get_string('basefile', 'plagiarism_moss'), null, array('subdirs' => 0));
-            $mform->addHelpButton('basefile'.$index, 'basefile', 'plagiarism_moss');
-            $mform->disabledIf('basefile'.$index, 'enabled');
+            $mform->addElement('filemanager', 'basefile' . $index, get_string('basefile', 'plagiarism_moss'), null, array('subdirs' => 0));
+            $mform->addHelpButton('basefile' . $index, 'basefile', 'plagiarism_moss');
+            $mform->disabledIf('basefile' . $index, 'enabled');
 
             if ($index != 0) {
-                $mform->setAdvanced('subheader'.$index);
-                $mform->setAdvanced('filepatterns'.$index);
-                $mform->setAdvanced('language'.$index);
-                $mform->setAdvanced('basefile'.$index);
+                $mform->setAdvanced('subheader' . $index);
+                $mform->setAdvanced('filepatterns' . $index);
+                $mform->setAdvanced('language' . $index);
+                $mform->setAdvanced('basefile' . $index);
             }
         }
 
         // set config values
         $cmid = optional_param('update', 0, PARAM_INT); //there doesn't seem to be a way to obtain the current cm a better way - $this->_cm is not available here.
-        if ($cmid != 0 and $moss = $DB->get_record('plagiarism_moss', array('cmid'=>$cmid))) { // configed
+        if ($cmid != 0 and $moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid))) { // configed
             $mform->setDefault('enabled', $moss->enabled);
             $mform->setDefault('timetomeasure', $moss->timetomeasure);
             $mform->setDefault('tag', $DB->get_field('plagiarism_moss_tags', 'name', array('id' => $moss->tag)));
@@ -221,17 +221,17 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             }
             $mform->addElement('hidden', 'mossid', $moss->id);
 
-            $subconfigs = $DB->get_records('plagiarism_moss_configs', array('moss'=>$moss->id));
+            $subconfigs = $DB->get_records('plagiarism_moss_configs', array('moss' => $moss->id));
             $index = 0;
             foreach ($subconfigs as $subconfig) {
-                $mform->setDefault('filepatterns'.$index, $subconfig->filepatterns);
-                $mform->setDefault('language'.$index, $subconfig->language);
-                $mform->addElement('hidden', 'configid'.$index, $subconfig->id);
+                $mform->setDefault('filepatterns' . $index, $subconfig->filepatterns);
+                $mform->setDefault('language' . $index, $subconfig->language);
+                $mform->addElement('hidden', 'configid' . $index, $subconfig->id);
 
                 $context = context_system::instance();
                 $draftitemid = 0;
                 file_prepare_draft_area($draftitemid, $context->id, 'plagiarism_moss', 'basefiles', $subconfig->id);
-                $mform->setDefault('basefile'.$index, $draftitemid);
+                $mform->setDefault('basefile' . $index, $draftitemid);
 
                 $index++;
             }
@@ -246,7 +246,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
     /**
      * hook to allow plagiarism specific information to be displayed beside a submission
      *
-     * @param array  $linkarraycontains all relevant information for the plugin to generate a link
+     * @param array $linkarraycontains all relevant information for the plugin to generate a link
      * @return string
      */
     public function get_links($linkarray) {
@@ -265,17 +265,13 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             $sql .= 'AND r.confirmed = 1 ';
         }
         $sql .= 'ORDER BY r.rank ASC';
-        $params = array(
-            'userid'      => $linkarray['userid'],
-            'contenthash' => $linkarray['file']->get_contenthash(),
-            'mossid'      => $DB->get_field('plagiarism_moss', 'id', array('cmid' => $linkarray['cmid']))
-        );
+        $params = array('userid' => $linkarray['userid'], 'contenthash' => $linkarray['file']->get_contenthash(), 'mossid' => $DB->get_field('plagiarism_moss', 'id', array('cmid' => $linkarray['cmid'])));
 
         $results = $DB->get_records_sql($sql, $params);
-        if (!empty($results)){
+        if (!empty($results)) {
             $result = current($results);
 
-            $text = $result->percentage.'%'."($result->linesmatched)";
+            $text = $result->percentage . '%' . "($result->linesmatched)";
             $icon = $OUTPUT->pix_icon('i/completion-manual-n', get_string('unconfirmed', 'plagiarism_moss'));
             foreach ($results as $r) {
                 if ($r->confirmed) {
@@ -316,13 +312,15 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
  * Enter description here ...
  * @param unknown_type $eventdata
  */
-function moss_event_file_uploaded($eventdata) {
+function moss_event_file_uploaded($event) {
+    $eventdata = $event->get_record_snapshot($event->objecttable, $event->objectid);
     return moss_save_files_from_event($eventdata);
 }
 
 /**
  * A module has been deleted
  */
-function moss_event_mod_deleted($eventdata) {
+function moss_event_mod_deleted($event) {
+    $eventdata = $event->get_record_snapshot($event->objecttable, $event->objectid);
     return moss_clean_cm($eventdata->cmid);
 }

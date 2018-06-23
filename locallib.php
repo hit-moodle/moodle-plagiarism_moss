@@ -157,10 +157,11 @@ function moss_trigger_assignment_events($cmid, $trigger_done = true) {
                 $eventdata->file = current($files);
             }
         }
-        events_trigger('assessable_file_uploaded', $eventdata);
+        $event = \assignsubmission_file\event\assessable_uploaded::create(array('context' => $context, 'objectid' => $eventdata->itemid));
+        $event->add_record_snapshot($eventdata);
+        $event->trigger();
         if ($trigger_done and $assignment->assignmenttype == 'upload') {
             unset($eventdata->files);
-            events_trigger('assessable_files_done', $eventdata);
         }
     }
 
