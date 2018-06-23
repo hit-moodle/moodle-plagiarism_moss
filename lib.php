@@ -62,7 +62,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
                 $disclosure = get_string('disclosurehasmeasured', 'plagiarism_moss', $a);
             }
 
-            if ($moss->timemeasured != 0 and has_capability('plagiarism/moss:viewallresults', get_context_instance(CONTEXT_MODULE, $cmid))) {
+            if ($moss->timemeasured != 0 and has_capability('plagiarism/moss:viewallresults', context_module::instance($cmid))) {
                 $url = new moodle_url('/plagiarism/moss/view.php', array('id' => $cmid));
                 $disclosure .= ' '.html_writer::link($url, get_string('clicktoviewresults', 'plagiarism_moss'));
             }
@@ -140,7 +140,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
                 $config->id = $DB->insert_record('plagiarism_moss_configs', $config);
             }
 
-            $context = get_system_context();
+            $context = context_system::instance();
             $member= 'basefile'.$index;
             file_save_draft_area_files($data->$member, $context->id, 'plagiarism_moss', 'basefiles', $config->id);
         }
@@ -174,7 +174,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
 
         $mform->addElement('text', 'sensitivity', get_string('sensitivity', 'plagiarism_moss'), 'size = "10"');
         $mform->addHelpButton('sensitivity', 'sensitivity', 'plagiarism_moss');
-        $mform->setType('sensitivity', PARAM_NUMBER);
+        $mform->setType('sensitivity', PARAM_FLOAT);
         $mform->addRule('sensitivity', null, 'numeric', null, 'client');
         $mform->disabledIf('sensitivity', 'enabled');
 
@@ -228,7 +228,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
                 $mform->setDefault('language'.$index, $subconfig->language);
                 $mform->addElement('hidden', 'configid'.$index, $subconfig->id);
 
-                $context = get_system_context();
+                $context = context_system::instance();
                 $draftitemid = 0;
                 file_prepare_draft_area($draftitemid, $context->id, 'plagiarism_moss', 'basefiles', $subconfig->id);
                 $mform->setDefault('basefile'.$index, $draftitemid);
