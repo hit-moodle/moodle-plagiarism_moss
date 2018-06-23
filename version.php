@@ -17,7 +17,7 @@
 
 $plugin->version   = 2012051000; // The current module version (Date: YYYYMMDDXX)
 $plugin->requires  = 2010122900; // Requires this Moodle version
-
+$plugin->component = 'plagiarism_moss';
 $module->maturity  = MATURITY_BETA;
 $module->release   = "2.1 beta"; // User-friendly version number
 
