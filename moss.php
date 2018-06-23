@@ -116,7 +116,7 @@ class moss {
         $sizelimit = $this->get_config('maxfilesize');
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
+        $files = $fs->get_area_files(context_system::instance()->id, 'plagiarism_moss', 'files', $moss->cmid, 'sortorder', false);
         foreach ($files as $file) {
             if ($file->get_filesize() > $sizelimit) {
                 continue;
@@ -156,7 +156,7 @@ class moss {
                 $content = pdf2text($temp_file);
                 break;
             case '.rtf':
-                $content = textlib_get_instance()->entities_to_utf8(rtf2text($temp_file));
+                $content = core_text::entities_to_utf8(rtf2text($temp_file));
                 break;
             case '.odt':
                 $content =  getTextFromZippedXML($temp_file,'content.xml');
@@ -168,11 +168,11 @@ class moss {
                     // It is really a docx
                     $content = getTextFromZippedXML($temp_file,'word/document.xml');
                 } else if (empty($antiwordpath) || !is_executable($antiwordpath)) {
-                    $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
+                    $content = core_text::entities_to_utf8(doc2text($temp_file));
                 } else {
                     $content = shell_exec($antiwordpath.' -f -w 0 '.escapeshellarg($temp_file));
                     if (empty($content)) { // antiword can not recognize this file
-                        $content = textlib_get_instance()->entities_to_utf8(doc2text($temp_file));
+                        $content = core_text::entities_to_utf8(doc2text($temp_file));
                     }
                 }
                 break;
@@ -190,7 +190,7 @@ class moss {
         if (!mb_check_encoding($content, 'UTF-8')) {
             if (mb_check_encoding($content, $localewincharset)) {
                 // Convert content charset to UTF-8
-                $content = textlib_get_instance()->convert($content, $localewincharset);
+                $content = core_text::convert($content, $localewincharset);
             } else {
                 // Unknown charset, possible binary file. Skip it
                 mtrace("\tSkip unknown charset/binary file ".$file->get_filepath().$file->get_filename());
@@ -295,7 +295,7 @@ class moss {
 
         $settings = $DB->get_records('plagiarism_moss_configs', array('moss' => $this->moss->id));
         $fs = get_file_storage();
-        $context = get_system_context();
+        $context = context_system::instance();
         $cmds = array();
 
         foreach($settings as $setting) {
@@ -363,7 +363,7 @@ class moss {
         );
 
         if (!isset($UNITTEST)) { // testcase can not construct course structure
-            $context = get_context_instance(CONTEXT_COURSE, $this->moss->course);
+            $context = context_course::instance($this->moss->course);
         }
 
         $filepatterns = $DB->get_field('plagiarism_moss_configs', 'filepatterns', array('id' => $configid));
@@ -401,7 +401,7 @@ class moss {
                 $userid = eval('return $result'.$i.'->userid;');
                 $resultid = eval('return $result'.$i.'->id;');
 
-                $files = $fs->get_directory_files(get_system_context()->id, 'plagiarism_moss', 'files', $this->moss->cmid, "/$userid/");
+                $files = $fs->get_directory_files(context_system::instance()->id, 'plagiarism_moss', 'files', $this->moss->cmid, "/$userid/");
                 foreach ($files as $file) {
                     foreach ($filepatterns as $pattern) {
                         if (fnmatch($pattern, $file->get_filename())) {
