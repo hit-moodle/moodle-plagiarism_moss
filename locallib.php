@@ -88,7 +88,7 @@ function moss_save_files_from_event($eventdata) {
  * @param int $userid
  */
 function moss_save_storedfiles($storedfiles, $cmid, $userid) {
-    $context = get_system_context();
+    $context = context_system::instance();
     $fs = get_file_storage();
 
     // remove all old files
@@ -137,7 +137,7 @@ function moss_trigger_assignment_events($cmid, $trigger_done = true) {
         return false;
     }
 
-    $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    $context = context_module::instance($cmid);
     $fs = get_file_storage();
     $assignment = $DB->get_record('assignment', array('id' => $cm->instance), '*', MUST_EXIST);
     $submissions = assignment_get_all_submissions($assignment);
@@ -241,7 +241,7 @@ function moss_get_supported_languages() {
         'vhdl'    => 'VHDL',
         'vb'      => 'Visual Basic');
 
-    textlib_get_instance()->asort($langs);
+    core_collator::asort($langs);
     return $langs;
 }
 
@@ -268,7 +268,7 @@ function moss_clean_cm($cmid) {
         if ($moss->tag == 0) {
             // if no tag setted, no need to keep the files and moss record for further detection
             $fs = get_file_storage();
-            $fs->delete_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $cmid);
+            $fs->delete_area_files(context_system::instance()->id, 'plagiarism_moss', 'files', $cmid);
             $DB->delete_records('plagiarism_moss', array('cmid' => $cmid));
 
             // Clean results
@@ -317,8 +317,8 @@ function moss_clean_noise($moss = null) {
         }
 
         $fs = get_file_storage();
-        $systemcontext = get_system_context();
-        $cmcontext = get_context_instance(CONTEXT_MODULE, $moss->cmid);
+        $systemcontext = context_system::instance();
+        $cmcontext = context_module::instance($moss->cmid);
 
         foreach ($confirmed_results as $result) {
             if (!is_enrolled($cmcontext, $result->userid)) {
@@ -341,7 +341,7 @@ function moss_get_submit_time($cmid, $userid) {
     global $DB;
 
     $fs = get_file_storage();
-    $context = get_system_context();
+    $context = context_system::instance();
     $time = 0;
     if ($files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'files', $cmid, "/$userid/")) {
         // search for the latest submitted file
