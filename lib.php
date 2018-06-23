@@ -150,7 +150,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
      * (non-PHPdoc)
      * @see plagiarism_plugin::get_form_elements_module()
      */
-    public function get_form_elements_module($mform, $context) {
+    public function get_form_elements_module($mform, $context, $modulename = "") {
         global $DB;
 
         if (!moss_enabled()) {
