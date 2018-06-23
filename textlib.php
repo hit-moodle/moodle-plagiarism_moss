@@ -1108,7 +1108,7 @@ class doc extends cfb {
         return $text;
     }
     // Function to convert from Unicode to UTF8
-    protected function unicode_to_utf8($in) {
+    protected function unicode_to_utf8($in, $check = false) {
         $out = "";
         // Loop through 2-byte sequences
         for ($i = 0; $i < strlen($in); $i += 2) {
