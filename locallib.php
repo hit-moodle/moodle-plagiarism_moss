@@ -130,22 +130,22 @@ function moss_save_storedfiles($storedfiles, $cmid, $userid) {
  */
 function moss_trigger_assignment_events($cmid, $trigger_done = true) {
     global $DB, $CFG;
-    require_once($CFG->dirroot.'/mod/assignment/lib.php');
+    require_once($CFG->dirroot.'/mod/assign/lib.php');
 
-    $cm = get_coursemodule_from_id('assignment', $cmid);
+    $cm = get_coursemodule_from_id('assign', $cmid);
     if (empty($cm)) {
         return false;
     }
 
     $context = context_module::instance($cmid);
     $fs = get_file_storage();
-    $assignment = $DB->get_record('assignment', array('id' => $cm->instance), '*', MUST_EXIST);
-    $submissions = assignment_get_all_submissions($assignment);
+    $assignment = $DB->get_record('assign', array('id' => $cm->instance), '*', MUST_EXIST);
+    $submissions = $DB->get_records('assign_submission', array('assignment' => $assignment));
 
     foreach ($submissions as $submission) {
-        $files = $fs->get_area_files($context->id, 'mod_assignment', 'submission', $submission->id, "timemodified", false);
+        $files = $fs->get_area_files($context->id, 'assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA, $submission->id, 'sortorder, timemodified', false);
         $eventdata = new stdClass();
-        $eventdata->modulename   = 'assignment';
+        $eventdata->modulename   = 'assign';
         $eventdata->cmid         = $cmid;
         $eventdata->itemid       = $submission->id;
         $eventdata->courseid     = $cm->course;
@@ -389,8 +389,8 @@ function moss_measure_all() {
     foreach ($duemosses as $moss) {
         if ($cm = get_coursemodule_from_id('', $moss->cmid)) {
             switch ($cm->modname) {
-            case 'assignment':
-                $duedate = $DB->get_field('assignment', 'timedue', array('id' => $cm->instance));
+            case 'assign':
+                $duedate = $DB->get_field('assign', 'duedate', array('id' => $cm->instance));
             }
             if (!empty($duedate)) {
                 if ($moss->timemeasured < $duedate and $duedate < time()) {
