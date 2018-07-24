@@ -55,6 +55,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
             echo $OUTPUT->box_start('generalbox boxaligncenter', 'intro');
 
             $moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid), 'timetomeasure, timemeasured');
+            $a = new \stdClass;
             $a->timemeasured = userdate($moss->timemeasured);
             if ($moss->timemeasured == 0) {
                 $disclosure = get_string('disclosurenevermeasured', 'plagiarism_moss', $a);
@@ -211,7 +212,7 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
         }
 
         // set config values
-        $cmid = optional_param('update', 0, PARAM_INT); //there doesn't seem to be a way to obtain the current cm a better way - $this->_cm is not available here.
+        $cmid = $context->instanceid;
         if ($cmid != 0 and $moss = $DB->get_record('plagiarism_moss', array('cmid' => $cmid))) { // configed
             $mform->setDefault('enabled', $moss->enabled);
             $mform->setDefault('timetomeasure', $moss->timetomeasure);
@@ -313,14 +314,12 @@ class plagiarism_plugin_moss extends plagiarism_plugin {
  * @param unknown_type $eventdata
  */
 function moss_event_file_uploaded($event) {
-    $eventdata = $event->get_record_snapshot($event->objecttable, $event->objectid);
-    return moss_save_files_from_event($eventdata);
+    return moss_save_files_from_event($event);
 }
 
 /**
  * A module has been deleted
  */
 function moss_event_mod_deleted($event) {
-    $eventdata = $event->get_record_snapshot($event->objecttable, $event->objectid);
-    return moss_clean_cm($eventdata->cmid);
+    return moss_clean_cm($event->contextinstanceid);
 }

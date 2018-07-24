@@ -64,7 +64,7 @@ function moss_save_files_from_event($eventdata) {
     global $DB;
     $result = true;
 
-    if (!moss_enabled($eventdata->cmid)) {
+    if (!moss_enabled($eventdata->contextinstanceid)) {
         return $result;
     }
 
