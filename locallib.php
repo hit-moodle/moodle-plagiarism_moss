@@ -64,7 +64,7 @@ function moss_save_files_from_event($eventdata) {
     global $DB;
     $result = true;
 
-    if (!moss_enabled($eventdata->cmid)) {
+    if (!moss_enabled($eventdata->contextinstanceid)) {
         return $result;
     }
 
@@ -88,7 +88,7 @@ function moss_save_files_from_event($eventdata) {
  * @param int $userid
  */
 function moss_save_storedfiles($storedfiles, $cmid, $userid) {
-    $context = get_system_context();
+    $context = context_system::instance();
     $fs = get_file_storage();
 
     // remove all old files
@@ -130,37 +130,38 @@ function moss_save_storedfiles($storedfiles, $cmid, $userid) {
  */
 function moss_trigger_assignment_events($cmid, $trigger_done = true) {
     global $DB, $CFG;
-    require_once($CFG->dirroot.'/mod/assignment/lib.php');
+    require_once($CFG->dirroot.'/mod/assign/lib.php');
 
-    $cm = get_coursemodule_from_id('assignment', $cmid);
+    $cm = get_coursemodule_from_id('assign', $cmid);
     if (empty($cm)) {
         return false;
     }
 
-    $context = get_context_instance(CONTEXT_MODULE, $cmid);
+    $context = context_module::instance($cmid);
     $fs = get_file_storage();
-    $assignment = $DB->get_record('assignment', array('id' => $cm->instance), '*', MUST_EXIST);
-    $submissions = assignment_get_all_submissions($assignment);
+    $assignment = $DB->get_record('assign', array('id' => $cm->instance), '*', MUST_EXIST);
+    $submissions = $DB->get_records('assign_submission', array('assignment' => $assignment));
 
     foreach ($submissions as $submission) {
-        $files = $fs->get_area_files($context->id, 'mod_assignment', 'submission', $submission->id, "timemodified", false);
+        $files = $fs->get_area_files($context->id, 'assignsubmission_file', ASSIGNSUBMISSION_FILE_FILEAREA, $submission->id, 'sortorder, timemodified', false);
         $eventdata = new stdClass();
-        $eventdata->modulename   = 'assignment';
+        $eventdata->modulename   = 'assign';
         $eventdata->cmid         = $cmid;
         $eventdata->itemid       = $submission->id;
         $eventdata->courseid     = $cm->course;
         $eventdata->userid       = $submission->userid;
         if ($files) {
-            if ($assignment->assignmenttype == 'upload') {
+            if (count($files) > 1) {
                 $eventdata->files = $files;
-            } else { // uploadsingle
+            } else { // single file uploaded
                 $eventdata->file = current($files);
             }
         }
-        events_trigger('assessable_file_uploaded', $eventdata);
-        if ($trigger_done and $assignment->assignmenttype == 'upload') {
+        $event = \assignsubmission_file\event\assessable_uploaded::create(array('context' => $context, 'objectid' => $eventdata->itemid));
+        $event->add_record_snapshot($eventdata);
+        $event->trigger();
+        if ($trigger_done and count($files) > 1) {
             unset($eventdata->files);
-            events_trigger('assessable_files_done', $eventdata);
         }
     }
 
@@ -241,7 +242,7 @@ function moss_get_supported_languages() {
         'vhdl'    => 'VHDL',
         'vb'      => 'Visual Basic');
 
-    textlib_get_instance()->asort($langs);
+    core_collator::asort($langs);
     return $langs;
 }
 
@@ -268,7 +269,7 @@ function moss_clean_cm($cmid) {
         if ($moss->tag == 0) {
             // if no tag setted, no need to keep the files and moss record for further detection
             $fs = get_file_storage();
-            $fs->delete_area_files(get_system_context()->id, 'plagiarism_moss', 'files', $cmid);
+            $fs->delete_area_files(context_system::instance()->id, 'plagiarism_moss', 'files', $cmid);
             $DB->delete_records('plagiarism_moss', array('cmid' => $cmid));
 
             // Clean results
@@ -317,8 +318,8 @@ function moss_clean_noise($moss = null) {
         }
 
         $fs = get_file_storage();
-        $systemcontext = get_system_context();
-        $cmcontext = get_context_instance(CONTEXT_MODULE, $moss->cmid);
+        $systemcontext = context_system::instance();
+        $cmcontext = context_module::instance($moss->cmid);
 
         foreach ($confirmed_results as $result) {
             if (!is_enrolled($cmcontext, $result->userid)) {
@@ -341,7 +342,7 @@ function moss_get_submit_time($cmid, $userid) {
     global $DB;
 
     $fs = get_file_storage();
-    $context = get_system_context();
+    $context = context_system::instance();
     $time = 0;
     if ($files = $fs->get_directory_files($context->id, 'plagiarism_moss', 'files', $cmid, "/$userid/")) {
         // search for the latest submitted file
@@ -388,8 +389,8 @@ function moss_measure_all() {
     foreach ($duemosses as $moss) {
         if ($cm = get_coursemodule_from_id('', $moss->cmid)) {
             switch ($cm->modname) {
-            case 'assignment':
-                $duedate = $DB->get_field('assignment', 'timedue', array('id' => $cm->instance));
+            case 'assign':
+                $duedate = $DB->get_field('assign', 'duedate', array('id' => $cm->instance));
             }
             if (!empty($duedate)) {
                 if ($moss->timemeasured < $duedate and $duedate < time()) {

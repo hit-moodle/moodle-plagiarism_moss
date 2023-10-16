@@ -106,7 +106,7 @@ class moss_global_settings_form extends moodleform {
 
 require_login();
 admin_externalpage_setup('plagiarismmoss');
-$context = get_context_instance(CONTEXT_SYSTEM);
+$context = context_system::instance();
 require_capability('moodle/site:config', $context, $USER->id);
 
 $mform = new moss_global_settings_form();

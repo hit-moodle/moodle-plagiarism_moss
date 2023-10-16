@@ -1,18 +1,18 @@
 <?php
 
-$handlers = array (
+$observers = array (
 
 /*
  * Event Handlers
  */
-    'assessable_file_uploaded' => array (
-        'handlerfile'      => '/plagiarism/moss/lib.php',
-        'handlerfunction'  => 'moss_event_file_uploaded',
-        'schedule'         => 'instant'
+    array(
+        'eventname' => 'assignsubmission_file\event\assessable_uploaded',
+        'callback' => 'moss_event_file_uploaded',
+        'includefile' => '/plagiarism/moss/lib.php'
     ),
-    'mod_deleted' => array (
-        'handlerfile'      => '/plagiarism/moss/lib.php',
-        'handlerfunction'  => 'moss_event_mod_deleted',
-        'schedule'         => 'instant'
+    array (
+        'eventname'      => 'core\event\course_module_deleted',
+        'callback'       => 'moss_event_file_uploaded',
+        'includefile'    => '/plagiarism/moss/lib.php'
     ),
 );

@@ -50,7 +50,7 @@ if ($cmid) {
         print_error('unsupportedmodule', 'plagiarism_moss');
     }
     if (! $course = $DB->get_record("course", array("id"=>$cm->course))) {
-        print_error('coursemisconf', 'assignment');
+        print_error('coursemisconf', 'assign');
     }
 } else if ($moss) {
     if (! $moss = $DB->get_record("plagiarism_moss", array('cmid'=>$cmid))) {
@@ -60,7 +60,7 @@ if ($cmid) {
         print_error('invalidcoursemodule');
     }
     if (! $course = $DB->get_record("course", array("id"=>$cm->course))) {
-        print_error('coursemisconf', 'assignment');
+        print_error('coursemisconf', 'assign');
     }
 } else {
     require_param('id', PARAM_INT);
@@ -74,7 +74,7 @@ if ($userid != 0) {
 $PAGE->set_url($url);
 require_login($course, true, $cm);
 
-$context = get_context_instance(CONTEXT_MODULE, $cmid);
+$context = context_module::instance($cmid);
 
 if ($userid != $USER->id) {
     require_capability('plagiarism/moss:viewallresults', $context);
